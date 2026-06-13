@@ -317,6 +317,17 @@ body {
     🗑 Reset Totale Punti
   </button>
 
+  <div class="section-label">Reset Fazioni</div>
+  <button onclick="resetFazioniTutte()" style="width:100%;background:rgba(168,85,247,0.1);border:1.5px solid rgba(168,85,247,0.4);color:var(--accent-siria);padding:14px 16px;border-radius:12px;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:8px;">
+    ⚔️ Reset Fazioni — Tutti
+  </button>
+  <div style="margin-bottom:12px;">
+    <div class="admin-search" style="margin-bottom:6px;">
+      <input class="admin-search" type="text" id="reset-fazione-search" placeholder="Cerca ospite per reset singolo..." oninput="filterResetFazione()" style="width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:14px;outline:none;">
+    </div>
+    <div id="reset-fazione-list"></div>
+  </div>
+
   <div class="section-label">Gestione Ospiti</div>
   <div id="tools-registrations"></div>
 </div>
@@ -933,6 +944,37 @@ window.resetPunti = async function() {
   if (!confirm("Sei SICURO? Tutti i punti verranno azzerati.")) return;
   await remove(ref(db, "punti"));
   showToast("✓ Tutti i punti resettati", "warn");
+};
+
+window.resetFazioniTutte = async function() {
+  if (!confirm("Reset TOTALE fazioni? Tutti i giocatori dovranno riaprire la busta.")) return;
+  if (!confirm("Sei SICURO? Tutte le carte fazione verranno cancellate.")) return;
+  await remove(ref(db, "fazioni"));
+  showToast("✓ Fazioni resettate", "warn");
+};
+
+window.resetFazioneSingola = async function(name) {
+  if (!confirm(`Reset fazione di ${name}? Dovrà riaprire la busta.`)) return;
+  const key = sanitize(name);
+  await remove(ref(db, `fazioni/${key}`));
+  showToast(`✓ Fazione di ${name} resettata`, "warn");
+};
+
+window.filterResetFazione = function() {
+  const q = (document.getElementById("reset-fazione-search").value || "").toLowerCase();
+  const list = document.getElementById("reset-fazione-list");
+  list.innerHTML = "";
+  if (!q) return;
+  PLAYERS.filter(p => p.toLowerCase().includes(q)).slice(0, 5).forEach(name => {
+    const div = document.createElement("div");
+    div.className = "storico-item";
+    div.style.marginBottom = "4px";
+    div.innerHTML = `
+      <div class="storico-info"><div class="storico-desc">${name}</div></div>
+      <button class="btn-annulla" style="border-color:rgba(168,85,247,0.4);color:var(--accent-siria);" onclick="resetFazioneSingola('${name}')">Reset</button>
+    `;
+    list.appendChild(div);
+  });
 };
 
 window.cancellaSquadra = async function(name) {
