@@ -204,6 +204,15 @@
 </div>
 
 <script>
+  // ── SE GIA' REGISTRATO → VAI DIRETTAMENTE ALLA HOME ──
+  (function() {
+    const savedName = localStorage.getItem("fc_player_name");
+    if (savedName) {
+      window.location.replace("home.html");
+    }
+  })();
+
+
   const questions = [
     {
       text: "Cosa è un Cody?",
