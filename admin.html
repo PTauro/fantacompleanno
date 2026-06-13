@@ -831,10 +831,12 @@ function renderToolsRegistrations() {
 }
 
 window.scollegaOspite = async function(name) {
-  if (!confirm(`Scollegare ${name}?`)) return;
+  if (!confirm(`Scollegare ${name}? Verranno cancellati anche la registrazione e la squadra.`)) return;
   const key = sanitize(name);
+  // Cancella registrazione E squadra
   await remove(ref(db, `registrations/${key}`));
-  showToast(`✓ ${name} scollegato`, "warn");
+  await remove(ref(db, `teams/${key}`));
+  showToast(`✓ ${name} scollegato e squadra cancellata`, "warn");
 };
 
 // ── UTILS ──
