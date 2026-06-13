@@ -452,6 +452,60 @@ body {
 
 <div class="toast" id="toast"></div>
 
+<script>
+  // ── COUNTDOWN — script indipendente, parte subito ──
+  const FESTA_DATE = new Date('2026-06-27T20:30:00');
+  const DRAFT_DATE = new Date('2026-06-26T18:00:00');
+
+  function pad(n) { return String(n).padStart(2, '0'); }
+
+  function updateCountdowns() {
+    const now = new Date();
+
+    // FESTA
+    const diffFesta = FESTA_DATE - now;
+    const bar = document.querySelector('.countdown-bar');
+    if (diffFesta > 0) {
+      const g = Math.floor(diffFesta / 86400000);
+      const h = Math.floor((diffFesta % 86400000) / 3600000);
+      const m = Math.floor((diffFesta % 3600000) / 60000);
+      const s = Math.floor((diffFesta % 60000) / 1000);
+      const dEl = document.getElementById('cd-giorni');
+      const hEl = document.getElementById('cd-ore');
+      const mEl = document.getElementById('cd-min');
+      const sEl = document.getElementById('cd-sec');
+      if (dEl) dEl.textContent = pad(g);
+      if (hEl) hEl.textContent = pad(h);
+      if (mEl) mEl.textContent = pad(m);
+      if (sEl) sEl.textContent = pad(s);
+    } else if (bar) {
+      bar.innerHTML = '<div class="countdown-label" style="color:var(--accent-cody);font-size:16px;font-weight:800;padding:4px 0;">⚔️ La guerra ha inizio — BUONA FORTUNA!</div>';
+    }
+
+    // DRAFT
+    const diffDraft = DRAFT_DATE - now;
+    const wrap = document.getElementById('draft-countdown-wrap');
+    if (wrap) {
+      if (diffDraft > 0) {
+        const g2 = Math.floor(diffDraft / 86400000);
+        const h2 = Math.floor((diffDraft % 86400000) / 3600000);
+        const m2 = Math.floor((diffDraft % 3600000) / 60000);
+        const s2 = Math.floor((diffDraft % 60000) / 1000);
+        const timerEl = document.getElementById('draft-cd-timer');
+        if (timerEl) timerEl.textContent = g2 > 0
+          ? g2 + 'g ' + pad(h2) + ':' + pad(m2) + ':' + pad(s2)
+          : pad(h2) + ':' + pad(m2) + ':' + pad(s2);
+      } else {
+        wrap.innerHTML = '<span class="draft-cd-closed">🔒 Draft chiuso</span>';
+      }
+    }
+  }
+
+  // Parte subito e aggiorna ogni secondo
+  updateCountdowns();
+  setInterval(updateCountdowns, 1000);
+</script>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
