@@ -826,16 +826,27 @@ function renderToolsRegistrations() {
   PLAYERS.forEach(name => {
     const key = sanitize(name);
     const code = registrazioni[key];
+    const hasTeam = !!(allTeams && allTeams[key]);
     const row = document.createElement("div");
     row.className = "storico-item";
+
+    let buttons = '';
+    if (code) {
+      buttons += `<button class="btn-annulla" onclick="scollegaOspite('${name}')">Scollega</button>`;
+    }
+    if (hasTeam) {
+      buttons += `<button class="btn-annulla" style="margin-left:4px;border-color:rgba(245,158,11,0.4);color:var(--gold);" onclick="cancellaSquadra('${name}')">✂️ Squadra</button>`;
+    }
+
     row.innerHTML = `
       <div class="storico-info">
         <div class="storico-desc">${name}</div>
         <div class="storico-time" style="color:${code ? 'var(--green)' : 'var(--text-muted)'}">
           ${code ? '🔑 ' + code : '— non registrato'}
+          ${hasTeam ? ' · ✂️ squadra creata' : ''}
         </div>
       </div>
-      ${code ? `<button class="btn-annulla" onclick="scollegaOspite('${name}')">Scollega</button>` : ''}
+      <div style="display:flex;gap:4px;flex-shrink:0;">${buttons}</div>
     `;
     container.appendChild(row);
   });
@@ -846,6 +857,13 @@ window.resetPunti = async function() {
   if (!confirm("Sei SICURO? Tutti i punti verranno azzerati.")) return;
   await remove(ref(db, "punti"));
   showToast("✓ Tutti i punti resettati", "warn");
+};
+
+window.cancellaSquadra = async function(name) {
+  if (!confirm(`Cancellare la squadra di ${name}?`)) return;
+  const key = sanitize(name);
+  await remove(ref(db, `teams/${key}`));
+  showToast(`✓ Squadra di ${name} cancellata`, "warn");
 };
 
 window.scollegaOspite = async function(name) {
