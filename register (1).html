@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FantaCompleanno — Accedi al Gioco</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700;800&family=Space+Mono:wght@400;700&display=swap');
+
+:root {
+  --bg: #0a0a0f; --surface: #13131a; --border: #1e1e2e;
+  --accent-cody: #ff6b2b; --accent-siria: #a855f7;
+  --text: #f0f0f5; --text-muted: #6b6b8a;
+  --green: #22c55e; --red: #ef4444;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Space Grotesk', sans-serif;
+  background: var(--bg); color: var(--text);
+  min-height: 100vh; display: flex; align-items: center;
+  justify-content: center; padding: 20px; overflow-x: hidden;
+}
+
+.screen { display: none; width: 100%; max-width: 480px; animation: fadeIn .4s ease; }
+.screen.active { display: block; }
+
+@keyframes fadeIn { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+
+/* ── TYPOGRAPHY ── */
+.label {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px; color: var(--text-muted);
+  letter-spacing: .15em; text-transform: uppercase; margin-bottom: 8px;
+}
+.headline { font-size: 22px; font-weight: 800; line-height: 1.25; margin-bottom: 8px; }
+.subline { font-size: 14px; color: var(--text-muted); line-height: 1.5; margin-bottom: 28px; }
+.cody { color: var(--accent-cody); }
+.siria { color: var(--accent-siria); }
+
+/* ── CARD ── */
+.card {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 14px; padding: 20px; margin-bottom: 14px;
+}
+
+/* ── CODE BADGE ── */
+.code-badge {
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(168,85,247,0.08); border: 1.5px solid rgba(168,85,247,0.3);
+  border-radius: 10px; padding: 14px 16px; margin-bottom: 20px;
+}
+.code-badge .code-label { font-size: 11px; color: var(--text-muted); font-family: 'Space Mono', monospace; letter-spacing: .1em; }
+.code-badge .code-value { font-family: 'Space Mono', monospace; font-size: 22px; font-weight: 700; color: var(--accent-siria); letter-spacing: .15em; }
+
+/* ── SEARCH ── */
+.search-wrap { position: relative; margin-bottom: 12px; }
+.search-input {
+  width: 100%; background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 10px; padding: 14px 14px 14px 42px;
+  color: var(--text); font-family: 'Space Grotesk', sans-serif;
+  font-size: 15px; outline: none; transition: border-color .2s;
+}
+.search-input:focus { border-color: var(--accent-siria); }
+.search-input::placeholder { color: var(--text-muted); }
+.search-icon {
+  position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+  font-size: 16px; pointer-events: none;
+}
+
+/* ── PLAYER LIST ── */
+.player-list { max-height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
+.player-list::-webkit-scrollbar { width: 4px; }
+.player-list::-webkit-scrollbar-track { background: transparent; }
+.player-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+.player-item {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 10px; padding: 14px 16px;
+  cursor: pointer; transition: all .2s;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.player-item:hover { border-color: var(--accent-cody); background: #1a1000; }
+.player-item.taken {
+  opacity: 0.4; cursor: not-allowed; pointer-events: none;
+}
+.player-name { font-size: 15px; font-weight: 600; }
+.player-meta { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.player-cost {
+  font-family: 'Space Mono', monospace; font-size: 13px;
+  color: var(--accent-cody); white-space: nowrap;
+}
+.taken-badge {
+  font-family: 'Space Mono', monospace; font-size: 10px;
+  color: var(--text-muted); background: var(--border);
+  padding: 3px 8px; border-radius: 100px;
+}
+.no-results { text-align: center; padding: 24px; color: var(--text-muted); font-size: 14px; }
+
+/* ── CONFIRM MODAL ── */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.8); z-index: 100;
+  align-items: flex-end; justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.open { display: flex; }
+.modal-box {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 20px 20px 20px 20px; padding: 28px 24px;
+  width: 100%; max-width: 480px; animation: slideUp .3s ease;
+}
+@keyframes slideUp { from { transform: translateY(40px); opacity:0; } to { transform:translateY(0); opacity:1; } }
+.modal-name { font-size: 28px; font-weight: 800; margin-bottom: 6px; }
+.modal-sub { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; line-height: 1.5; }
+
+/* ── BUTTONS ── */
+.btn-primary {
+  width: 100%; background: linear-gradient(135deg, var(--accent-cody), var(--accent-siria));
+  color: white; padding: 16px; border-radius: 12px; border: none;
+  font-family: 'Space Grotesk', sans-serif; font-size: 16px; font-weight: 700;
+  cursor: pointer; transition: opacity .2s; margin-bottom: 10px;
+}
+.btn-primary:hover { opacity: .85; }
+.btn-ghost {
+  width: 100%; background: transparent; border: 1.5px solid var(--border);
+  color: var(--text-muted); padding: 14px; border-radius: 12px;
+  font-family: 'Space Grotesk', sans-serif; font-size: 14px;
+  cursor: pointer; transition: all .2s;
+}
+.btn-ghost:hover { border-color: var(--text-muted); color: var(--text); }
+
+/* ── WELCOME SCREEN ── */
+.welcome-emoji { font-size: 72px; text-align: center; display: block; margin-bottom: 20px; }
+.info-row {
+  display: flex; gap: 10px; margin-bottom: 10px;
+}
+.info-chip {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 8px; padding: 10px 14px; flex: 1;
+  font-size: 12px; text-align: center;
+}
+.info-chip .chip-icon { font-size: 20px; display: block; margin-bottom: 4px; }
+.info-chip .chip-label { color: var(--text-muted); font-size: 11px; }
+
+/* ── ADMIN SCREEN ── */
+.admin-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 32px 0 20px;
+}
+.admin-badge {
+  background: rgba(255,107,43,0.15); border: 1.5px solid var(--accent-cody);
+  color: var(--accent-cody); font-family: 'Space Mono', monospace;
+  font-size: 11px; padding: 4px 10px; border-radius: 100px;
+}
+.admin-list { display: flex; flex-direction: column; gap: 6px; max-height: 65vh; overflow-y: auto; }
+.admin-player-row {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 10px; padding: 14px 16px;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+.admin-player-row.linked { border-color: rgba(34,197,94,0.3); }
+.admin-info { flex: 1; }
+.admin-name { font-size: 14px; font-weight: 600; }
+.admin-code {
+  font-family: 'Space Mono', monospace; font-size: 11px;
+  color: var(--green); margin-top: 2px;
+}
+.admin-code.none { color: var(--text-muted); }
+.btn-unlink {
+  background: rgba(239,68,68,0.1); border: 1.5px solid rgba(239,68,68,0.3);
+  color: var(--red); padding: 6px 12px; border-radius: 8px;
+  font-family: 'Space Mono', monospace; font-size: 11px; cursor: pointer;
+  transition: all .2s; white-space: nowrap;
+}
+.btn-unlink:hover { background: rgba(239,68,68,0.2); }
+.admin-search {
+  width: 100%; background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 10px; padding: 12px 14px;
+  color: var(--text); font-family: 'Space Grotesk', sans-serif;
+  font-size: 14px; outline: none; margin-bottom: 12px;
+  transition: border-color .2s;
+}
+.admin-search:focus { border-color: var(--accent-cody); }
+.admin-stats {
+  display: flex; gap: 10px; margin-bottom: 16px;
+}
+.stat-chip {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 8px; padding: 10px 14px; flex: 1; text-align: center;
+}
+.stat-num { font-family: 'Space Mono', monospace; font-size: 20px; font-weight: 700; }
+.stat-label { font-size: 11px; color: var(--text-muted); }
+.stat-chip.ok .stat-num { color: var(--green); }
+.stat-chip.wait .stat-num { color: var(--accent-cody); }
+
+/* ── FEEDBACK ── */
+.toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  background: var(--surface); border: 1.5px solid var(--green);
+  color: var(--green); font-family: 'Space Mono', monospace;
+  font-size: 13px; padding: 12px 20px; border-radius: 100px;
+  opacity: 0; transition: opacity .3s; pointer-events: none; white-space: nowrap;
+  z-index: 200;
+}
+.toast.show { opacity: 1; }
+.toast.error { border-color: var(--red); color: var(--red); }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     SCREEN 1 — WELCOME / CODICE ASSEGNATO
+══════════════════════════════════════════ -->
+<div class="screen active" id="screen-welcome">
+  <div style="padding: 40px 20px 20px;">
+    <p class="label">// Operazione completata //</p>
+    <span class="welcome-emoji">🎯</span>
+    <h1 class="headline">Missione compiuta.<br>Ora entra nel gioco.</h1>
+    <p class="subline">Hai risolto il quiz. Adesso abbina il tuo nome per partecipare al FantaCompleanno.</p>
+
+    <div class="code-badge">
+      <div>
+        <div class="code-label">Il tuo codice univoco</div>
+        <div class="code-value" id="welcome-code">——</div>
+      </div>
+      <div style="font-size:28px;">🔑</div>
+    </div>
+
+    <div class="info-row">
+      <div class="info-chip">
+        <span class="chip-icon">📱</span>
+        <div style="font-weight:600; font-size:13px;">Questo telefono</div>
+        <div class="chip-label">ti ricorderà sempre</div>
+      </div>
+      <div class="info-chip">
+        <span class="chip-icon">🔒</span>
+        <div style="font-weight:600; font-size:13px;">Un nome</div>
+        <div class="chip-label">per codice</div>
+      </div>
+      <div class="info-chip">
+        <span class="chip-icon">⚡</span>
+        <div style="font-weight:600; font-size:13px;">30 secondi</div>
+        <div class="chip-label">per registrarsi</div>
+      </div>
+    </div>
+
+    <button class="btn-primary" onclick="showScreen('screen-register')" style="margin-top:16px;">
+      Abbina il tuo nome →
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SCREEN 2 — CERCA E SELEZIONA NOME
+══════════════════════════════════════════ -->
+<div class="screen" id="screen-register">
+  <div style="padding: 32px 20px 20px;">
+    <p class="label">// Chi sei? //</p>
+    <h2 class="headline">Trovati nella lista</h2>
+    <p class="subline">Cerca il tuo nome e selezionalo. Verrai abbinato a questo dispositivo.</p>
+
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input
+        class="search-input"
+        id="search-input"
+        type="text"
+        placeholder="Scrivi il tuo nome..."
+        oninput="filterPlayers()"
+        autocomplete="off"
+      >
+    </div>
+
+    <div class="player-list" id="player-list"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SCREEN 3 — GIÀ REGISTRATO
+══════════════════════════════════════════ -->
+<div class="screen" id="screen-already">
+  <div style="padding: 40px 20px 20px; text-align: center;">
+    <span style="font-size:72px; display:block; margin-bottom:20px;">👋</span>
+    <p class="label">// Bentornato //</p>
+    <h2 class="headline" id="already-name" style="margin-bottom:8px;"></h2>
+    <p class="subline">Questo dispositivo è già abbinato al tuo nome. Sei pronto per il FantaCompleanno!</p>
+
+    <div class="code-badge" style="margin-bottom:24px;">
+      <div>
+        <div class="code-label">Il tuo codice</div>
+        <div class="code-value" id="already-code">——</div>
+      </div>
+      <div style="font-size:28px;">✅</div>
+    </div>
+
+    <button class="btn-primary" onclick="window.location.href='draft.html'">Vai al gioco →</button>
+    <button class="btn-ghost" onclick="showScreen('screen-register')" style="margin-top:10px;">
+      Non sono io — cambia nome
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SCREEN 4 — ADMIN
+══════════════════════════════════════════ -->
+<div class="screen" id="screen-admin">
+  <div style="padding: 20px;">
+    <div class="admin-header">
+      <div>
+        <p class="label" style="margin-bottom:4px;">Pannello Admin</p>
+        <h2 style="font-size:20px; font-weight:800;">Gestione Ospiti</h2>
+      </div>
+      <div class="admin-badge">30CODY30SYRIA</div>
+    </div>
+
+    <div class="admin-stats">
+      <div class="stat-chip ok">
+        <div class="stat-num" id="stat-linked">0</div>
+        <div class="stat-label">Abbinati</div>
+      </div>
+      <div class="stat-chip wait">
+        <div class="stat-num" id="stat-waiting">0</div>
+        <div class="stat-label">In attesa</div>
+      </div>
+      <div class="stat-chip">
+        <div class="stat-num" id="stat-total">0</div>
+        <div class="stat-label">Totale</div>
+      </div>
+    </div>
+
+    <input
+      class="admin-search"
+      type="text"
+      placeholder="Cerca ospite..."
+      oninput="filterAdmin()"
+      id="admin-search-input"
+    >
+
+    <div class="admin-list" id="admin-list"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     MODAL CONFERMA SELEZIONE
+══════════════════════════════════════════ -->
+<div class="modal-overlay" id="confirm-modal">
+  <div class="modal-box">
+    <p class="label">Conferma selezione</p>
+    <div class="modal-name" id="modal-name"></div>
+    <p class="modal-sub">
+      Sei sicuro? Questo dispositivo verrà abbinato permanentemente a questo nome.<br>
+      <span style="color:var(--accent-cody);">Non potrai cambiarlo senza chiedere a Pietro.</span>
+    </p>
+    <button class="btn-primary" id="modal-confirm-btn">✓ Sì, sono io!</button>
+    <button class="btn-ghost" onclick="closeModal()">← Torna indietro</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- ══════════════════════════════════════════
+     FIREBASE + LOGICA
+══════════════════════════════════════════ -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, get, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+// ── CONFIG FIREBASE ──
+const firebaseConfig = {
+  apiKey: "AIzaSyCqLFQW8XQioObmxG0oDPc_MFpdFXJxmac",
+  authDomain: "fantacompleanno-c64c3.firebaseapp.com",
+  databaseURL: "https://fantacompleanno-c64c3-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "fantacompleanno-c64c3",
+  storageBucket: "fantacompleanno-c64c3.firebasestorage.app",
+  messagingSenderId: "1090185599902",
+  appId: "1:1090185599902:web:abcc2c0bcfdc2077d2548f"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+// ── LISTA OSPITI (da game design doc) ──
+const PLAYERS = [
+  { name: "Alessia", cost: 175 },
+  { name: "Madre (Anna)", cost: 150 },
+  { name: "Eleonora Sorella", cost: 90 },
+  { name: "Paolo", cost: 110 },
+  { name: "Mattia (Milano)", cost: 70 },
+  { name: "Mirco", cost: 85 },
+  { name: "Gloria", cost: 85 },
+  { name: "Dario", cost: 95 },
+  { name: "Gabriele", cost: 100 },
+  { name: "Federica", cost: 85 },
+  { name: "Simone", cost: 85 },
+  { name: "Desi", cost: 85 },
+  { name: "Michele", cost: 65 },
+  { name: "Zia Anna", cost: 105 },
+  { name: "Arianna", cost: 80 },
+  { name: "Francesca", cost: 140 },
+  { name: "Nicolas", cost: 115 },
+  { name: "Giulia", cost: 55 },
+  { name: "Andrea", cost: 55 },
+  { name: "Emilio", cost: 110 },
+  { name: "Eleonora B", cost: 110 },
+  { name: "Marta", cost: 160 },
+  { name: "Beppe", cost: 160 },
+  { name: "Annachiara", cost: 85 },
+  { name: "Davide S", cost: 50 },
+  { name: "Antonio", cost: 130 },
+  { name: "Marika", cost: 90 },
+  { name: "Danilo", cost: 175 },
+  { name: "Ilaria", cost: 90 },
+  { name: "Donato", cost: 115 },
+  { name: "Emily", cost: 80 },
+  { name: "Martina P", cost: 115 },
+  { name: "Maicol", cost: 125 },
+  { name: "Laura", cost: 95 },
+  { name: "Davide A (Attanasio)", cost: 135 },
+  { name: "Manuel", cost: 180 },
+  { name: "Carlotta", cost: 95 },
+  { name: "Nicolo Spada", cost: 120 },
+  { name: "Antonella", cost: 50 },
+  { name: "Beatrice", cost: 80 },
+  { name: "Marciarla", cost: 45 },
+  { name: "Mattia Martina", cost: 80 },
+  { name: "Pisi", cost: 90 },
+  { name: "Annalisa", cost: 105 },
+  { name: "Sciurti", cost: 100 },
+  { name: "Nicolo M", cost: 85 },
+  { name: "Silvia", cost: 50 },
+  { name: "Alessio Maci", cost: 85 },
+  { name: "Rachele", cost: 50 },
+  { name: "Perotto", cost: 40 },
+  { name: "Erminio", cost: 165 },
+  { name: "Sara C", cost: 50 },
+  { name: "Luca Grasso", cost: 85 },
+  { name: "Annalisa M", cost: 50 },
+  { name: "Caretto", cost: 85 },
+  { name: "Silvia M", cost: 50 },
+  { name: "Errico", cost: 85 },
+  { name: "Chiara D", cost: 50 },
+  { name: "Daniele", cost: 80 },
+  { name: "Davide M", cost: 160 },
+  { name: "Marialuce", cost: 85 },
+  { name: "Francesco R", cost: 85 },
+  { name: "MariaChiara L", cost: 50 },
+  { name: "Alberto", cost: 100 },
+  { name: "Martina S", cost: 85 },
+  { name: "Luca I", cost: 80 },
+  { name: "Marika P", cost: 50 },
+  { name: "Stefanuccio", cost: 130 },
+];
+
+// ── ADMIN KEY ──
+const ADMIN_KEY = "30cody30syria";
+
+// ── STATO ──
+let myCode = null;
+let myName = null;
+let linkedPlayers = {}; // { playerName: deviceCode }
+let selectedPlayer = null;
+
+// ── GENERA / RECUPERA CODICE ──
+function getOrCreateCode() {
+  let code = localStorage.getItem("fc_device_code");
+  if (!code) {
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    code = Array.from({length: 6}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+    localStorage.setItem("fc_device_code", code);
+  }
+  return code;
+}
+
+// ── INIT ──
+async function init() {
+  myCode = getOrCreateCode();
+
+  // Controlla se admin
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("key") === ADMIN_KEY) {
+    showScreen('screen-admin');
+    initAdmin();
+    return;
+  }
+
+  // Carica abbinamenti da Firebase
+  const snap = await get(ref(db, "registrations"));
+  if (snap.exists()) {
+    linkedPlayers = snap.val();
+  }
+
+  // Controlla se questo codice è già abbinato
+  const alreadyLinked = Object.entries(linkedPlayers).find(([name, code]) => code === myCode);
+  if (alreadyLinked) {
+    myName = alreadyLinked[0];
+    localStorage.setItem("fc_player_name", myName);
+    document.getElementById("already-name").textContent = myName;
+    document.getElementById("already-code").textContent = myCode;
+    showScreen('screen-already');
+    return;
+  }
+
+  // Controlla localStorage come fallback
+  const savedName = localStorage.getItem("fc_player_name");
+  if (savedName) {
+    myName = savedName;
+    document.getElementById("already-name").textContent = myName;
+    document.getElementById("already-code").textContent = myCode;
+    showScreen('screen-already');
+    return;
+  }
+
+  // Mostra welcome con codice
+  document.getElementById("welcome-code").textContent = myCode;
+  showScreen('screen-welcome');
+}
+
+// ── FILTRA LISTA GIOCATORI ──
+window.filterPlayers = function() {
+  const q = document.getElementById("search-input").value.toLowerCase();
+  renderPlayerList(q);
+};
+
+function renderPlayerList(filter = "") {
+  const list = document.getElementById("player-list");
+  list.innerHTML = "";
+
+  const filtered = PLAYERS.filter(p => p.name.toLowerCase().includes(filter));
+
+  if (filtered.length === 0) {
+    list.innerHTML = '<div class="no-results">Nessun ospite trovato 🤔</div>';
+    return;
+  }
+
+  filtered.forEach(player => {
+    const isTaken = linkedPlayers[player.name] && linkedPlayers[player.name] !== myCode;
+    const div = document.createElement("div");
+    div.className = "player-item" + (isTaken ? " taken" : "");
+    div.innerHTML = `
+      <div>
+        <div class="player-name">${player.name}</div>
+        <div class="player-meta">✂️ ${player.cost} Capelli</div>
+      </div>
+      ${isTaken
+        ? '<span class="taken-badge">già abbinato</span>'
+        : '<span class="player-cost">Seleziona →</span>'
+      }
+    `;
+    if (!isTaken) {
+      div.onclick = () => openModal(player.name);
+    }
+    list.appendChild(div);
+  });
+}
+
+// ── MODAL CONFERMA ──
+window.openModal = function(name) {
+  selectedPlayer = name;
+  document.getElementById("modal-name").textContent = name;
+  document.getElementById("modal-confirm-btn").onclick = () => confirmSelection(name);
+  document.getElementById("confirm-modal").classList.add("open");
+};
+
+window.closeModal = function() {
+  document.getElementById("confirm-modal").classList.remove("open");
+  selectedPlayer = null;
+};
+
+async function confirmSelection(name) {
+  closeModal();
+
+  // Salva su Firebase
+  await set(ref(db, `registrations/${name.replace(/[.#$[\]]/g, '_')}`), myCode);
+
+  // Salva su localStorage
+  localStorage.setItem("fc_player_name", name);
+  myName = name;
+
+  showToast(`✓ Benvenuto/a, ${name}!`);
+
+  setTimeout(() => {
+    document.getElementById("already-name").textContent = name;
+    document.getElementById("already-code").textContent = myCode;
+    showScreen('screen-already');
+  }, 1200);
+}
+
+// ── ADMIN ──
+function initAdmin() {
+  const dbRef = ref(db, "registrations");
+  onValue(dbRef, (snap) => {
+    linkedPlayers = snap.exists() ? snap.val() : {};
+    renderAdminList();
+    updateStats();
+  });
+}
+
+function renderAdminList(filter = "") {
+  const list = document.getElementById("admin-list");
+  list.innerHTML = "";
+
+  const filtered = PLAYERS.filter(p => p.name.toLowerCase().includes(filter.toLowerCase()));
+
+  filtered.forEach(player => {
+    const key = player.name.replace(/[.#$[\]]/g, '_');
+    const code = linkedPlayers[key] || null;
+    const isLinked = !!code;
+
+    const row = document.createElement("div");
+    row.className = "admin-player-row" + (isLinked ? " linked" : "");
+    row.innerHTML = `
+      <div class="admin-info">
+        <div class="admin-name">${player.name}</div>
+        <div class="admin-code ${code ? '' : 'none'}">${code ? `🔑 ${code}` : '— non abbinato'}</div>
+      </div>
+      ${isLinked
+        ? `<button class="btn-unlink" onclick="unlinkPlayer('${player.name}')">Scollega</button>`
+        : ''
+      }
+    `;
+    list.appendChild(row);
+  });
+}
+
+window.filterAdmin = function() {
+  const q = document.getElementById("admin-search-input").value;
+  renderAdminList(q);
+};
+
+window.unlinkPlayer = async function(name) {
+  if (!confirm(`Scollegare ${name}? Il giocatore dovrà riselezionare il nome.`)) return;
+  const key = name.replace(/[.#$[\]]/g, '_');
+  await remove(ref(db, `registrations/${key}`));
+  showToast(`✓ ${name} scollegato`);
+};
+
+function updateStats() {
+  const linked = Object.keys(linkedPlayers).length;
+  const total = PLAYERS.length;
+  document.getElementById("stat-linked").textContent = linked;
+  document.getElementById("stat-waiting").textContent = total - linked;
+  document.getElementById("stat-total").textContent = total;
+}
+
+// ── UTILS ──
+window.showScreen = function(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+  if (id === 'screen-register') renderPlayerList();
+};
+
+window.goToGame = function() {
+  // In futuro: redirect a dashboard.html
+  showToast("🚧 Il gioco completo è in arrivo!");
+};
+
+function showToast(msg, isError = false) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.className = "toast show" + (isError ? " error" : "");
+  setTimeout(() => { t.className = "toast"; }, 3000);
+}
+
+// ── START ──
+init();
+</script>
+</body>
+</html>
