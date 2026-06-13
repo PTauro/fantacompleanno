@@ -186,15 +186,103 @@ body {
   opacity: 0; transition: opacity .3s; pointer-events: none; white-space: nowrap; z-index: 300;
 }
 .toast.show { opacity: 1; }
+
+/* ── COUNTDOWN ── */
+.countdown-bar {
+  background: linear-gradient(135deg, #0d0020, #1a0035);
+  border-bottom: 1px solid rgba(168,85,247,0.3);
+  padding: 14px 20px; text-align: center;
+}
+.countdown-label {
+  font-family: 'Space Mono', monospace; font-size: 10px;
+  color: var(--accent-siria); letter-spacing: .15em; text-transform: uppercase; margin-bottom: 6px;
+}
+.countdown-timer {
+  display: flex; justify-content: center; gap: 8px; align-items: center;
+}
+.cd-unit {
+  background: rgba(168,85,247,0.1); border: 1px solid rgba(168,85,247,0.3);
+  border-radius: 8px; padding: 6px 10px; min-width: 52px; text-align: center;
+}
+.cd-num {
+  font-family: 'Space Mono', monospace; font-size: 20px; font-weight: 700;
+  color: var(--accent-siria); display: block; line-height: 1;
+}
+.cd-label { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .1em; }
+.cd-sep { font-family: 'Space Mono', monospace; font-size: 20px; color: rgba(168,85,247,0.5); margin-bottom: 12px; }
+
+.draft-countdown {
+  background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.25);
+  border-radius: 10px; padding: 10px 14px; margin-top: 8px;
+  display: flex; align-items: center; gap: 10px;
+}
+.draft-cd-label { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--gold); letter-spacing: .1em; flex-shrink: 0; }
+.draft-cd-timer { font-family: 'Space Mono', monospace; font-size: 14px; font-weight: 700; color: var(--gold); }
+.draft-cd-closed { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--red); }
+
+/* ── LORE ── */
+.lore-box {
+  margin: 0 20px 4px;
+  background: linear-gradient(135deg, rgba(255,107,43,0.06), rgba(168,85,247,0.06));
+  border: 1.5px solid var(--border);
+  border-radius: 14px; padding: 18px 20px;
+}
+.lore-text {
+  font-size: 14px; line-height: 1.7; color: var(--text-muted);
+  font-style: italic;
+}
+.lore-text strong { color: var(--text); font-style: normal; }
+.lore-text .cody { color: var(--accent-cody); font-style: normal; }
+.lore-text .siria { color: var(--accent-siria); font-style: normal; }
+
+/* ── SEZIONE GENERALE ── */
+.generale-box {
+  margin: 0 20px 4px;
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 14px; padding: 20px;
+}
+.generale-title {
+  font-size: 16px; font-weight: 800; margin-bottom: 14px;
+  display: flex; align-items: center; gap: 8px;
+}
+.generale-block { margin-bottom: 16px; }
+.generale-block:last-child { margin-bottom: 0; }
+.generale-block-title {
+  font-family: 'Space Mono', monospace; font-size: 11px;
+  color: var(--accent-cody); letter-spacing: .1em; text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.generale-block p { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+.generale-block p strong { color: var(--text); }
+.info-chips-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+.info-chip-small {
+  background: var(--border); border-radius: 8px; padding: 6px 12px;
+  font-size: 12px; color: var(--text-muted);
+}
+.info-chip-small strong { color: var(--text); }
 </style>
 </head>
 <body>
 
 <!-- ══ HEADER ══ -->
+<!-- ══ COUNTDOWN FESTA ══ -->
+<div class="countdown-bar">
+  <div class="countdown-label">⚔️ La guerra ha inizio tra</div>
+  <div class="countdown-timer" id="festa-countdown">
+    <div class="cd-unit"><span class="cd-num" id="cd-giorni">--</span><span class="cd-label">giorni</span></div>
+    <span class="cd-sep">:</span>
+    <div class="cd-unit"><span class="cd-num" id="cd-ore">--</span><span class="cd-label">ore</span></div>
+    <span class="cd-sep">:</span>
+    <div class="cd-unit"><span class="cd-num" id="cd-min">--</span><span class="cd-label">min</span></div>
+    <span class="cd-sep">:</span>
+    <div class="cd-unit"><span class="cd-num" id="cd-sec">--</span><span class="cd-label">sec</span></div>
+  </div>
+</div>
+
 <div class="header">
   <div class="header-top">
     <div>
-      <div class="greeting">// FantaCompleanno — 27 Giugno 2025 //</div>
+      <div class="greeting">// FantaCompleanno — 27 Giugno 2026 //</div>
       <div class="player-name">Ciao, <span id="player-name-display">...</span> 👋</div>
     </div>
     <div class="avatar-circle" id="avatar-circle">?</div>
@@ -202,6 +290,54 @@ body {
   <div class="status-pills">
     <div class="pill neutral" id="pill-squad">⏳ Squadra non creata</div>
     <div class="pill neutral">🎂 27 Giugno</div>
+  </div>
+</div>
+
+
+<!-- ══ LORE ══ -->
+<div class="lore-box" style="margin-top:16px;">
+  <div class="lore-text">
+    <span class="cody">🐕 Cody il Beagle Vorace</span> contro <span class="siria">🐱 Siria la Bisbetica Gatta</span>.<br><br>
+    <strong>Partecipa attivamente alla guerra del territorio di Casa Tauro.</strong> Crea la tua fanta squadra, scopri chi è la tua alleanza, svela la tua fazione segreta e scopri il tuo ceto sociale. Ogni tua azione durante la serata vale punti — per te, per la tua squadra, per il tuo regno.
+  </div>
+</div>
+
+<!-- ══ COME FUNZIONA ══ -->
+<div class="generale-box" style="margin-top:12px;">
+  <div class="generale-title">📖 Come funziona il gioco</div>
+
+  <div class="generale-block">
+    <div class="generale-block-title">🏆 Il Campionato</div>
+    <p>Ogni ospite costruisce una <strong>squadra di 5 persone</strong> con un budget di <strong>500 Capelli ✂️</strong>. Durante la festa Pietro assegna punti in tempo reale. Chi ha quella persona in squadra guadagna i suoi punti. Il <strong>Capitano</strong> vale il doppio. Vince chi accumula più punti a fine serata.</p>
+  </div>
+
+  <div class="generale-block">
+    <div class="generale-block-title">⚔️ Le Fazioni — Cody vs Siria</div>
+    <p>All'arrivo alla festa ogni ospite pesca una carta segreta: <span style="color:var(--accent-cody)">Team Cody</span> o <span style="color:var(--accent-siria)">Team Siria</span>. Nessuno sa a che fazione appartengono gli altri. A fine serata si rivela tutto: la fazione con più punti vince <strong>+150 pt campionato</strong> a tutti i suoi membri.</p>
+  </div>
+
+  <div class="generale-block">
+    <div class="generale-block-title">🤝 Le Alleanze</div>
+    <p>Ogni ospite è assegnato da Pietro a uno di <strong>6 gruppi fissi</strong>. Il punteggio alleanza si calcola come <strong>(Media Bonus membri) − (Media Malus membri)</strong> — il coefficiente con la differenza più alta vince. Nessun vantaggio per i gruppi più grandi. L'alleanza vincente porta <strong>+150 pt campionato</strong> a tutti i suoi membri.</p>
+  </div>
+
+  <div class="generale-block">
+    <div class="generale-block-title">✅ Come si guadagnano punti (Bonus)</div>
+    <p>I punti si guadagnano in <strong>6 categorie</strong>: prima della festa (quiz, draft, outfit spoiler), con la squadra che costruisci, con l'outfit che indossi, con le azioni durante la festa, con le sfide e giochi, e con alleanze e fazioni. Alcuni bonus sono <strong>automatici</strong> (l'app li registra da sola), altri richiedono il <strong>giudizio di Pietro</strong>.</p>
+    <div class="info-chips-row">
+      <div class="info-chip-small">⚡ <strong>Automatico</strong> — app lo assegna da sola</div>
+      <div class="info-chip-small">👑 <strong>Giudizio admin</strong> — Pietro decide</div>
+    </div>
+  </div>
+
+  <div class="generale-block">
+    <div class="generale-block-title">❌ Come si perdono punti (Malus)</div>
+    <p>Stessa logica dei bonus — ci sono malus automatici (ritardo, non creare la squadra, spoilerare la fazione) e malus a giudizio di Pietro (rifiutare sfide, sprecare cibo, essere palesemente annoiato). Alcuni malus sono <strong>molto pesanti</strong> — leggiti bene il regolamento prima della festa.</p>
+  </div>
+
+  <div class="generale-block">
+    <div class="generale-block-title">🎭 Bonus Ad Personam</div>
+    <p>Alcuni ospiti hanno <strong>sfide personalizzate</strong> create apposta per loro. Solo i diretti interessati possono ottenerle. Controlla nel regolamento se sei tra i fortunati — o gli sfortunati.</p>
   </div>
 </div>
 
@@ -214,6 +350,10 @@ body {
     <span class="card-icon">✂️</span>
     <div class="card-title">Crea la tua Squadra</div>
     <div class="card-sub">500 Capelli di budget. Scegli 5 giocatori, nomina il capitano.</div>
+    <div class="draft-countdown" id="draft-countdown-wrap">
+      <span class="draft-cd-label">⏳ DRAFT CHIUDE</span>
+      <span class="draft-cd-timer" id="draft-cd-timer">--:--:--</span>
+    </div>
     <div class="card-badge badge-warn" id="draft-badge">Da completare</div>
     <div class="card-arrow">→</div>
   </div>
@@ -358,9 +498,8 @@ const REG = {
       { pts: "+30", desc: "Risolve il mistero location", type: "Automatico" },
       { pts: "+5", desc: "Accede al sito e si abbina al nome giocatore", type: "Automatico" },
       { pts: "+10", desc: "Crea la sua squadra (completa il draft)", type: "Automatico" },
-      { pts: "+20", desc: "Crea o si unisce a un'alleanza", type: "Automatico" },
       { pts: "+5", desc: "Nome originale squadra (riporta al festeggiato o lo fa ridere)", type: "Giudizio admin" },
-      { pts: "+10", desc: "Nome originale alleanza", type: "Giudizio admin" },
+      { pts: "+20", desc: "Visualizza la pagina della tua alleanza", type: "Automatico" },
       { pts: "+20", desc: "Agente in missione (ha pescato un ruolo speciale nella fazione)", type: "Automatico" },
       { pts: "+10", desc: "Spoiler outfit (foto sul gruppo ufficiale entro le 15:00 del 27/06)", type: "Automatico" },
     ],
@@ -369,6 +508,8 @@ const REG = {
       { pts: "-20", desc: "Si perde e chiede informazioni sulla location", type: "Giudizio admin" },
       { pts: "-30", desc: "Non accede al sito / non si abbina", type: "Automatico" },
       { pts: "-30", desc: "Non crea la squadra", type: "Automatico" },
+      { pts: "-20", desc: "Non visualizza la pagina della tua alleanza", type: "Automatico" },
+      { pts: "-30", desc: "Non pesca la carta fazione all'arrivo alla festa", type: "Automatico" },
       { pts: "-10", desc: "Squadra senza alleanza", type: "Automatico" },
       { pts: "-30", desc: "Non conferma partecipazione", type: "Automatico" },
     ]
@@ -495,7 +636,7 @@ const REG = {
     note: "Il premio finale viene assegnato a fine serata. +150 pt campionato a tutti i membri della fazione/alleanza vincente.",
     bonus: [
       { pts: "+150", desc: "Fazione vincente — tutti i membri della fazione con più punti a fine serata", type: "Automatico" },
-      { pts: "+150", desc: "Alleanza vincente — tutti i membri dell'alleanza con media punti più alta", type: "Automatico" },
+      { pts: "+150", desc: "Alleanza vincente — alleanza con coefficiente (Media Bonus − Media Malus) più alto", type: "Automatico" },
       { pts: "x2", desc: "Moltiplicatore (Cuoco di Corte / Umano Preferito) — i tuoi punti contano doppio per la fazione", type: "Ruolo speciale" },
       { pts: "Spia", desc: "Glitter di Beagle / Fioriera come Lettiera — i tuoi punti vanno alla fazione nemica", type: "Ruolo speciale" },
     ],
