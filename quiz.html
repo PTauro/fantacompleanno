@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FantaCompleanno — Missione Segreta</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700;800&family=Space+Mono:wght@400;700&display=swap');
+  :root {
+    --bg: #0a0a0f; --surface: #13131a; --border: #1e1e2e;
+    --accent-cody: #ff6b2b; --accent-siria: #a855f7;
+    --text: #f0f0f5; --text-muted: #6b6b8a;
+    --green: #22c55e; --red: #ef4444;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Space Grotesk', sans-serif;
+    background: var(--bg); color: var(--text);
+    min-height: 100vh; display: flex; align-items: center;
+    justify-content: center; padding: 20px; overflow-x: hidden;
+  }
+  .screen { display: none; width: 100%; max-width: 480px; animation: fadeIn .4s ease; }
+  .screen.active { display: block; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+
+  .glitch-container { text-align: center; padding: 40px 20px 20px; }
+  .pets-row { display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 32px; }
+  .pet-box {
+    width: 130px; height: 130px; border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 72px; position: relative; overflow: hidden;
+  }
+  .pet-cody {
+    background: linear-gradient(135deg, #1a0a00, #2d1200);
+    border: 2px solid var(--accent-cody);
+    box-shadow: 0 0 20px rgba(255,107,43,0.3);
+    animation: glitch 3s infinite;
+  }
+  .pet-siria {
+    background: linear-gradient(135deg, #0d0020, #1a0035);
+    border: 2px solid var(--accent-siria);
+    box-shadow: 0 0 20px rgba(168,85,247,0.3);
+    animation: glitch 3s infinite .5s;
+  }
+  .vs-badge { font-family: 'Space Mono', monospace; font-size: 22px; font-weight: 700; color: var(--text-muted); }
+  @keyframes glitch {
+    0%,90%,100% { transform:translate(0); filter:none; }
+    92% { transform:translate(-3px,1px); filter:hue-rotate(90deg); }
+    94% { transform:translate(3px,-1px); filter:hue-rotate(-90deg); }
+    96% { transform:translate(-2px,2px); filter:brightness(1.5); }
+    98% { transform:translate(2px,-2px); filter:none; }
+  }
+  .intro-title { font-size:13px; font-family:'Space Mono',monospace; color:var(--text-muted); letter-spacing:.15em; text-transform:uppercase; margin-bottom:12px; }
+  .intro-headline { font-size:22px; font-weight:800; line-height:1.2; margin-bottom:32px; }
+  .intro-headline .cody { color:var(--accent-cody); }
+  .intro-headline .siria { color:var(--accent-siria); }
+
+  .btn-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px; }
+  .btn-option {
+    background:var(--surface); border:1.5px solid var(--border);
+    color:var(--text); text-align:left; padding:16px; border-radius:12px;
+    cursor:pointer; transition:all .2s; font-family:'Space Grotesk',sans-serif;
+  }
+  .btn-option:hover { border-color:var(--accent-cody); background:#1a1a2a; transform:translateY(-2px); }
+  .btn-option.correct { border-color:var(--green); background:#052010; }
+  .btn-option.wrong { border-color:var(--red); background:#200505; }
+  .option-num { font-family:'Space Mono',monospace; font-size:18px; font-weight:700; color:var(--accent-cody); display:block; margin-bottom:4px; }
+  .btn-option.correct .option-num { color:var(--green); }
+  .btn-option.wrong .option-num { color:var(--red); }
+  .option-text { font-size:12px; color:var(--text-muted); line-height:1.4; }
+  .btn-option.correct .option-text { color:var(--green); }
+  .btn-option.wrong .option-text { color:var(--red); }
+
+  .progress-bar { width:100%; height:3px; background:var(--border); border-radius:2px; margin-bottom:28px; }
+  .progress-fill { height:100%; background:linear-gradient(90deg,var(--accent-cody),var(--accent-siria)); border-radius:2px; transition:width .4s ease; }
+  .q-label { font-family:'Space Mono',monospace; font-size:11px; color:var(--text-muted); letter-spacing:.1em; text-transform:uppercase; margin-bottom:10px; }
+  .q-text { font-size:20px; font-weight:700; line-height:1.3; margin-bottom:24px; }
+
+  .feedback-box { background:var(--surface); border:1.5px solid var(--border); border-radius:12px; padding:14px 16px; margin-top:14px; font-size:13px; color:var(--text-muted); display:none; }
+  .feedback-box.show { display:block; }
+  .feedback-box.correct-fb { border-color:var(--green); color:var(--green); }
+  .feedback-box.wrong-fb { border-color:var(--red); color:var(--red); }
+
+  .btn-enter {
+    width:100%; background:linear-gradient(135deg,var(--accent-cody),var(--accent-siria));
+    color:white; padding:16px; border-radius:12px; border:none;
+    font-family:'Space Grotesk',sans-serif; font-size:16px; font-weight:700;
+    cursor:pointer; transition:opacity .2s; margin-top:14px;
+  }
+  .btn-enter:hover { opacity:.85; }
+  .btn-secondary {
+    width:100%; background:transparent; border:1.5px solid var(--red); color:var(--red);
+    padding:14px; border-radius:12px; font-family:'Space Grotesk',sans-serif;
+    font-size:14px; font-weight:700; cursor:pointer; margin-top:10px; transition:all .2s;
+  }
+  .btn-secondary:hover { background:rgba(239,68,68,.1); }
+
+  .coord-recap { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:14px; margin-bottom:20px; }
+  .recap-item { display:flex; align-items:flex-start; padding:9px 0; border-bottom:1px solid var(--border); gap: 10px; }
+  .recap-item:last-child { border-bottom:none; }
+  .recap-num { font-family:'Space Mono',monospace; font-size:12px; color:var(--text-muted); flex-shrink:0; min-width:52px; padding-top:1px; }
+  .recap-q { color:var(--text); font-size:13px; line-height:1.4; }
+
+  .coordinate-label { font-family:'Space Mono',monospace; font-size:11px; color:var(--text-muted); letter-spacing:.1em; text-transform:uppercase; margin-bottom:6px; }
+  .coord-input-row { display:flex; gap:8px; margin-bottom:14px; }
+  .coord-input {
+    flex:1; background:var(--surface); border:1.5px solid var(--border); border-radius:10px;
+    padding:14px; color:var(--text); font-family:'Space Mono',monospace; font-size:16px;
+    text-align:center; outline:none; transition:border-color .2s;
+  }
+  .coord-input:focus { border-color:var(--accent-siria); }
+  .coord-separator { display:flex; align-items:center; font-family:'Space Mono',monospace; font-size:20px; color:var(--text-muted); flex-shrink:0; }
+
+  .attempts-row { display:flex; gap:6px; margin-bottom:14px; justify-content:center; }
+  .attempt-dot { width:10px; height:10px; border-radius:50%; background:var(--border); }
+  .attempt-dot.used { background:var(--red); }
+
+  .final-screen { text-align:center; padding:40px 20px; }
+  .final-emoji { font-size:80px; margin-bottom:20px; display:block; }
+  .final-title { font-size:28px; font-weight:800; margin-bottom:12px; }
+  .final-sub { font-size:15px; color:var(--text-muted); line-height:1.6; margin-bottom:24px; }
+  .final-pts { display:inline-block; padding:10px 24px; border-radius:100px; font-family:'Space Mono',monospace; font-size:20px; font-weight:700; margin-bottom:28px; }
+  .pts-pos { background:rgba(34,197,94,.15); border:1.5px solid var(--green); color:var(--green); }
+  .pts-neg { background:rgba(239,68,68,.15); border:1.5px solid var(--red); color:var(--red); }
+  .final-headline { font-family:'Space Mono',monospace; font-size:13px; color:var(--text-muted); letter-spacing:.1em; text-transform:uppercase; margin-bottom:16px; }
+</style>
+</head>
+<body>
+
+<!-- INTRO -->
+<div class="screen active" id="screen-intro">
+  <div class="glitch-container">
+    <p class="intro-title">// SISTEMA IN ALLERTA //</p>
+    <div class="pets-row">
+      <div class="pet-box pet-cody">🐕</div>
+      <div class="vs-badge">VS</div>
+      <div class="pet-box pet-siria">🐱</div>
+    </div>
+    <p class="intro-title" style="margin-bottom:8px">Classificato — Solo per invitati</p>
+    <h1 class="intro-headline">
+      Sei stato selezionato a risolvere una <span class="cody">disputa</span> <span class="siria">territoriale</span>
+    </h1>
+    <div class="btn-grid">
+      <button class="btn-option" onclick="startQuiz()"><span class="option-num">01</span><span class="option-text">Si</span></button>
+      <button class="btn-option" onclick="startQuiz()"><span class="option-num">02</span><span class="option-text">Si</span></button>
+      <button class="btn-option" onclick="startQuiz()"><span class="option-num">03</span><span class="option-text">Ovvio</span></button>
+      <button class="btn-option" onclick="startQuiz()"><span class="option-num">04</span><span class="option-text">Andiamo</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- QUIZ -->
+<div class="screen" id="screen-quiz">
+  <div style="padding:32px 20px 20px;">
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+    <p class="q-label" id="q-label">Domanda 1 di 4</p>
+    <h2 class="q-text" id="q-text"></h2>
+    <div class="btn-grid" id="options-grid"></div>
+    <div class="feedback-box" id="feedback-box"></div>
+    <button class="btn-enter" id="next-btn" style="display:none;" onclick="nextQuestion()">Avanti →</button>
+  </div>
+</div>
+
+<!-- COORDINATE -->
+<div class="screen" id="screen-coords">
+  <div style="padding:32px 20px 20px;">
+    <p class="q-label">// MISSIONE QUASI COMPLETATA //</p>
+    <h2 class="q-text" style="margin-bottom:8px">"Bene, ora sai già dove trovarti il 27 giugno giusto?"</h2>
+    <div class="coord-recap" id="coord-recap"></div>
+    <input class="coord-input" id="coord-single" type="text" placeholder="_________ , _________" maxlength="25" style="width:100%; margin-bottom:14px;">
+
+    <div class="attempts-row">
+      <div class="attempt-dot" id="dot-1"></div>
+      <div class="attempt-dot" id="dot-2"></div>
+      <div class="attempt-dot" id="dot-3"></div>
+    </div>
+    <div class="feedback-box" id="coord-feedback"></div>
+    <button class="btn-enter" onclick="checkCoords()">⚔️ Conferma — Andiamo in Guerra!</button>
+    <button class="btn-secondary" onclick="handleResa()">🏳️ Mi arrendo (malus -30)</button>
+  </div>
+</div>
+
+<!-- SUCCESS -->
+<div class="screen" id="screen-success">
+  <div class="final-screen">
+    <span class="final-emoji">🎯</span>
+    <p class="final-headline">// LOCATION SBLOCCATA //</p>
+    <h2 class="final-title">Missione compiuta!</h2>
+    <p class="final-sub">Hai trovato la location del FantaCompleanno.<br>Ci vediamo il <strong>27 Giugno</strong> 🎂</p>
+    <div class="final-pts pts-pos">+30 punti assegnati ✓</div>
+    <button class="btn-enter" onclick="alert('Il gioco principale è in arrivo!')">Accedi al gioco →</button>
+  </div>
+</div>
+
+<!-- FAIL -->
+<div class="screen" id="screen-fail">
+  <div class="final-screen">
+    <span class="final-emoji">💀</span>
+    <p class="final-headline">// MISSIONE FALLITA //</p>
+    <h2 class="final-title" style="color:var(--red)">Tentativi esauriti</h2>
+    <p class="final-sub">Non sei riuscito a trovare la location.<br>Il territorio rimane conteso tra Cody e Siria.</p>
+    <div class="final-pts pts-neg">-30 punti assegnati</div>
+    <button class="btn-enter" onclick="alert('Il gioco principale è in arrivo!')">Accedi al gioco →</button>
+  </div>
+</div>
+
+<!-- RESA -->
+<div class="screen" id="screen-resa">
+  <div class="final-screen">
+    <span class="final-emoji">🏳️</span>
+    <p class="final-headline">// RESA REGISTRATA //</p>
+    <h2 class="final-title" style="color:var(--red)">Ti sei arreso</h2>
+    <p class="final-sub">Vergogna.<br>Il regno di Casa Tauro non dimentica i codardi.</p>
+    <div class="final-pts pts-neg">-30 punti assegnati</div>
+    <button class="btn-enter" onclick="alert('Il gioco principale è in arrivo!')">Accedi al gioco →</button>
+  </div>
+</div>
+
+<script>
+  const questions = [
+    {
+      text: "Cosa è un Cody?",
+      options: [
+        { num: "35", text: "Un cane" },
+        { num: "999", text: "Un Gatto" },
+        { num: "27", text: "Cane puzzone" },
+        { num: "40.", text: "Cody è un cody che domanda è" }
+      ],
+      correct: "40.",
+      feedback: "Esatto. Cody è un cody. Non esistono altre definizioni accettabili."
+    },
+    {
+      text: "Cosa è una Siria?",
+      options: [
+        { num: "404", text: "Un gatto" },
+        { num: "72", text: "Una gatta" },
+        { num: "130626", text: "Una gattagattocangattagatto" },
+        { num: "405357,", text: "Siria la gatta nata dalla testa madre delle palle di pelo, distruttrice di divani e fodere" }
+      ],
+      correct: "405357,",
+      feedback: "Corretto. La definizione scientifica è stata accettata."
+    },
+    {
+      text: "Se credi di essere stato invitato a un semplice compleanno — di chi è la festa?",
+      options: [
+        { num: "8", text: "Pietro" },
+        { num: "9", text: "Pietro Tauro" },
+        { num: "12", text: "Di un esperto SAP" },
+        { num: "18.", text: "Del più forte giocatore di fantacalcio che la lega FantaSanPio abbia mai conosciuto" }
+      ],
+      correct: "18.",
+      feedback: "Risposta corretta. Non era un semplice compleanno."
+    },
+    {
+      text: "Il 27 Giugno hai impegno?",
+      options: [
+        { num: "88", text: "Si" },
+        { num: "78", text: "No ma non verrò" },
+        { num: "69587", text: "No ma Ti Odio" },
+        { num: "089569", text: "Ho paura, concedetemi un po' di paura" }
+      ],
+      correct: "089569",
+      feedback: "La paura è accettabile. Presentati lo stesso."
+    }
+  ];
+
+  let currentQ = 0;
+  let answered = false;
+  let coordAttempts = 0;
+  const CORRECT_LAT = "40.405357";
+  const CORRECT_LNG = "18.089569";
+
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    window.scrollTo(0, 0);
+  }
+
+  function startQuiz() {
+    currentQ = 0;
+    showScreen('screen-quiz');
+    renderQuestion();
+  }
+
+  function renderQuestion() {
+    const q = questions[currentQ];
+    const progress = (currentQ / questions.length) * 100;
+    document.getElementById('progress-fill').style.width = progress + '%';
+    document.getElementById('q-label').textContent = 'Domanda ' + (currentQ + 1) + ' di ' + questions.length;
+    document.getElementById('q-text').textContent = q.text;
+    answered = false;
+
+    const grid = document.getElementById('options-grid');
+    grid.innerHTML = '';
+    q.options.forEach(function(opt) {
+      const btn = document.createElement('button');
+      btn.className = 'btn-option';
+      btn.dataset.num = opt.num;
+      btn.innerHTML = '<span class="option-num">' + opt.num + '</span><span class="option-text">' + opt.text + '</span>';
+      btn.onclick = function() { selectOption(opt.num); };
+      grid.appendChild(btn);
+    });
+
+    const fb = document.getElementById('feedback-box');
+    fb.className = 'feedback-box';
+    fb.textContent = '';
+    document.getElementById('next-btn').style.display = 'none';
+  }
+
+  function selectOption(num) {
+    if (answered) return;
+    answered = true;
+    const q = questions[currentQ];
+    const isCorrect = (num === q.correct);
+
+    document.querySelectorAll('#options-grid .btn-option').forEach(function(b) {
+      const bNum = b.dataset.num;
+      if (bNum === q.correct) b.classList.add('correct');
+      else b.classList.add('wrong');
+    });
+
+    const fb = document.getElementById('feedback-box');
+    if (isCorrect) {
+      fb.className = 'feedback-box show correct-fb';
+      fb.textContent = '✓ ' + q.feedback;
+    } else {
+      fb.className = 'feedback-box show wrong-fb';
+      fb.textContent = '✗ Sbagliato. La risposta corretta era ' + q.correct;
+    }
+    document.getElementById('next-btn').style.display = 'block';
+  }
+
+  function nextQuestion() {
+    currentQ++;
+    if (currentQ >= questions.length) {
+      showCoordScreen();
+    } else {
+      renderQuestion();
+    }
+  }
+
+  function showCoordScreen() {
+    showScreen('screen-coords');
+    document.getElementById('progress-fill').style.width = '100%';
+    const recap = document.getElementById('coord-recap');
+    recap.innerHTML = '<p style="font-size:11px;color:var(--text-muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;">// Le risposte giuste //</p>';
+    questions.forEach(function(q) {
+      const correctOpt = q.options.find(function(o) { return o.num === q.correct; });
+      const item = document.createElement('div');
+      item.className = 'recap-item';
+      const shortText = correctOpt.text.length > 38 ? correctOpt.text.substring(0, 38) + '...' : correctOpt.text;
+      item.innerHTML = '<span class="recap-num">' + q.correct + '</span><span class="recap-q">' + shortText + '</span>';
+      recap.appendChild(item);
+    });
+  }
+
+  function checkCoords() {
+    if (coordAttempts >= 3) return;
+    const val = document.getElementById('coord-single').value.trim().replace(/\s/g, '');
+    const fb = document.getElementById('coord-feedback');
+
+    if (!val) {
+      fb.className = 'feedback-box show wrong-fb';
+      fb.textContent = 'Inserisci la risposta.';
+      return;
+    }
+
+    // Accept various formats: "40.405357,18.089569" or "40.405357, 18.089569"
+    const normalized = val.replace(/\s/g, '');
+    const correct = CORRECT_LAT + ',' + CORRECT_LNG;
+
+    if (normalized === correct) {
+      showScreen('screen-success');
+      return;
+    }
+
+    coordAttempts++;
+    document.getElementById('dot-' + coordAttempts).classList.add('used');
+    fb.className = 'feedback-box show wrong-fb';
+
+    if (coordAttempts >= 3) {
+      fb.textContent = 'Tentativi esauriti. Malus assegnato.';
+      setTimeout(function() { showScreen('screen-fail'); }, 1500);
+    } else {
+      fb.textContent = 'Risposta errata. Hai ancora ' + (3 - coordAttempts) + ' tentativo/i.';
+    }
+  }
+
+  function handleResa() {
+    if (confirm('Sei sicuro di volerti arrendere? Riceverai -30 punti.')) {
+      showScreen('screen-resa');
+    }
+  }
+</script>
+</body>
+</html>
