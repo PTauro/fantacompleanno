@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FantaCompleanno — Alleanze</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700;800&family=Space+Mono:wght@400;700&display=swap');
+
+:root {
+  --bg: #0a0a0f; --surface: #13131a; --border: #1e1e2e;
+  --accent-cody: #ff6b2b; --accent-siria: #a855f7;
+  --text: #f0f0f5; --text-muted: #6b6b8a;
+  --green: #22c55e; --red: #ef4444; --gold: #f59e0b;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Space Grotesk', sans-serif;
+  background: var(--bg); color: var(--text);
+  min-height: 100vh; padding-bottom: 40px;
+}
+
+/* ── NAV ── */
+.nav {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(10,10,15,0.97); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 20px; display: flex; align-items: center; justify-content: space-between;
+}
+.nav-left { display: flex; flex-direction: column; }
+.nav-label { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--text-muted); letter-spacing:.1em; }
+.nav-title { font-size: 16px; font-weight: 800; }
+.btn-home {
+  background: var(--surface); border: 1.5px solid var(--border);
+  color: var(--text-muted); padding: 8px 14px; border-radius: 10px;
+  font-family: 'Space Grotesk', sans-serif; font-size: 13px; cursor: pointer;
+}
+
+/* ── TABS ── */
+.tabs {
+  display: flex; border-bottom: 1px solid var(--border);
+  background: var(--surface); position: sticky; top: 53px; z-index: 40;
+}
+.tab {
+  flex: 1; padding: 13px 8px; text-align: center;
+  font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700;
+  color: var(--text-muted); cursor: pointer; transition: all .2s;
+  border-bottom: 2px solid transparent;
+}
+.tab.active { color: var(--accent-siria); border-bottom-color: var(--accent-siria); }
+
+.tab-content { display: none; padding: 16px 20px; }
+.tab-content.active { display: block; }
+
+/* ── MIA ALLEANZA HEADER ── */
+.alleanza-hero {
+  border-radius: 16px; padding: 20px; margin-bottom: 16px;
+  background: linear-gradient(135deg, #0d0020, #1a0035);
+  border: 1.5px solid rgba(168,85,247,0.4);
+}
+.alleanza-hero-name { font-size: 22px; font-weight: 800; margin-bottom: 4px; }
+.alleanza-hero-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 16px; }
+
+.coeff-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.coeff-label { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--text-muted); letter-spacing:.1em; }
+.coeff-val { font-family: 'Space Mono', monospace; font-size: 24px; font-weight: 700; color: var(--accent-siria); }
+.coeff-val.neg { color: var(--red); }
+
+.track { width: 100%; height: 6px; background: var(--border); border-radius: 3px; margin-bottom: 12px; }
+.track-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--accent-cody), var(--accent-siria)); transition: width .5s; }
+
+.stats-pills { display: flex; gap: 8px; }
+.stat-pill {
+  background: rgba(168,85,247,0.1); border: 1px solid rgba(168,85,247,0.25);
+  border-radius: 100px; padding: 5px 12px;
+  font-family: 'Space Mono', monospace; font-size: 12px; color: var(--accent-siria);
+}
+.stat-pill.pos { background: rgba(34,197,94,0.1); border-color: rgba(34,197,94,0.25); color: var(--green); }
+
+/* ── SEZIONE LABEL ── */
+.section-label {
+  font-family: 'Space Mono', monospace; font-size: 10px;
+  color: var(--text-muted); letter-spacing: .12em; text-transform: uppercase;
+  margin-bottom: 10px; margin-top: 4px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.squadre-counter {
+  background: var(--border); border-radius: 100px; padding: 3px 10px;
+  font-size: 11px; color: var(--text-muted);
+}
+.squadre-counter.complete { background: rgba(34,197,94,0.15); color: var(--green); }
+
+/* ── SQUADRA CARD ── */
+.squadra-card {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 12px; padding: 14px 16px; margin-bottom: 8px;
+  display: flex; align-items: center; gap: 14px; transition: all .2s;
+}
+.squadra-card.me { border-color: var(--accent-cody); background: rgba(255,107,43,0.05); }
+.squadra-card.top { border-color: var(--gold); }
+.squadra-rank {
+  font-family: 'Space Mono', monospace; font-size: 18px; font-weight: 700;
+  min-width: 28px; color: var(--text-muted); text-align: center;
+}
+.squadra-rank.gold { color: var(--gold); }
+.squadra-rank.silver { color: #94a3b8; }
+.squadra-rank.bronze { color: var(--accent-cody); }
+.squadra-info { flex: 1; min-width: 0; }
+.squadra-name { font-size: 15px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.squadra-owner { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.squadra-pts {
+  font-family: 'Space Mono', monospace; font-size: 18px; font-weight: 700; text-align: right;
+}
+.squadra-pts.pos { color: var(--green); }
+.squadra-pts.neg { color: var(--red); }
+.squadra-pts.zero { color: var(--text-muted); }
+.squadra-delta { font-size: 10px; text-align: right; margin-top: 2px; font-family: 'Space Mono', monospace; color: var(--text-muted); }
+
+/* ── NO SQUADRA ── */
+.no-squadra {
+  background: var(--surface); border: 1.5px dashed var(--border);
+  border-radius: 12px; padding: 12px 16px; margin-bottom: 8px;
+  display: flex; align-items: center; gap: 14px; opacity: 0.5;
+}
+.no-sq-name { font-size: 13px; color: var(--text-muted); }
+
+/* ── ALTRE ALLEANZE ── */
+.altra-alleanza-card {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 14px; padding: 16px; margin-bottom: 10px;
+  cursor: pointer; transition: all .2s;
+}
+.altra-alleanza-card:hover { border-color: var(--accent-siria); }
+.altra-alleanza-card.winner { border-color: var(--gold); background: rgba(245,158,11,0.04); }
+.altra-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.altra-name { font-size: 15px; font-weight: 800; }
+.altra-pos {
+  font-family: 'Space Mono', monospace; font-size: 12px;
+  padding: 3px 10px; border-radius: 100px; background: var(--border); color: var(--text-muted);
+}
+.altra-pos.first { background: rgba(245,158,11,0.2); color: var(--gold); }
+.altra-coeff {
+  font-family: 'Space Mono', monospace; font-size: 20px; font-weight: 700;
+  color: var(--accent-siria); margin-bottom: 8px;
+}
+.altra-coeff.neg { color: var(--red); }
+.altra-track { width: 100%; height: 4px; background: var(--border); border-radius: 2px; margin-bottom: 10px; }
+.altra-track-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--accent-cody), var(--accent-siria)); transition: width .5s; }
+.altra-footer { display: flex; align-items: center; justify-content: space-between; }
+.altra-counter {
+  font-family: 'Space Mono', monospace; font-size: 11px; color: var(--text-muted);
+}
+.altra-counter.ok { color: var(--green); }
+.altra-expand { font-size: 12px; color: var(--text-muted); }
+
+/* ── DETTAGLIO ALLEANZA (modal) ── */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.88); z-index: 100;
+  overflow-y: auto; padding: 16px;
+}
+.modal-overlay.open { display: block; }
+.modal-box {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 20px; padding: 20px; max-width: 480px;
+  margin: 0 auto; animation: slideUp .25s ease;
+}
+@keyframes slideUp { from { transform:translateY(30px); opacity:0; } to { transform:translateY(0); opacity:1; } }
+.modal-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px; }
+.modal-title { font-size: 18px; font-weight: 800; }
+.modal-coeff { font-family: 'Space Mono', monospace; font-size: 14px; color: var(--accent-siria); margin-top: 4px; }
+.btn-close {
+  background: var(--border); border: none; color: var(--text);
+  width: 32px; height: 32px; border-radius: 50%; font-size: 16px;
+  cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+}
+
+/* ── EMPTY ── */
+.empty-state { text-align: center; padding: 30px 20px; color: var(--text-muted); font-size: 13px; }
+
+/* ── LIVE DOT ── */
+.live-dot {
+  display: flex; align-items: center; gap: 6px;
+  font-family: 'Space Mono', monospace; font-size: 11px; color: var(--green);
+}
+.live-dot::before {
+  content: ''; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--green); animation: pulse 1.5s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+/* ── TOAST ── */
+.toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  background: var(--surface); border: 1.5px solid var(--green);
+  color: var(--green); font-family: 'Space Mono', monospace;
+  font-size: 13px; padding: 12px 20px; border-radius: 100px;
+  opacity: 0; transition: opacity .3s; pointer-events: none; z-index: 300;
+}
+.toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<div class="nav">
+  <div class="nav-left">
+    <div class="nav-label">// ALLEANZE //</div>
+    <div class="nav-title">FantaCompleanno 🤝</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <div class="live-dot">LIVE</div>
+    <button class="btn-home" onclick="window.location.href='home.html'">← Home</button>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('mia')" id="tab-mia">🤝 La Mia Alleanza</div>
+  <div class="tab" onclick="switchTab('altre')" id="tab-altre">👀 Altre Alleanze</div>
+</div>
+
+<!-- TAB MIA ALLEANZA -->
+<div class="tab-content active" id="content-mia">
+  <div id="mia-alleanza-content"></div>
+</div>
+
+<!-- TAB ALTRE ALLEANZE -->
+<div class="tab-content" id="content-altre">
+  <div id="altre-alleanze-content"></div>
+</div>
+
+<!-- MODAL DETTAGLIO ALLEANZA -->
+<div class="modal-overlay" id="modal-alleanza">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="modal-alleanza-title"></div>
+        <div class="modal-coeff" id="modal-alleanza-coeff"></div>
+      </div>
+      <button class="btn-close" onclick="closeModal()">✕</button>
+    </div>
+    <div id="modal-alleanza-body"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCqLFQW8XQioObmxG0oDPc_MFpdFXJxmac",
+  authDomain: "fantacompleanno-c64c3.firebaseapp.com",
+  databaseURL: "https://fantacompleanno-c64c3-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "fantacompleanno-c64c3",
+  storageBucket: "fantacompleanno-c64c3.firebasestorage.app",
+  messagingSenderId: "1090185599902",
+  appId: "1:1090185599902:web:abcc2c0bcfdc2077d2548f"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+const myName = localStorage.getItem("fc_player_name");
+if (!myName) window.location.replace("register.html");
+
+// ── DATI ──
+const ALLEANZE = {
+  "💰 ISEE Allargato": ["Alessia","Madre (Anna)","Eleonora Sorella","Paolo","Mattia (Milano)","Mirco","Gloria","Dario","Gabriele","Federica","Simone","Desi","Michele","Zia Anna","Arianna"],
+  "💥 Bombette di Cisternino ASAP": ["Francesca","Nicolas","Giulia","Andrea","Emilio","Eleonora B","Marta","Beppe","Annachiara","Davide S"],
+  "😈 Il Buono Il Bello e il Danilo": ["Antonio","Marika","Danilo","Ilaria","Donato","Emily"],
+  "💸 Cuoricini Broke": ["Martina P","Maicol","Laura","Davide A (Attanasio)","Manuel","Carlotta","Nicolo Spada","Antonella","Beatrice","Marciarla","Mattia Martina"],
+  "⚽ FantaSanPio 08:00 AM": ["Pisi","Annalisa","Sciurti","Nicolo M","Silvia","Alessio Maci","Rachele","Perotto","Erminio","Sara C","Luca Grasso","Annalisa M","Caretto","Silvia M","Errico","Chiara D","Daniele","Davide M","Marialuce"],
+  "🏆 Guinness World Record Partecipazione": ["Francesco R","MariaChiara L","Alberto","Martina S","Luca I","Marika P","Stefanuccio"],
+};
+
+// ── STATO ──
+let punti = {};
+let teams = {};
+
+function sanitize(s) { return s.replace(/[.#$[\]]/g, "_"); }
+
+// ── CALCOLI ──
+function getPuntiPersonali(name) {
+  const key = sanitize(name);
+  if (!punti[key]) return { bonus: 0, malus: 0, tot: 0 };
+  let bonus = 0, malus = 0;
+  Object.values(punti[key]).forEach(e => {
+    if (e.pts > 0) bonus += e.pts; else malus += Math.abs(e.pts);
+  });
+  return { bonus, malus, tot: bonus - malus };
+}
+
+function getPuntiSquadra(ownerName) {
+  const key = sanitize(ownerName);
+  const team = teams[key];
+  if (!team || !team.roster) return { bonus: 0, malus: 0, tot: 0 };
+  let bonus = 0, malus = 0;
+  team.roster.forEach(playerName => {
+    const isCap = team.captain === playerName;
+    const pp = getPuntiPersonali(playerName);
+    const mult = isCap ? 2 : 1;
+    bonus += pp.bonus * mult;
+    malus += pp.malus * mult;
+  });
+  return { bonus, malus, tot: bonus - malus };
+}
+
+function getCoeffAlleanza(membri) {
+  const conSquadra = membri.filter(m => teams[sanitize(m)]);
+  if (conSquadra.length === 0) return 0;
+  const totBonus = conSquadra.reduce((s, m) => s + getPuntiSquadra(m).bonus, 0);
+  const totMalus = conSquadra.reduce((s, m) => s + getPuntiSquadra(m).malus, 0);
+  return (totBonus / conSquadra.length) - (totMalus / conSquadra.length);
+}
+
+function getSquadreFormate(membri) {
+  return membri.filter(m => teams[sanitize(m)]).length;
+}
+
+// Trova alleanza dell'utente
+function getMiaAlleanza() {
+  for (const [nome, membri] of Object.entries(ALLEANZE)) {
+    if (membri.includes(myName)) return { nome, membri };
+  }
+  return null;
+}
+
+// ── RENDER MIA ALLEANZA ──
+function renderMiaAlleanza() {
+  const container = document.getElementById("mia-alleanza-content");
+  const mia = getMiaAlleanza();
+
+  if (!mia) {
+    container.innerHTML = '<div class="empty-state">Non sei in nessuna alleanza.</div>';
+    return;
+  }
+
+  const coeff = getCoeffAlleanza(mia.membri);
+  const squadreFormate = getSquadreFormate(mia.membri);
+  const totMembri = mia.membri.length;
+
+  // Posizione in classifica
+  const ranked = Object.entries(ALLEANZE)
+    .map(([n, m]) => ({ nome: n, coeff: getCoeffAlleanza(m) }))
+    .sort((a, b) => b.coeff - a.coeff);
+  const myPos = ranked.findIndex(a => a.nome === mia.nome) + 1;
+
+  // Squadre ordinate per punti
+  const squadreOrdinate = mia.membri
+    .map(m => ({
+      owner: m,
+      teamName: teams[sanitize(m)]?.teamName || null,
+      pts: getPuntiSquadra(m).tot,
+      bonus: getPuntiSquadra(m).bonus,
+      malus: getPuntiSquadra(m).malus,
+      hasTeam: !!teams[sanitize(m)],
+    }))
+    .sort((a, b) => {
+      if (a.hasTeam && !b.hasTeam) return -1;
+      if (!a.hasTeam && b.hasTeam) return 1;
+      return b.pts - a.pts;
+    });
+
+  const isComplete = squadreFormate === totMembri;
+
+  container.innerHTML = `
+    <div class="alleanza-hero">
+      <div class="alleanza-hero-name">${mia.nome}</div>
+      <div class="alleanza-hero-sub">Sei in questa alleanza · ${myPos}° posto in classifica</div>
+      <div class="coeff-row">
+        <span class="coeff-label">COEFFICIENTE</span>
+        <span class="coeff-val ${coeff < 0 ? 'neg' : ''}">${coeff > 0 ? '+' : ''}${coeff.toFixed(1)}</span>
+      </div>
+      <div class="track"><div class="track-fill" style="width:${Math.min(100, Math.max(10, 50 + coeff))}%"></div></div>
+      <div class="stats-pills">
+        <div class="stat-pill pos">${myPos}° su 6 alleanze</div>
+        <div class="stat-pill">${squadreFormate}/${totMembri} squadre formate</div>
+      </div>
+    </div>
+
+    <div class="section-label">
+      <span>Squadre dell'Alleanza</span>
+      <span class="squadre-counter ${isComplete ? 'complete' : ''}">${squadreFormate}/${totMembri} ✂️</span>
+    </div>
+  `;
+
+  // Lista squadre
+  let rank = 1;
+  squadreOrdinate.forEach(s => {
+    const isMe = s.owner === myName;
+    if (s.hasTeam) {
+      const posC = rank === 1 ? "gold" : rank === 2 ? "silver" : rank === 3 ? "bronze" : "";
+      const div = document.createElement("div");
+      div.className = "squadra-card" + (isMe ? " me" : "") + (rank === 1 ? " top" : "");
+      div.innerHTML = `
+        <div class="squadra-rank ${posC}">${rank}</div>
+        <div class="squadra-info">
+          <div class="squadra-name">${s.teamName || "Squadra senza nome"}</div>
+          <div class="squadra-owner">${s.owner}${isMe ? " 👤" : ""}</div>
+        </div>
+        <div>
+          <div class="squadra-pts ${s.pts > 0 ? 'pos' : s.pts < 0 ? 'neg' : 'zero'}">${s.pts > 0 ? '+' : ''}${s.pts}</div>
+          <div class="squadra-delta"><span style="color:var(--green)">+${s.bonus}</span> / <span style="color:var(--red)">-${s.malus}</span></div>
+        </div>
+      `;
+      container.appendChild(div);
+      rank++;
+    } else {
+      // Membro senza squadra
+      const div = document.createElement("div");
+      div.className = "no-squadra";
+      div.innerHTML = `
+        <div class="squadra-rank">—</div>
+        <div class="squadra-info">
+          <div class="no-sq-name">${s.owner}${isMe ? " 👤" : ""}</div>
+          <div class="squadra-owner">Squadra non ancora creata</div>
+        </div>
+      `;
+      container.appendChild(div);
+    }
+  });
+}
+
+// ── RENDER ALTRE ALLEANZE ──
+function renderAltreAlleanze() {
+  const container = document.getElementById("altre-alleanze-content");
+  container.innerHTML = "";
+
+  const mia = getMiaAlleanza();
+  const ranked = Object.entries(ALLEANZE)
+    .map(([nome, membri]) => ({ nome, membri, coeff: getCoeffAlleanza(membri) }))
+    .sort((a, b) => b.coeff - a.coeff);
+
+  const maxCoeff = Math.max(...ranked.map(a => Math.abs(a.coeff)), 1);
+
+  ranked.forEach((a, i) => {
+    const isMia = mia && a.nome === mia.nome;
+    const squadreFormate = getSquadreFormate(a.membri);
+    const totMembri = a.membri.length;
+    const isComplete = squadreFormate === totMembri;
+    const pct = Math.min(100, Math.max(5, 50 + (a.coeff / maxCoeff) * 50));
+
+    const div = document.createElement("div");
+    div.className = "altra-alleanza-card" + (i === 0 ? " winner" : "");
+    div.onclick = () => openDettaglio(a.nome, a.membri, i + 1, a.coeff);
+
+    div.innerHTML = `
+      <div class="altra-header">
+        <div>
+          <div class="altra-name">${a.nome}${isMia ? " 👤" : ""}</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">${totMembri} membri</div>
+        </div>
+        <div class="altra-pos ${i === 0 ? 'first' : ''}">${i === 0 ? '🥇 1°' : (i + 1) + '°'}</div>
+      </div>
+      <div class="altra-coeff ${a.coeff < 0 ? 'neg' : ''}">${a.coeff > 0 ? '+' : ''}${a.coeff.toFixed(1)}</div>
+      <div class="altra-track"><div class="altra-track-fill" style="width:${pct}%"></div></div>
+      <div class="altra-footer">
+        <div class="altra-counter ${isComplete ? 'ok' : ''}">
+          ✂️ ${squadreFormate}/${totMembri} squadre formate
+        </div>
+        <div class="altra-expand">Vedi squadre →</div>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+// ── MODAL DETTAGLIO ALTRA ALLEANZA ──
+window.openDettaglio = function(nome, membri, pos, coeff) {
+  document.getElementById("modal-alleanza-title").textContent = nome;
+  document.getElementById("modal-alleanza-coeff").textContent =
+    `${pos}° posto · Coefficiente ${coeff > 0 ? '+' : ''}${coeff.toFixed(1)}`;
+
+  const squadreFormate = getSquadreFormate(membri);
+  const body = document.getElementById("modal-alleanza-body");
+
+  const label = document.createElement("div");
+  label.className = "section-label";
+  label.innerHTML = `<span>Squadre</span><span class="squadre-counter ${squadreFormate === membri.length ? 'complete' : ''}">${squadreFormate}/${membri.length} ✂️</span>`;
+  body.innerHTML = "";
+  body.appendChild(label);
+
+  const squadre = membri
+    .map(m => ({
+      owner: m,
+      teamName: teams[sanitize(m)]?.teamName || null,
+      pts: getPuntiSquadra(m).tot,
+      bonus: getPuntiSquadra(m).bonus,
+      malus: getPuntiSquadra(m).malus,
+      hasTeam: !!teams[sanitize(m)],
+    }))
+    .sort((a, b) => {
+      if (a.hasTeam && !b.hasTeam) return -1;
+      if (!a.hasTeam && b.hasTeam) return 1;
+      return b.pts - a.pts;
+    });
+
+  let rank = 1;
+  squadre.forEach(s => {
+    const isMe = s.owner === myName;
+    if (s.hasTeam) {
+      const posC = rank === 1 ? "gold" : rank === 2 ? "silver" : rank === 3 ? "bronze" : "";
+      const div = document.createElement("div");
+      div.className = "squadra-card" + (isMe ? " me" : "");
+      div.innerHTML = `
+        <div class="squadra-rank ${posC}">${rank}</div>
+        <div class="squadra-info">
+          <div class="squadra-name">${s.teamName || "Squadra senza nome"}</div>
+          <div class="squadra-owner">${s.owner}${isMe ? " 👤" : ""}</div>
+        </div>
+        <div>
+          <div class="squadra-pts ${s.pts > 0 ? 'pos' : s.pts < 0 ? 'neg' : 'zero'}">${s.pts > 0 ? '+' : ''}${s.pts}</div>
+          <div class="squadra-delta"><span style="color:var(--green)">+${s.bonus}</span> / <span style="color:var(--red)">-${s.malus}</span></div>
+        </div>
+      `;
+      body.appendChild(div);
+      rank++;
+    } else {
+      const div = document.createElement("div");
+      div.className = "no-squadra";
+      div.innerHTML = `
+        <div class="squadra-rank">—</div>
+        <div class="squadra-info">
+          <div class="no-sq-name">${s.owner}${isMe ? " 👤" : ""}</div>
+          <div class="squadra-owner">Squadra non ancora creata</div>
+        </div>
+      `;
+      body.appendChild(div);
+    }
+  });
+
+  document.getElementById("modal-alleanza").classList.add("open");
+};
+
+window.closeModal = function() {
+  document.getElementById("modal-alleanza").classList.remove("open");
+};
+
+// ── TABS ──
+window.switchTab = function(tab) {
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  document.querySelectorAll(".tab-content").forEach(t => t.classList.remove("active"));
+  document.getElementById("tab-" + tab).classList.add("active");
+  document.getElementById("content-" + tab).classList.add("active");
+};
+
+// ── INIT ──
+function init() {
+  onValue(ref(db, "punti"), snap => {
+    punti = snap.exists() ? snap.val() : {};
+    renderMiaAlleanza();
+    renderAltreAlleanze();
+  });
+
+  onValue(ref(db, "teams"), snap => {
+    teams = snap.exists() ? snap.val() : {};
+    renderMiaAlleanza();
+    renderAltreAlleanze();
+  });
+}
+
+init();
+</script>
+</body>
+</html>
