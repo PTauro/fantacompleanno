@@ -313,12 +313,12 @@ body {
 
   <div class="generale-block">
     <div class="generale-block-title">⚔️ Le Fazioni — Cody vs Siria</div>
-    <p>All'arrivo alla festa ogni ospite pesca una carta segreta: <span style="color:var(--accent-cody)">Team Cody</span> o <span style="color:var(--accent-siria)">Team Siria</span>. Nessuno sa a che fazione appartengono gli altri. A fine serata si rivela tutto: la fazione con più punti vince <strong>+150 pt campionato</strong> a tutti i suoi membri.</p>
+    <p>Ogni ospite ha una <strong>carta fazione segreta</strong> che può scoprire in qualsiasi momento dal sito — aprendo una busta animata. La carta rivela la fazione (<span style="color:var(--accent-cody)">Team Cody</span> o <span style="color:var(--accent-siria)">Team Siria</span>) e il ruolo segreto. Nessuno sa la fazione degli altri. A fine serata si rivela tutto: la fazione con più punti vince <strong>+150 pt campionato</strong> a tutti i suoi membri.</p>
   </div>
 
   <div class="generale-block">
     <div class="generale-block-title">🤝 Le Alleanze</div>
-    <p>Ogni ospite è assegnato da Pietro a uno di <strong>6 gruppi fissi</strong>. Il punteggio alleanza si calcola come <strong>(Media Bonus membri) − (Media Malus membri)</strong> — il coefficiente con la differenza più alta vince. Nessun vantaggio per i gruppi più grandi. L'alleanza vincente porta <strong>+150 pt campionato</strong> a tutti i suoi membri.</p>
+    <p>Ogni ospite è assegnato da Pietro a uno di <strong>6 gruppi fissi</strong>. Il punteggio si calcola come <strong>(Media Bonus membri) − (Media Malus membri)</strong> — il coefficiente più alto vince. Nessun vantaggio per i gruppi più grandi. L'alleanza vincente porta <strong>+150 pt campionato</strong> a tutti i suoi membri.</p>
   </div>
 
   <div class="generale-block">
@@ -369,11 +369,11 @@ body {
     </div>
 
     <!-- FAZIONE -->
-    <div class="action-card-small action-card-fazione" onclick="showComingSoon('Fazione')">
+    <div class="action-card-small action-card-fazione" onclick="window.location.href='fazione.html'">
       <span class="card-icon">⚔️</span>
-      <div class="card-title">Fazione</div>
-      <div class="card-sub" style="color:var(--text-muted);">Cody o Siria?</div>
-      <div class="card-badge badge-lock" style="margin-top:8px; font-size:9px;">Si scopre alla festa</div>
+      <div class="card-title">La tua Fazione</div>
+      <div class="card-sub" style="color:var(--text-muted);">Scopri il tuo ruolo segreto</div>
+      <div class="card-badge badge-lock" style="margin-top:8px; font-size:9px;" id="fazione-badge">Apri la busta →</div>
     </div>
   </div>
 </div>
