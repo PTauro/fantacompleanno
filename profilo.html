@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FantaCompleanno — Il Mio Profilo</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700;800&family=Space+Mono:wght@400;700&display=swap');
+
+:root {
+  --bg: #0a0a0f; --surface: #13131a; --border: #1e1e2e;
+  --accent-cody: #ff6b2b; --accent-siria: #a855f7;
+  --text: #f0f0f5; --text-muted: #6b6b8a;
+  --green: #22c55e; --red: #ef4444; --gold: #f59e0b;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Space Grotesk', sans-serif;
+  background: var(--bg); color: var(--text);
+  min-height: 100vh; padding-bottom: 40px;
+}
+
+/* ── NAV ── */
+.nav {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(10,10,15,0.97); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 20px; display: flex; align-items: center; justify-content: space-between;
+}
+.nav-label { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--text-muted); letter-spacing:.1em; }
+.nav-name { font-size: 16px; font-weight: 800; }
+.btn-home {
+  background: var(--surface); border: 1.5px solid var(--border);
+  color: var(--text-muted); padding: 8px 14px; border-radius: 10px;
+  font-family: 'Space Grotesk', sans-serif; font-size: 13px; cursor: pointer;
+}
+
+/* ── HERO ── */
+.hero {
+  padding: 24px 20px 0;
+}
+.hero-top {
+  display: flex; align-items: center; gap: 16px; margin-bottom: 20px;
+}
+.avatar {
+  width: 64px; height: 64px; border-radius: 16px;
+  background: linear-gradient(135deg, var(--accent-cody), var(--accent-siria));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px; font-weight: 800; font-family: 'Space Mono', monospace;
+  color: white; flex-shrink: 0;
+}
+.hero-info { flex: 1; }
+.hero-name { font-size: 22px; font-weight: 800; line-height: 1.1; }
+.hero-team { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+
+/* ── PUNTI HERO ── */
+.punti-hero {
+  background: linear-gradient(135deg, #150800, #2d1200);
+  border: 1.5px solid rgba(255,107,43,0.4);
+  border-radius: 16px; padding: 20px; margin-bottom: 16px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.punti-num {
+  font-family: 'Space Mono', monospace; font-size: 48px; font-weight: 700;
+  line-height: 1;
+}
+.punti-num.pos { color: var(--accent-cody); }
+.punti-num.neg { color: var(--red); }
+.punti-num.zero { color: var(--text-muted); }
+.punti-label { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--text-muted); letter-spacing: .1em; margin-bottom: 4px; }
+.punti-sub { font-size: 12px; color: var(--text-muted); }
+.punti-breakdown { text-align: right; }
+.punti-breakdown-row { font-family: 'Space Mono', monospace; font-size: 14px; margin-bottom: 4px; }
+
+/* ── STATS GRID ── */
+.stats-grid {
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px; margin-bottom: 16px; padding: 0 20px;
+}
+.stat-card {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 12px; padding: 12px; text-align: center;
+}
+.stat-card-num {
+  font-family: 'Space Mono', monospace; font-size: 20px; font-weight: 700;
+  display: block; margin-bottom: 3px;
+}
+.stat-card-num.gold { color: var(--gold); }
+.stat-card-num.green { color: var(--green); }
+.stat-card-num.siria { color: var(--accent-siria); }
+.stat-card-label { font-size: 10px; color: var(--text-muted); }
+
+/* ── SEZIONI ── */
+.section { padding: 0 20px; margin-bottom: 20px; }
+.section-title {
+  font-family: 'Space Mono', monospace; font-size: 11px;
+  color: var(--text-muted); letter-spacing: .12em; text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+/* ── SQUADRA ── */
+.squadra-header {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 14px; padding: 14px 16px; margin-bottom: 8px;
+}
+.squadra-nome { font-size: 16px; font-weight: 800; margin-bottom: 4px; }
+.squadra-budget { font-size: 12px; color: var(--text-muted); }
+
+.giocatore-row {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 10px; padding: 12px 14px; margin-bottom: 6px;
+  display: flex; align-items: center; gap: 12px;
+}
+.giocatore-row.capitano { border-color: var(--gold); background: rgba(245,158,11,0.05); }
+.giocatore-avatar {
+  width: 36px; height: 36px; border-radius: 8px;
+  background: var(--border); display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 800; font-family: 'Space Mono', monospace;
+  color: var(--text-muted); flex-shrink: 0;
+}
+.giocatore-row.capitano .giocatore-avatar { background: rgba(245,158,11,0.2); color: var(--gold); }
+.giocatore-info { flex: 1; }
+.giocatore-nome { font-size: 14px; font-weight: 700; }
+.giocatore-ruolo { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.giocatore-pts {
+  font-family: 'Space Mono', monospace; font-size: 15px; font-weight: 700; text-align: right;
+}
+.giocatore-pts.pos { color: var(--green); }
+.giocatore-pts.neg { color: var(--red); }
+.giocatore-pts.zero { color: var(--text-muted); }
+.cap-x2 { font-size: 10px; color: var(--gold); text-align: right; margin-top: 2px; font-family: 'Space Mono', monospace; }
+
+/* ── POSIZIONE ── */
+.posizione-row {
+  display: flex; gap: 8px;
+}
+.pos-card {
+  flex: 1; background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 12px; padding: 14px; text-align: center;
+}
+.pos-card.highlight { border-color: var(--accent-cody); background: rgba(255,107,43,0.05); }
+.pos-num {
+  font-family: 'Space Mono', monospace; font-size: 28px; font-weight: 700;
+  color: var(--accent-cody); display: block; margin-bottom: 4px;
+}
+.pos-label { font-size: 11px; color: var(--text-muted); }
+.pos-sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+/* ── ALLEANZA ── */
+.alleanza-mini {
+  background: linear-gradient(135deg, #0d0020, #1a0035);
+  border: 1.5px solid rgba(168,85,247,0.35);
+  border-radius: 14px; padding: 16px; cursor: pointer; transition: all .2s;
+}
+.alleanza-mini:hover { border-color: var(--accent-siria); }
+.alleanza-mini-name { font-size: 16px; font-weight: 800; margin-bottom: 6px; }
+.alleanza-mini-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.alleanza-mini-coeff { font-family: 'Space Mono', monospace; font-size: 18px; font-weight: 700; color: var(--accent-siria); }
+.alleanza-mini-pos { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--text-muted); }
+.alleanza-mini-track { width: 100%; height: 4px; background: var(--border); border-radius: 2px; }
+.alleanza-mini-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--accent-cody), var(--accent-siria)); transition: width .5s; }
+
+/* ── STORICO ── */
+.storico-item {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 10px; padding: 12px 14px; margin-bottom: 6px;
+  display: flex; align-items: center; gap: 12px;
+}
+.storico-pts {
+  font-family: 'Space Mono', monospace; font-size: 16px; font-weight: 700;
+  min-width: 52px; flex-shrink: 0;
+}
+.storico-pts.pos { color: var(--green); }
+.storico-pts.neg { color: var(--red); }
+.storico-info { flex: 1; }
+.storico-desc { font-size: 13px; font-weight: 600; }
+.storico-time { font-size: 10px; color: var(--text-muted); margin-top: 2px; font-family: 'Space Mono', monospace; }
+
+/* ── EMPTY ── */
+.empty-state { text-align: center; padding: 24px; color: var(--text-muted); font-size: 13px; }
+
+/* ── LIVE ── */
+.live-dot {
+  display: flex; align-items: center; gap: 6px;
+  font-family: 'Space Mono', monospace; font-size: 11px; color: var(--green);
+}
+.live-dot::before {
+  content:''; width:8px; height:8px; border-radius:50%;
+  background:var(--green); animation:pulse 1.5s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1}50%{opacity:.3} }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<div class="nav">
+  <div>
+    <div class="nav-label">// IL MIO PROFILO //</div>
+    <div class="nav-name" id="nav-name">...</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <div class="live-dot">LIVE</div>
+    <button class="btn-home" onclick="window.location.href='home.html'">← Home</button>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-top">
+    <div class="avatar" id="avatar">?</div>
+    <div class="hero-info">
+      <div class="hero-name" id="hero-name">...</div>
+      <div class="hero-team" id="hero-team">Caricamento...</div>
+    </div>
+  </div>
+
+  <!-- PUNTI PERSONALI -->
+  <div class="punti-hero" style="margin: 0 0 16px;">
+    <div>
+      <div class="punti-label">PUNTI PERSONALI</div>
+      <div class="punti-num zero" id="punti-num">0</div>
+      <div class="punti-sub">assegnati durante la festa</div>
+    </div>
+    <div class="punti-breakdown">
+      <div class="punti-breakdown-row" style="color:var(--green)" id="punti-bonus">+0 bonus</div>
+      <div class="punti-breakdown-row" style="color:var(--red)" id="punti-malus">-0 malus</div>
+      <div class="punti-breakdown-row" style="color:var(--text-muted)" id="punti-eventi">0 eventi</div>
+    </div>
+  </div>
+</div>
+
+<!-- STATS GRID -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <span class="stat-card-num gold" id="pos-camp">—</span>
+    <span class="stat-card-label">Classifica</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-card-num green" id="pts-squadra">0</span>
+    <span class="stat-card-label">Pts Squadra</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-card-num siria" id="pos-alleanza">—</span>
+    <span class="stat-card-label">Alleanza</span>
+  </div>
+</div>
+
+<!-- SQUADRA -->
+<div class="section">
+  <div class="section-title">La mia squadra</div>
+  <div id="squadra-content"></div>
+</div>
+
+<!-- POSIZIONE IN CLASSIFICA -->
+<div class="section">
+  <div class="section-title">Posizione</div>
+  <div class="posizione-row" id="posizione-row"></div>
+</div>
+
+<!-- ALLEANZA -->
+<div class="section">
+  <div class="section-title">La mia alleanza</div>
+  <div id="alleanza-content"></div>
+</div>
+
+<!-- STORICO EVENTI -->
+<div class="section">
+  <div class="section-title">Storico eventi personali</div>
+  <div id="storico-content"></div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCqLFQW8XQioObmxG0oDPc_MFpdFXJxmac",
+  authDomain: "fantacompleanno-c64c3.firebaseapp.com",
+  databaseURL: "https://fantacompleanno-c64c3-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "fantacompleanno-c64c3",
+  storageBucket: "fantacompleanno-c64c3.firebasestorage.app",
+  messagingSenderId: "1090185599902",
+  appId: "1:1090185599902:web:abcc2c0bcfdc2077d2548f"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+const myName = localStorage.getItem("fc_player_name");
+if (!myName) { window.location.replace("register.html"); }
+
+const PLAYERS = [
+  { name: "Alessia", cost: 175 },
+  { name: "Madre (Anna)", cost: 150 },
+  { name: "Eleonora Sorella", cost: 90 },
+  { name: "Paolo", cost: 110 },
+  { name: "Mattia (Milano)", cost: 70 },
+  { name: "Mirco", cost: 85 },
+  { name: "Gloria", cost: 85 },
+  { name: "Dario", cost: 95 },
+  { name: "Gabriele", cost: 100 },
+  { name: "Federica", cost: 85 },
+  { name: "Simone", cost: 85 },
+  { name: "Desi", cost: 85 },
+  { name: "Michele", cost: 65 },
+  { name: "Zia Anna", cost: 105 },
+  { name: "Arianna", cost: 80 },
+  { name: "Francesca", cost: 140 },
+  { name: "Nicolas", cost: 115 },
+  { name: "Giulia", cost: 55 },
+  { name: "Andrea", cost: 55 },
+  { name: "Emilio", cost: 110 },
+  { name: "Eleonora B", cost: 110 },
+  { name: "Marta", cost: 160 },
+  { name: "Beppe", cost: 160 },
+  { name: "Annachiara", cost: 85 },
+  { name: "Davide S", cost: 50 },
+  { name: "Antonio", cost: 130 },
+  { name: "Marika", cost: 90 },
+  { name: "Danilo", cost: 175 },
+  { name: "Ilaria", cost: 90 },
+  { name: "Donato", cost: 115 },
+  { name: "Emily", cost: 80 },
+  { name: "Martina P", cost: 115 },
+  { name: "Maicol", cost: 125 },
+  { name: "Laura", cost: 95 },
+  { name: "Davide A (Attanasio)", cost: 135 },
+  { name: "Manuel", cost: 180 },
+  { name: "Carlotta", cost: 95 },
+  { name: "Nicolo Spada", cost: 120 },
+  { name: "Antonella", cost: 50 },
+  { name: "Beatrice", cost: 80 },
+  { name: "Marciarla", cost: 45 },
+  { name: "Mattia Martina", cost: 80 },
+  { name: "Pisi", cost: 90 },
+  { name: "Annalisa", cost: 105 },
+  { name: "Sciurti", cost: 100 },
+  { name: "Nicolo M", cost: 85 },
+  { name: "Silvia", cost: 50 },
+  { name: "Alessio Maci", cost: 85 },
+  { name: "Rachele", cost: 50 },
+  { name: "Perotto", cost: 40 },
+  { name: "Erminio", cost: 165 },
+  { name: "Sara C", cost: 50 },
+  { name: "Luca Grasso", cost: 85 },
+  { name: "Annalisa M", cost: 50 },
+  { name: "Caretto", cost: 85 },
+  { name: "Silvia M", cost: 50 },
+  { name: "Errico", cost: 85 },
+  { name: "Chiara D", cost: 50 },
+  { name: "Daniele", cost: 80 },
+  { name: "Davide M", cost: 160 },
+  { name: "Marialuce", cost: 85 },
+  { name: "Francesco R", cost: 85 },
+  { name: "MariaChiara L", cost: 50 },
+  { name: "Alberto", cost: 100 },
+  { name: "Martina S", cost: 85 },
+  { name: "Luca I", cost: 80 },
+  { name: "Marika P", cost: 50 },
+  { name: "Stefanuccio", cost: 130 },
+];
+
+const ALLEANZE = {
+  "💰 ISEE Allargato": ["Alessia","Madre (Anna)","Eleonora Sorella","Paolo","Mattia (Milano)","Mirco","Gloria","Dario","Gabriele","Federica","Simone","Desi","Michele","Zia Anna","Arianna"],
+  "💥 Bombette di Cisternino ASAP": ["Francesca","Nicolas","Giulia","Andrea","Emilio","Eleonora B","Marta","Beppe","Annachiara","Davide S"],
+  "😈 Il Buono Il Bello e il Danilo": ["Antonio","Marika","Danilo","Ilaria","Donato","Emily"],
+  "💸 Cuoricini Broke": ["Martina P","Maicol","Laura","Davide A (Attanasio)","Manuel","Carlotta","Nicolo Spada","Antonella","Beatrice","Marciarla","Mattia Martina"],
+  "⚽ FantaSanPio 08:00 AM": ["Pisi","Annalisa","Sciurti","Nicolo M","Silvia","Alessio Maci","Rachele","Perotto","Erminio","Sara C","Luca Grasso","Annalisa M","Caretto","Silvia M","Errico","Chiara D","Daniele","Davide M","Marialuce"],
+  "🏆 Guinness World Record Partecipazione": ["Francesco R","MariaChiara L","Alberto","Martina S","Luca I","Marika P","Stefanuccio"],
+};
+
+let punti = {};
+let teams = {};
+
+function sanitize(s) { return s.replace(/[.#$[\]]/g, "_"); }
+
+// ── CALCOLI ──
+function getPuntiPersonali(name) {
+  const key = sanitize(name);
+  if (!punti[key]) return { bonus: 0, malus: 0, tot: 0, eventi: [] };
+  let bonus = 0, malus = 0, eventi = [];
+  Object.entries(punti[key]).forEach(([id, e]) => {
+    if (e.pts > 0) bonus += e.pts; else malus += Math.abs(e.pts);
+    eventi.push({ id, ...e });
+  });
+  return { bonus, malus, tot: bonus - malus, eventi: eventi.sort((a,b) => (b.ts||0)-(a.ts||0)) };
+}
+
+function getPuntiSquadra(ownerName) {
+  const key = sanitize(ownerName);
+  const team = teams[key];
+  if (!team || !team.roster) return 0;
+  let tot = 0;
+  team.roster.forEach(p => {
+    const isCap = team.captain === p;
+    const pp = getPuntiPersonali(p);
+    tot += (pp.bonus - pp.malus) * (isCap ? 2 : 1);
+  });
+  return tot;
+}
+
+function getMiaAlleanza() {
+  for (const [nome, membri] of Object.entries(ALLEANZE)) {
+    if (membri.includes(myName)) return { nome, membri };
+  }
+  return null;
+}
+
+function getCoeffAlleanza(membri) {
+  const conSq = membri.filter(m => teams[sanitize(m)]);
+  if (!conSq.length) return 0;
+  const totB = conSq.reduce((s,m) => s + getPuntiPersonali(m).bonus, 0);
+  const totM = conSq.reduce((s,m) => s + getPuntiPersonali(m).malus, 0);
+  return (totB / conSq.length) - (totM / conSq.length);
+}
+
+// ── RENDER ──
+function render() {
+  const pp = getPuntiPersonali(myName);
+  const myKey = sanitize(myName);
+  const myTeam = teams[myKey];
+  const ptsSq = getPuntiSquadra(myName);
+  const initials = myName.split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase();
+
+  // Nav + avatar
+  document.getElementById("nav-name").textContent = myName;
+  document.getElementById("avatar").textContent = initials;
+  document.getElementById("hero-name").textContent = myName;
+  document.getElementById("hero-team").textContent = myTeam ? `✂️ ${myTeam.teamName || "Squadra senza nome"}` : "Nessuna squadra ancora";
+
+  // Punti personali
+  const pEl = document.getElementById("punti-num");
+  pEl.textContent = (pp.tot > 0 ? "+" : "") + pp.tot;
+  pEl.className = "punti-num " + (pp.tot > 0 ? "pos" : pp.tot < 0 ? "neg" : "zero");
+  document.getElementById("punti-bonus").textContent = `+${pp.bonus} bonus`;
+  document.getElementById("punti-malus").textContent = `-${pp.malus} malus`;
+  document.getElementById("punti-eventi").textContent = `${pp.eventi.length} eventi`;
+
+  // Posizione campionato (basata su punti squadra)
+  const classifica = PLAYERS.map(p => ({ name: p.name, pts: getPuntiSquadra(p.name) }))
+    .sort((a,b) => b.pts - a.pts);
+  const myPos = classifica.findIndex(p => p.name === myName) + 1;
+
+  // Posizione alleanza
+  const miaAll = getMiaAlleanza();
+  const allanzeRanked = Object.entries(ALLEANZE)
+    .map(([n,m]) => ({ nome: n, coeff: getCoeffAlleanza(m) }))
+    .sort((a,b) => b.coeff - a.coeff);
+  const myAllPos = miaAll ? allanzeRanked.findIndex(a => a.nome === miaAll.nome) + 1 : null;
+
+  // Stats grid
+  document.getElementById("pos-camp").textContent = myPos + "°";
+  document.getElementById("pts-squadra").textContent = (ptsSq > 0 ? "+" : "") + ptsSq;
+  document.getElementById("pos-alleanza").textContent = myAllPos ? myAllPos + "°" : "—";
+
+  // ── SQUADRA ──
+  const sqContainer = document.getElementById("squadra-content");
+  sqContainer.innerHTML = "";
+  if (!myTeam || !myTeam.roster) {
+    sqContainer.innerHTML = '<div class="empty-state">Non hai ancora creato la squadra.<br><br><button onclick="window.location.href=\'draft.html\'" style="background:linear-gradient(135deg,var(--accent-cody),var(--accent-siria));color:white;padding:12px 24px;border-radius:10px;border:none;font-family:\'Space Grotesk\',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">Crea squadra →</button></div>';
+  } else {
+    const header = document.createElement("div");
+    header.className = "squadra-header";
+    const spesi = myTeam.roster.reduce((s,n) => s + (PLAYERS.find(p=>p.name===n)?.cost||0), 0);
+    header.innerHTML = `<div class="squadra-nome">${myTeam.teamName || "Squadra senza nome"}</div><div class="squadra-budget">✂️ ${spesi}/500 Capelli spesi · ${myTeam.roster.length}/5 giocatori</div>`;
+    sqContainer.appendChild(header);
+
+    myTeam.roster.forEach(pName => {
+      const isCap = myTeam.captain === pName;
+      const pPts = getPuntiPersonali(pName);
+      const pData = PLAYERS.find(p => p.name === pName);
+      const initials2 = pName.split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase();
+      const ptsConMolt = isCap ? (pPts.bonus - pPts.malus) * 2 : pPts.tot;
+
+      const div = document.createElement("div");
+      div.className = "giocatore-row" + (isCap ? " capitano" : "");
+      div.innerHTML = `
+        <div class="giocatore-avatar">${isCap ? "⭐" : initials2}</div>
+        <div class="giocatore-info">
+          <div class="giocatore-nome">${pName}</div>
+          <div class="giocatore-ruolo">${pData?.cost || 0} ✂️${isCap ? " · CAPITANO x2" : ""}</div>
+        </div>
+        <div>
+          <div class="giocatore-pts ${ptsConMolt > 0 ? 'pos' : ptsConMolt < 0 ? 'neg' : 'zero'}">${ptsConMolt > 0 ? '+' : ''}${ptsConMolt}</div>
+          ${isCap ? '<div class="cap-x2">x2 applicato</div>' : ''}
+        </div>
+      `;
+      sqContainer.appendChild(div);
+    });
+
+    // Tasto modifica
+    const editBtn = document.createElement("button");
+    editBtn.onclick = () => window.location.href = "draft.html";
+    editBtn.style.cssText = "width:100%;background:var(--surface);border:1.5px solid var(--border);color:var(--text-muted);padding:12px;border-radius:10px;font-family:'Space Grotesk',sans-serif;font-size:13px;cursor:pointer;margin-top:8px;";
+    editBtn.textContent = "✏️ Modifica squadra";
+    sqContainer.appendChild(editBtn);
+  }
+
+  // ── POSIZIONE IN CLASSIFICA ──
+  const posRow = document.getElementById("posizione-row");
+  posRow.innerHTML = "";
+  const prevName = myPos > 1 ? classifica[myPos-2].name : null;
+  const nextName = myPos < classifica.length ? classifica[myPos].name : null;
+  const prevPts = prevName ? getPuntiSquadra(prevName) : null;
+  const nextPts = nextName ? getPuntiSquadra(nextName) : null;
+
+  if (prevName) {
+    const div = document.createElement("div");
+    div.className = "pos-card";
+    div.innerHTML = `<span class="pos-num" style="font-size:14px;color:var(--text-muted)">${prevName.split(" ")[0]}</span><span class="pos-label">Sopra di te</span><span class="pos-sub">+${prevPts} pt</span>`;
+    posRow.appendChild(div);
+  }
+
+  const myCard = document.createElement("div");
+  myCard.className = "pos-card highlight";
+  myCard.innerHTML = `<span class="pos-num">${myPos}°</span><span class="pos-label">su ${PLAYERS.length}</span><span class="pos-sub">${ptsSq > 0 ? '+' : ''}${ptsSq} pt squadra</span>`;
+  posRow.appendChild(myCard);
+
+  if (nextName) {
+    const div = document.createElement("div");
+    div.className = "pos-card";
+    div.innerHTML = `<span class="pos-num" style="font-size:14px;color:var(--text-muted)">${nextName.split(" ")[0]}</span><span class="pos-label">Sotto di te</span><span class="pos-sub">${nextPts > 0 ? '+' : ''}${nextPts} pt</span>`;
+    posRow.appendChild(div);
+  }
+
+  // ── ALLEANZA ──
+  const allContainer = document.getElementById("alleanza-content");
+  if (!miaAll) {
+    allContainer.innerHTML = '<div class="empty-state">Non sei in nessuna alleanza.</div>';
+  } else {
+    const coeff = getCoeffAlleanza(miaAll.membri);
+    const sqFormate = miaAll.membri.filter(m => teams[sanitize(m)]).length;
+    allContainer.innerHTML = `
+      <div class="alleanza-mini" onclick="window.location.href='alleanze.html'">
+        <div class="alleanza-mini-name">${miaAll.nome}</div>
+        <div class="alleanza-mini-row">
+          <div class="alleanza-mini-coeff">${coeff > 0 ? '+' : ''}${coeff.toFixed(1)}</div>
+          <div class="alleanza-mini-pos">${myAllPos}° su 6 · ${sqFormate}/${miaAll.membri.length} squadre</div>
+        </div>
+        <div class="alleanza-mini-track">
+          <div class="alleanza-mini-fill" style="width:${Math.min(100, Math.max(5, 50 + coeff))}%"></div>
+        </div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:8px;">Tocca per vedere il dettaglio →</div>
+      </div>
+    `;
+  }
+
+  // ── STORICO PERSONALE ──
+  const storContainer = document.getElementById("storico-content");
+  storContainer.innerHTML = "";
+  if (pp.eventi.length === 0) {
+    storContainer.innerHTML = '<div class="empty-state">Nessun evento ancora assegnato.</div>';
+  } else {
+    pp.eventi.forEach(ev => {
+      const div = document.createElement("div");
+      div.className = "storico-item";
+      const d = new Date(ev.ts);
+      const timeStr = d.toLocaleTimeString('it-IT', { hour:'2-digit', minute:'2-digit' });
+      div.innerHTML = `
+        <div class="storico-pts ${ev.pts > 0 ? 'pos' : 'neg'}">${ev.pts > 0 ? '+' : ''}${ev.pts}</div>
+        <div class="storico-info">
+          <div class="storico-desc">${ev.desc}</div>
+          <div class="storico-time">${timeStr}</div>
+        </div>
+      `;
+      storContainer.appendChild(div);
+    });
+  }
+}
+
+// ── INIT ──
+onValue(ref(db, "punti"), snap => {
+  punti = snap.exists() ? snap.val() : {};
+  render();
+});
+onValue(ref(db, "teams"), snap => {
+  teams = snap.exists() ? snap.val() : {};
+  render();
+});
+</script>
+</body>
+</html>
