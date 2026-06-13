@@ -235,7 +235,7 @@ body {
     <div class="nav-title">// DRAFT SQUADRA //</div>
     <div class="nav-name" id="nav-player-name">Caricamento...</div>
   </div>
-  <div style="font-size:24px;">✂️</div>
+  <button onclick="window.location.href='home.html'" style="background:var(--surface);border:1.5px solid var(--border);color:var(--text-muted);padding:8px 14px;border-radius:10px;font-family:'Space Grotesk',sans-serif;font-size:13px;cursor:pointer;">← Home</button>
 </div>
 
 <!-- BUDGET BAR -->
@@ -461,12 +461,12 @@ function updateBudget() {
   `;
 
   // Bottone salva
-  const canSave = myTeam.length === MAX_PLAYERS && getRemaining() >= 0;
+  const canSave = myTeam.length >= 1 && getRemaining() >= 0;
   document.getElementById("save-btn").disabled = !canSave;
   document.getElementById("save-btn").textContent = canSave
     ? "✓ Salva Squadra"
-    : myTeam.length < MAX_PLAYERS
-      ? `Seleziona ancora ${MAX_PLAYERS - myTeam.length} giocator${MAX_PLAYERS - myTeam.length === 1 ? 'e' : 'i'}`
+    : myTeam.length === 0
+      ? "Aggiungi almeno 1 giocatore"
       : "Budget superato!";
 }
 
@@ -516,13 +516,13 @@ window.renderPlayerList = function() {
 
   const isFull = myTeam.length >= MAX_PLAYERS;
 
-  PLAYERS
+  [...PLAYERS].sort((a,b) => b.cost - a.cost)
     .filter(p => p.name.toLowerCase().includes(q))
     .forEach(player => {
       const isSelected = myTeam.some(t => t.name === player.name);
       const isCap = player.name === myCaptain;
       const cantAfford = !isSelected && getRemaining() < player.cost;
-      const isDisabled = (!isSelected && isFull) || cantAfford;
+      const isDisabled = cantAfford;
 
       const div = document.createElement("div");
       div.className = "player-card " +
@@ -531,16 +531,12 @@ window.renderPlayerList = function() {
 
       const initials = player.name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
 
-      const tagHtml = player.tags.map(t => {
-        const labels = { coppia: "💑 Coppia", affetto: "❤️ Affetto", remoto: "📡 Remoto", maternita: "👶 Mat", paternita: "👶 Pat", bonus: "⚡ Bonus", "first-lady": "👑 First Lady", over55: "🎖 Over55" };
-        return `<span class="tag ${t}">${labels[t] || t}</span>`;
-      }).join("");
+      const tagHtml = "";
 
       div.innerHTML = `
         <div class="player-avatar">${isSelected ? (isCap ? "⭐" : "✓") : initials}</div>
         <div class="player-info">
           <div class="player-name">${player.name}</div>
-          <div class="player-tags">${tagHtml}</div>
         </div>
         <div class="player-right">
           <div class="player-cost">${player.cost}</div>
