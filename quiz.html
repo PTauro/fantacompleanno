@@ -205,11 +205,11 @@
 </div>
 
 <script>
-  // ── SE GIA' REGISTRATO → VAI DIRETTAMENTE ALLA HOME ──
+  // ── SE HA GIA' UN NOME SALVATO → MANDA A REGISTER CHE DECIDE DOVE ANDARE ──
   (function() {
     const savedName = localStorage.getItem("fc_player_name");
     if (savedName) {
-      window.location.replace("home.html");
+      window.location.replace("register.html");
     }
   })();
 

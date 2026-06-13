@@ -400,16 +400,6 @@ async function init() {
     return;
   }
 
-  // Verifica Firebase — se scollegato dall'admin torna al quiz
-  const checkKey = myName.replace(/[.#$[\]]/g, "_");
-  const checkSnap = await get(ref(db, `registrations/${checkKey}`));
-  if (!checkSnap.exists()) {
-    localStorage.removeItem("fc_player_name");
-    localStorage.removeItem("fc_device_code");
-    window.location.href = "quiz.html";
-    return;
-  }
-
   document.getElementById("nav-player-name").textContent = myName;
 
   // Carica team salvato

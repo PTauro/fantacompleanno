@@ -486,43 +486,30 @@ async function init() {
     return;
   }
 
-  // Carica abbinamenti da Firebase
+  // Carica tutti gli abbinamenti da Firebase
   const snap = await get(ref(db, "registrations"));
   if (snap.exists()) {
     linkedPlayers = snap.val();
   }
 
-  // Controlla se questo codice è già abbinato
+  // 1. Controlla se questo CODICE DISPOSITIVO è abbinato su Firebase
   const alreadyLinked = Object.entries(linkedPlayers).find(([name, code]) => code === myCode);
   if (alreadyLinked) {
+    // Dispositivo riconosciuto → aggiorna localStorage e vai a home
     myName = alreadyLinked[0];
     localStorage.setItem("fc_player_name", myName);
-    document.getElementById("already-name").textContent = myName;
-    document.getElementById("already-code").textContent = myCode;
-    showScreen('screen-already');
+    window.location.replace("home.html");
     return;
   }
 
-  // Controlla localStorage come fallback
+  // 2. Controlla se c'è un nome in localStorage ma NON corrisponde più a Firebase
   const savedName = localStorage.getItem("fc_player_name");
   if (savedName) {
-    // Verifica che sia ancora valido su Firebase
-    const savedKey = savedName.replace(/[.#$[\]]/g, "_");
-    const savedSnap = await get(ref(db, `registrations/${savedKey}`));
-    if (savedSnap.exists()) {
-      myName = savedName;
-      document.getElementById("already-name").textContent = myName;
-      document.getElementById("already-code").textContent = myCode;
-      showScreen('screen-already');
-      return;
-    } else {
-      // Scollegato dall'admin — pulisci tutto
-      localStorage.removeItem("fc_player_name");
-      localStorage.removeItem("fc_device_code");
-    }
+    // Pulisci localStorage — era stato scollegato dall'admin
+    localStorage.removeItem("fc_player_name");
   }
 
-  // Mostra welcome con codice
+  // 3. Nessun abbinamento → mostra welcome, scegli nome
   document.getElementById("welcome-code").textContent = myCode;
   showScreen('screen-welcome');
 }
@@ -591,9 +578,7 @@ async function confirmSelection(name) {
   showToast(`✓ Benvenuto/a, ${name}!`);
 
   setTimeout(() => {
-    document.getElementById("already-name").textContent = name;
-    document.getElementById("already-code").textContent = myCode;
-    showScreen('screen-already');
+    window.location.replace("home.html");
   }, 1200);
 }
 
