@@ -527,6 +527,17 @@ async function init() {
   const myName = localStorage.getItem("fc_player_name");
   if (!myName) { window.location.href = "register.html"; return; }
 
+  // Verifica che sia ancora registrato su Firebase
+  const key = myName.replace(/[.#$[\]]/g, "_");
+  const snap = await get(ref(db, `registrations/${key}`));
+  if (!snap.exists()) {
+    // Scollegato dall'admin — pulisci localStorage e rimanda al quiz
+    localStorage.removeItem("fc_player_name");
+    localStorage.removeItem("fc_device_code");
+    window.location.href = "quiz.html";
+    return;
+  }
+
   document.getElementById("player-name-display").textContent = myName;
   const initials = myName.split(" ").map(w => w[0]).join("").slice(0,2).toUpperCase();
   document.getElementById("avatar-circle").textContent = initials;

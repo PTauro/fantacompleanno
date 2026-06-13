@@ -506,11 +506,20 @@ async function init() {
   // Controlla localStorage come fallback
   const savedName = localStorage.getItem("fc_player_name");
   if (savedName) {
-    myName = savedName;
-    document.getElementById("already-name").textContent = myName;
-    document.getElementById("already-code").textContent = myCode;
-    showScreen('screen-already');
-    return;
+    // Verifica che sia ancora valido su Firebase
+    const savedKey = savedName.replace(/[.#$[\]]/g, "_");
+    const savedSnap = await get(ref(db, `registrations/${savedKey}`));
+    if (savedSnap.exists()) {
+      myName = savedName;
+      document.getElementById("already-name").textContent = myName;
+      document.getElementById("already-code").textContent = myCode;
+      showScreen('screen-already');
+      return;
+    } else {
+      // Scollegato dall'admin — pulisci tutto
+      localStorage.removeItem("fc_player_name");
+      localStorage.removeItem("fc_device_code");
+    }
   }
 
   // Mostra welcome con codice
