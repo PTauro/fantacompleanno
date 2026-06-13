@@ -192,18 +192,31 @@ body {
     <div class="nav-title">// CLASSIFICA LIVE //</div>
     <div class="nav-name">FantaCompleanno 🎂</div>
   </div>
-  <div class="live-dot">LIVE</div>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <div class="live-dot">LIVE</div>
+    <button onclick="window.location.href='home.html'" style="background:var(--surface);border:1.5px solid var(--border);color:var(--text-muted);padding:8px 14px;border-radius:10px;font-family:'Space Grotesk',sans-serif;font-size:13px;cursor:pointer;">← Home</button>
+  </div>
 </div>
 
 <!-- TABS -->
 <div class="tabs">
-  <div class="tab active" onclick="switchTab('campionato')" id="tab-campionato">🏆 Campionato</div>
+  <div class="tab active" onclick="switchTab('invitati')" id="tab-invitati">👤 Invitati</div>
+  <div class="tab" onclick="switchTab('campionato')" id="tab-campionato">🏆 Squadre</div>
   <div class="tab" onclick="switchTab('alleanze')" id="tab-alleanze">🤝 Alleanze</div>
   <div class="tab" onclick="switchTab('fazioni')" id="tab-fazioni">⚔️ Fazioni</div>
 </div>
 
+<!-- TAB INVITATI -->
+<div class="tab-content active" id="content-invitati">
+  <div style="background:rgba(255,107,43,0.08);border:1px solid rgba(255,107,43,0.2);border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:12px;color:var(--text-muted);line-height:1.5;">
+    Punti <strong style="color:var(--text)">personali</strong> di ogni invitato — assegnati automaticamente dall'app o da Pietro in base alle azioni durante la serata.
+  </div>
+  <div class="podio" id="podio-invitati"></div>
+  <div id="invitati-list"></div>
+</div>
+
 <!-- TAB CAMPIONATO -->
-<div class="tab-content active" id="content-campionato">
+<div class="tab-content" id="content-campionato">
   <div class="podio" id="podio"></div>
   <div id="classifica-list"></div>
 </div>
@@ -388,6 +401,61 @@ function getPuntiFazione(faz) {
   return tot;
 }
 
+// ── RENDER INVITATI ──
+function renderInvitati() {
+  const classifica = PLAYERS.map(p => {
+    const pp = getPuntiPersonali(p.name);
+    return { name: p.name, pts: pp.tot, bonus: pp.bonus, malus: pp.malus };
+  }).sort((a, b) => b.pts - a.pts);
+
+  // PODIO
+  const podio = document.getElementById("podio-invitati");
+  podio.innerHTML = "";
+  const top3 = classifica.slice(0, 3);
+  const order = [top3[1], top3[0], top3[2]].filter(Boolean);
+  const posClass = ["podio-2", "podio-1", "podio-3"];
+  const posEmoji = ["🥈", "🥇", "🥉"];
+
+  order.forEach((p, i) => {
+    if (!p) return;
+    const div = document.createElement("div");
+    div.className = "podio-slot " + posClass[i];
+    div.innerHTML = `
+      <div class="podio-bar"><span class="podio-pos">${posEmoji[i]}</span></div>
+      <div class="podio-name">${p.name.split(" ")[0]}</div>
+      <div class="podio-pts">${p.pts > 0 ? '+' : ''}${p.pts}</div>
+    `;
+    podio.appendChild(div);
+  });
+
+  // LISTA
+  const list = document.getElementById("invitati-list");
+  list.innerHTML = "";
+
+  if (classifica.every(p => p.pts === 0)) {
+    list.innerHTML = '<div class="empty-state"><span class="empty-emoji">⏳</span>Nessun punto ancora assegnato</div>';
+    return;
+  }
+
+  classifica.forEach((p, i) => {
+    const posC = i === 0 ? "gold" : i === 1 ? "silver" : i === 2 ? "bronze" : "";
+    const isMe = p.name === myName;
+    const div = document.createElement("div");
+    div.className = "rank-row" + (isMe ? " me" : "") + (i === 0 ? " top1" : "");
+    div.innerHTML = `
+      <div class="rank-pos ${posC}">${i + 1}</div>
+      <div class="rank-info">
+        <div class="rank-name">${p.name}${isMe ? " 👤" : ""}</div>
+        <div class="rank-team" style="color:var(--green)">+${p.bonus} bonus &nbsp;·&nbsp; <span style="color:var(--red)">-${p.malus} malus</span></div>
+      </div>
+      <div>
+        <div class="rank-pts ${p.pts > 0 ? 'pos' : p.pts < 0 ? 'neg' : 'zero'}">${p.pts > 0 ? '+' : ''}${p.pts}</div>
+      </div>
+    `;
+    list.appendChild(div);
+  });
+}
+
 // ── RENDER CAMPIONATO ──
 function renderCampionato() {
   // Per ogni ospite calcola punti squadra
@@ -545,6 +613,7 @@ function init() {
   // Ascolta punti in tempo reale
   onValue(ref(db, "punti"), snap => {
     punti = snap.exists() ? snap.val() : {};
+    renderInvitati();
     renderCampionato();
     renderAlleanze();
     renderFazioni();
@@ -553,6 +622,7 @@ function init() {
   // Ascolta squadre
   onValue(ref(db, "teams"), snap => {
     teams = snap.exists() ? snap.val() : {};
+    renderInvitati();
     renderCampionato();
     renderAlleanze();
   });
