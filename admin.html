@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — FantaCompleanno</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700;800&family=Space+Mono:wght@400;700&display=swap');
+
+:root {
+  --bg: #0a0a0f; --surface: #13131a; --border: #1e1e2e;
+  --accent-cody: #ff6b2b; --accent-siria: #a855f7;
+  --text: #f0f0f5; --text-muted: #6b6b8a;
+  --green: #22c55e; --red: #ef4444; --gold: #f59e0b;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Space Grotesk', sans-serif;
+  background: var(--bg); color: var(--text);
+  min-height: 100vh; padding-bottom: 100px;
+}
+
+/* ── NAV ── */
+.nav {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(10,10,15,0.97); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 16px; display: flex; align-items: center; justify-content: space-between;
+}
+.nav-title { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--accent-cody); letter-spacing:.1em; }
+.nav-name { font-size: 16px; font-weight: 800; }
+.admin-badge {
+  background: rgba(255,107,43,0.15); border: 1.5px solid var(--accent-cody);
+  color: var(--accent-cody); font-family: 'Space Mono', monospace;
+  font-size: 10px; padding: 4px 10px; border-radius: 100px;
+}
+
+/* ── TABS ── */
+.tabs {
+  display: flex; border-bottom: 1px solid var(--border);
+  background: var(--surface); position: sticky; top: 53px; z-index: 40;
+}
+.tab {
+  flex: 1; padding: 13px 8px; text-align: center;
+  font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700;
+  color: var(--text-muted); cursor: pointer; transition: all .2s;
+  border-bottom: 2px solid transparent;
+}
+.tab.active { color: var(--accent-cody); border-bottom-color: var(--accent-cody); }
+
+.tab-content { display: none; padding: 14px 16px; }
+.tab-content.active { display: block; }
+
+/* ── SEARCH ── */
+.search-wrap { position: relative; margin-bottom: 12px; }
+.search-icon { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); font-size: 15px; pointer-events: none; }
+.search-input {
+  width: 100%; background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 10px; padding: 12px 12px 12px 38px;
+  color: var(--text); font-family: 'Space Grotesk', sans-serif;
+  font-size: 15px; outline: none; transition: border-color .2s;
+}
+.search-input:focus { border-color: var(--accent-cody); }
+.search-input::placeholder { color: var(--text-muted); }
+
+/* ── GUEST LIST ── */
+.guest-item {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 12px; padding: 14px 16px; margin-bottom: 8px;
+  display: flex; align-items: center; justify-content: space-between;
+  cursor: pointer; transition: all .2s;
+}
+.guest-item:hover, .guest-item.selected { border-color: var(--accent-cody); background: #150800; }
+.guest-info { flex: 1; }
+.guest-name { font-size: 15px; font-weight: 700; }
+.guest-pts {
+  font-family: 'Space Mono', monospace; font-size: 13px;
+  margin-top: 3px;
+}
+.guest-pts.pos { color: var(--green); }
+.guest-pts.neg { color: var(--red); }
+.guest-pts.zero { color: var(--text-muted); }
+.guest-arrow { font-size: 18px; color: var(--text-muted); }
+
+/* ── MODAL OSPITE ── */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.85); z-index: 100;
+  overflow-y: auto; padding: 16px;
+}
+.modal-overlay.open { display: block; }
+.modal-box {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 20px; padding: 20px; max-width: 480px;
+  margin: 0 auto 20px; animation: slideUp .25s ease;
+}
+@keyframes slideUp { from { transform:translateY(30px); opacity:0; } to { transform:translateY(0); opacity:1; } }
+
+.modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.modal-guest-name { font-size: 20px; font-weight: 800; }
+.modal-pts {
+  font-family: 'Space Mono', monospace; font-size: 22px; font-weight: 700;
+  padding: 6px 16px; border-radius: 100px;
+}
+.modal-pts.pos { background: rgba(34,197,94,0.15); color: var(--green); border: 1px solid rgba(34,197,94,0.3); }
+.modal-pts.neg { background: rgba(239,68,68,0.15); color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
+.modal-pts.zero { background: var(--border); color: var(--text-muted); }
+
+.btn-close {
+  background: var(--border); border: none; color: var(--text);
+  width: 34px; height: 34px; border-radius: 50%; font-size: 16px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+
+.section-label {
+  font-family: 'Space Mono', monospace; font-size: 10px;
+  color: var(--text-muted); letter-spacing: .12em; text-transform: uppercase;
+  margin-bottom: 8px; margin-top: 16px;
+}
+
+/* ── EVENTI RAPIDI ── */
+.eventi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.evento-btn {
+  background: var(--bg); border: 1.5px solid var(--border);
+  border-radius: 10px; padding: 10px 12px; cursor: pointer;
+  transition: all .2s; text-align: left;
+}
+.evento-btn:hover { transform: scale(1.02); }
+.evento-btn.bonus-btn { border-color: rgba(34,197,94,0.3); }
+.evento-btn.bonus-btn:hover { background: rgba(34,197,94,0.08); border-color: var(--green); }
+.evento-btn.malus-btn { border-color: rgba(239,68,68,0.3); }
+.evento-btn.malus-btn:hover { background: rgba(239,68,68,0.08); border-color: var(--red); }
+.evento-pts {
+  font-family: 'Space Mono', monospace; font-size: 16px; font-weight: 700;
+  display: block; margin-bottom: 3px;
+}
+.evento-pts.pos { color: var(--green); }
+.evento-pts.neg { color: var(--red); }
+.evento-desc { font-size: 11px; color: var(--text-muted); line-height: 1.3; }
+
+/* ── STORICO ── */
+.storico-item {
+  background: var(--bg); border: 1.5px solid var(--border);
+  border-radius: 10px; padding: 10px 14px; margin-bottom: 6px;
+  display: flex; align-items: center; gap: 10px;
+}
+.storico-pts {
+  font-family: 'Space Mono', monospace; font-size: 15px; font-weight: 700;
+  min-width: 52px; flex-shrink: 0;
+}
+.storico-pts.pos { color: var(--green); }
+.storico-pts.neg { color: var(--red); }
+.storico-info { flex: 1; }
+.storico-desc { font-size: 12px; font-weight: 600; }
+.storico-time { font-size: 10px; color: var(--text-muted); font-family: 'Space Mono', monospace; margin-top: 2px; }
+.btn-annulla {
+  background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3);
+  color: var(--red); padding: 5px 10px; border-radius: 8px;
+  font-size: 11px; font-family: 'Space Mono', monospace;
+  cursor: pointer; transition: all .2s; white-space: nowrap; flex-shrink: 0;
+}
+.btn-annulla:hover { background: rgba(239,68,68,0.2); }
+
+/* ── VISTA PER EVENTO ── */
+.evento-big {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 12px; padding: 14px 16px; margin-bottom: 8px;
+  cursor: pointer; transition: all .2s;
+}
+.evento-big:hover { border-color: var(--accent-cody); }
+.evento-big.bonus-big { border-left: 4px solid var(--green); }
+.evento-big.malus-big { border-left: 4px solid var(--red); }
+.evento-big-header { display: flex; align-items: center; gap: 12px; }
+.evento-big-pts {
+  font-family: 'Space Mono', monospace; font-size: 20px; font-weight: 700;
+  min-width: 60px;
+}
+.evento-big-pts.pos { color: var(--green); }
+.evento-big-pts.neg { color: var(--red); }
+.evento-big-desc { font-size: 13px; font-weight: 600; flex: 1; }
+.evento-big-type { font-size: 10px; color: var(--text-muted); margin-top: 3px; }
+
+/* ── MULTI-SELECT OSPITI ── */
+.ospiti-multi { margin-top: 12px; }
+.ospite-check {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 14px; border-radius: 10px;
+  cursor: pointer; transition: background .15s; margin-bottom: 4px;
+}
+.ospite-check:hover { background: var(--surface); }
+.ospite-check.checked { background: rgba(255,107,43,0.1); }
+.check-box {
+  width: 22px; height: 22px; border-radius: 6px;
+  border: 2px solid var(--border); display: flex; align-items: center;
+  justify-content: center; flex-shrink: 0; transition: all .2s;
+}
+.ospite-check.checked .check-box { background: var(--accent-cody); border-color: var(--accent-cody); }
+.check-label { font-size: 14px; font-weight: 600; flex: 1; }
+.check-pts { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--text-muted); }
+
+/* ── PULSANTI AZIONE ── */
+.btn-primary {
+  width: 100%; background: linear-gradient(135deg, var(--accent-cody), var(--accent-siria));
+  color: white; padding: 15px; border-radius: 12px; border: none;
+  font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 700;
+  cursor: pointer; transition: opacity .2s; margin-top: 12px;
+}
+.btn-primary:hover { opacity: .85; }
+.btn-primary:disabled { opacity: .4; cursor: not-allowed; }
+.btn-unlock {
+  width: 100%; background: rgba(245,158,11,0.15); border: 2px solid var(--gold);
+  color: var(--gold); padding: 15px; border-radius: 12px;
+  font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 700;
+  cursor: pointer; transition: all .2s; margin-bottom: 12px;
+}
+.btn-unlock:hover { background: rgba(245,158,11,0.25); }
+.btn-unlock.done { background: rgba(34,197,94,0.1); border-color: var(--green); color: var(--green); cursor: default; }
+
+/* ── STATS BAR ── */
+.stats-bar {
+  display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap;
+}
+.stat-chip {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 8px; padding: 8px 12px; flex: 1; text-align: center; min-width: 70px;
+}
+.stat-num { font-family: 'Space Mono', monospace; font-size: 18px; font-weight: 700; display: block; }
+.stat-num.pos { color: var(--green); }
+.stat-num.neg { color: var(--red); }
+.stat-num.info { color: var(--accent-siria); }
+.stat-label { font-size: 10px; color: var(--text-muted); }
+
+/* ── TOAST ── */
+.toast {
+  position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
+  background: var(--surface); border: 1.5px solid var(--green);
+  color: var(--green); font-family: 'Space Mono', monospace;
+  font-size: 13px; padding: 12px 20px; border-radius: 100px;
+  opacity: 0; transition: opacity .3s; pointer-events: none; white-space: nowrap; z-index: 300;
+}
+.toast.show { opacity: 1; }
+.toast.error { border-color: var(--red); color: var(--red); }
+.toast.warn { border-color: var(--gold); color: var(--gold); }
+
+/* ── SAVE BAR ── */
+.save-bar {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: rgba(10,10,15,0.97); border-top: 1px solid var(--border);
+  padding: 14px 16px; z-index: 60;
+}
+
+.empty-state { text-align: center; padding: 32px 20px; color: var(--text-muted); font-size: 14px; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<div class="nav">
+  <div>
+    <div class="nav-title">// PANNELLO ADMIN //</div>
+    <div class="nav-name">FantaCompleanno 🎂</div>
+  </div>
+  <div class="admin-badge">PIETRO</div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('ospiti')" id="tab-ospiti">👤 Per Ospite</div>
+  <div class="tab" onclick="switchTab('eventi')" id="tab-eventi">⚡ Per Evento</div>
+  <div class="tab" onclick="switchTab('storico')" id="tab-storico">📋 Storico</div>
+  <div class="tab" onclick="switchTab('tools')" id="tab-tools">🔧 Tools</div>
+</div>
+
+<!-- ══ TAB: PER OSPITE ══ -->
+<div class="tab-content active" id="content-ospiti">
+  <div class="stats-bar" id="stats-bar"></div>
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input class="search-input" id="guest-search" type="text" placeholder="Cerca ospite..." oninput="renderGuestList()" autocomplete="off">
+  </div>
+  <div id="guest-list"></div>
+</div>
+
+<!-- ══ TAB: PER EVENTO ══ -->
+<div class="tab-content" id="content-eventi">
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input class="search-input" id="evento-search" type="text" placeholder="Cerca evento..." oninput="renderEventiList()" autocomplete="off">
+  </div>
+  <div id="eventi-list"></div>
+</div>
+
+<!-- ══ TAB: STORICO ══ -->
+<div class="tab-content" id="content-storico">
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input class="search-input" id="storico-search" type="text" placeholder="Cerca per nome..." oninput="renderStorico()" autocomplete="off">
+  </div>
+  <div id="storico-list"></div>
+</div>
+
+<!-- ══ TAB: TOOLS ══ -->
+<div class="tab-content" id="content-tools">
+  <div class="section-label" style="margin-top:8px;">Punti Pre-Festa</div>
+  <button class="btn-unlock" id="btn-unlock" onclick="sblocca()">
+    🔓 Sblocca Punti Pre-Festa
+  </button>
+
+  <div class="section-label">Gestione Ospiti</div>
+  <div id="tools-registrations"></div>
+</div>
+
+<!-- ══ MODAL OSPITE ══ -->
+<div class="modal-overlay" id="modal-ospite">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div>
+        <div class="modal-guest-name" id="modal-name">—</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:2px;" id="modal-sub">0 eventi assegnati</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div class="modal-pts zero" id="modal-pts">0 pt</div>
+        <button class="btn-close" onclick="closeModal()">✕</button>
+      </div>
+    </div>
+
+    <div class="section-label">Assegna Bonus</div>
+    <div class="eventi-grid" id="modal-bonus-grid"></div>
+
+    <div class="section-label">Assegna Malus</div>
+    <div class="eventi-grid" id="modal-malus-grid"></div>
+
+    <div class="section-label">Storico Ospite</div>
+    <div id="modal-storico"></div>
+  </div>
+</div>
+
+<!-- ══ MODAL EVENTO (per-evento) ══ -->
+<div class="modal-overlay" id="modal-evento">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div>
+        <div class="modal-guest-name" id="evento-modal-title">—</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:2px;" id="evento-modal-pts-label">—</div>
+      </div>
+      <button class="btn-close" onclick="closeEventoModal()">✕</button>
+    </div>
+
+    <div class="section-label">Seleziona ospiti</div>
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input class="search-input" id="evento-ospite-search" type="text" placeholder="Filtra ospiti..." oninput="renderOspiteMulti()" autocomplete="off">
+    </div>
+    <div class="ospiti-multi" id="ospiti-multi-list"></div>
+
+    <button class="btn-primary" id="evento-assign-btn" onclick="assegnaEvento()">
+      Assegna a selezionati
+    </button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, get, set, push, remove, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCqLFQW8XQioObmxG0oDPc_MFpdFXJxmac",
+  authDomain: "fantacompleanno-c64c3.firebaseapp.com",
+  databaseURL: "https://fantacompleanno-c64c3-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "fantacompleanno-c64c3",
+  storageBucket: "fantacompleanno-c64c3.firebasestorage.app",
+  messagingSenderId: "1090185599902",
+  appId: "1:1090185599902:web:abcc2c0bcfdc2077d2548f"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+// ── ADMIN CHECK ──
+const ADMIN_KEY = "30cody30syria";
+const params = new URLSearchParams(window.location.search);
+if (params.get("key") !== ADMIN_KEY) {
+  document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:monospace;color:#ef4444;font-size:18px;">⛔ Accesso negato</div>';
+  throw new Error("Not admin");
+}
+
+// ── LISTA OSPITI ──
+const PLAYERS = [
+  "Alessia","Madre (Anna)","Eleonora Sorella","Paolo","Mattia (Milano)","Mirco","Gloria",
+  "Dario","Gabriele","Federica","Simone","Desi","Michele","Zia Anna","Arianna",
+  "Francesca","Nicolas","Giulia","Andrea","Emilio","Eleonora B","Marta","Beppe",
+  "Annachiara","Davide S","Antonio","Marika","Danilo","Ilaria","Donato","Emily",
+  "Martina P","Maicol","Laura","Davide A (Attanasio)","Manuel","Carlotta",
+  "Nicolo Spada","Antonella","Beatrice","Marciarla","Mattia Martina","Pisi",
+  "Annalisa","Sciurti","Nicolo M","Silvia","Alessio Maci","Rachele","Perotto",
+  "Erminio","Sara C","Luca Grasso","Annalisa M","Caretto","Silvia M","Errico",
+  "Chiara D","Daniele","Davide M","Marialuce","Francesco R","MariaChiara L",
+  "Alberto","Martina S","Luca I","Marika P","Stefanuccio"
+];
+
+// ── EVENTI RAPIDI ──
+const EVENTI = [
+  // BONUS
+  { id:"b_outfit_spoiler", pts:10, desc:"Spoiler outfit", tipo:"bonus", cat:"Pre-festa" },
+  { id:"b_storia_ig", pts:20, desc:"Storia Instagram", tipo:"bonus", cat:"Festa" },
+  { id:"b_foto_festeggiato", pts:15, desc:"Foto con Pietro", tipo:"bonus", cat:"Festa" },
+  { id:"b_arriva_orario", pts:10, desc:"Arriva puntuale", tipo:"bonus", cat:"Festa" },
+  { id:"b_ben_idratato", pts:30, desc:"Ben Idratato (corpo intero)", tipo:"bonus", cat:"Festa" },
+  { id:"b_ben_idratato_parte", pts:30, desc:"Ben Idratato (parte corpo)", tipo:"bonus", cat:"Festa" },
+  { id:"b_brindisi", pts:35, desc:"Brindisi in rima", tipo:"bonus", cat:"Festa" },
+  { id:"b_discorso", pts:20, desc:"Discorso applaudito", tipo:"bonus", cat:"Festa" },
+  { id:"b_serenata", pts:150, desc:"Serenata dedica", tipo:"bonus", cat:"Festa" },
+  { id:"b_guanto_sfida", pts:40, desc:"Lancia guanto di sfida", tipo:"bonus", cat:"Festa" },
+  { id:"b_tripletta", pts:70, desc:"Tripletta 3 sfide vinte", tipo:"bonus", cat:"Giochi" },
+  { id:"b_vittoria_sfida", pts:30, desc:"Vince una sfida", tipo:"bonus", cat:"Giochi" },
+  { id:"b_flashmob", pts:80, desc:"Flash Mob 35+ persone", tipo:"bonus", cat:"Festa" },
+  { id:"b_animatore", pts:60, desc:"Animatore Provetto", tipo:"bonus", cat:"Festa" },
+  { id:"b_vocalist", pts:50, desc:"Vocalist per Sbaglio", tipo:"bonus", cat:"Festa" },
+  { id:"b_influencer", pts:50, desc:"Influencer TikTok", tipo:"bonus", cat:"Festa" },
+  { id:"b_regalo_assurdo", pts:30, desc:"Regalo Assurdo (max 5€)", tipo:"bonus", cat:"Festa" },
+  { id:"b_fatti_trascinare", pts:25, desc:"Fatti Trascinare (balla)", tipo:"bonus", cat:"Festa", ripetibile:true },
+  { id:"b_piatto_pulito", pts:15, desc:"Piatto Pulito", tipo:"bonus", cat:"Festa" },
+  { id:"b_applausi", pts:10, desc:"Applausi for no reason", tipo:"bonus", cat:"Festa" },
+  { id:"b_proposta", pts:780, desc:"Proposta matrimonio 💍", tipo:"bonus", cat:"Festa" },
+  { id:"b_auguri_paese", pts:150, desc:"Video auguri personaggio paese", tipo:"bonus", cat:"Festa" },
+  { id:"b_auguri_vip", pts:250, desc:"Video auguri VIP (NO IA)", tipo:"bonus", cat:"Festa" },
+  { id:"b_caparezza", pts:1500, desc:"Imbucato: Caparezza 🎸", tipo:"bonus", cat:"Leggendario" },
+  { id:"b_nome_squadra", pts:5, desc:"Nome squadra originale", tipo:"bonus", cat:"Pre-festa" },
+  { id:"b_fortunato", pts:20, desc:"Fortunato nella Sfortuna (ruota)", tipo:"bonus", cat:"Giochi" },
+  // MALUS
+  { id:"m_ritardo_30", pts:-10, desc:"30 min di ritardo", tipo:"malus", cat:"Ritardo" },
+  { id:"m_ritardo_60", pts:-20, desc:"1 ora di ritardo", tipo:"malus", cat:"Ritardo" },
+  { id:"m_ritardo_oltre", pts:-80, desc:"Oltre 1 ora di ritardo", tipo:"malus", cat:"Ritardo" },
+  { id:"m_asciutto", pts:-15, desc:"Completamente asciutto", tipo:"malus", cat:"Festa" },
+  { id:"m_no_torta", pts:-5, desc:"Non mangia la torta", tipo:"malus", cat:"Festa" },
+  { id:"m_no_cibo", pts:-50, desc:"Non mangia nulla", tipo:"malus", cat:"Festa" },
+  { id:"m_no_alcool", pts:-20, desc:"Non beve alcool", tipo:"malus", cat:"Festa" },
+  { id:"m_no_foto_torta", pts:-15, desc:"Assente foto taglio torta", tipo:"malus", cat:"Festa" },
+  { id:"m_rifiuta_sfida", pts:-50, desc:"Rifiuta guanto di sfida", tipo:"malus", cat:"Giochi" },
+  { id:"m_perde_sfida", pts:-15, desc:"Perde una sfida", tipo:"malus", cat:"Giochi" },
+  { id:"m_polemica", pts:-50, desc:"Polemica con admin/festeggiato", tipo:"malus", cat:"Festa" },
+  { id:"m_annoiato", pts:-150, desc:"Palesemente annoiato", tipo:"malus", cat:"Festa" },
+  { id:"m_spoiler_fazione", pts:-80, desc:"Spoilera fazione segreta", tipo:"malus", cat:"Fazione" },
+  { id:"m_spoiler_ruolo", pts:-150, desc:"Spoilera ruolo speciale", tipo:"malus", cat:"Fazione" },
+  { id:"m_spreco_personale", pts:-30, desc:"Spreco cibo personale", tipo:"malus", cat:"Festa" },
+  { id:"m_spreco_collettivo", pts:-150, desc:"Spreco collettivo (A TUTTI)", tipo:"malus", cat:"Festa" },
+  { id:"m_interrompe", pts:-30, desc:"Interrompe sfida in corso", tipo:"malus", cat:"Giochi" },
+  { id:"m_imbarazzato_serenata", pts:-70, desc:"Imbarazzato per serenata", tipo:"malus", cat:"Festa" },
+  { id:"m_no_bonus_festa", pts:-50, desc:"Zero bonus festa", tipo:"malus", cat:"Festa" },
+  { id:"m_no_costume", pts:-10, desc:"Niente costume da bagno", tipo:"malus", cat:"Outfit" },
+  { id:"m_total_black_white", pts:-30, desc:"Total Black / Total White", tipo:"malus", cat:"Outfit" },
+  { id:"m_no_bonus_outfit", pts:-20, desc:"Zero bonus outfit", tipo:"malus", cat:"Outfit" },
+  { id:"m_cane_sbagliato", pts:-500, desc:"Cane sbagliato (non Beagle)", tipo:"malus", cat:"Outfit" },
+  { id:"m_milan_juve", pts:-300, desc:"Milan o Juve", tipo:"malus", cat:"Outfit" },
+  { id:"m_risponde_no", pts:-450, desc:"Risponde No alla proposta", tipo:"malus", cat:"Festa" },
+  { id:"m_tira_torta", pts:-300, desc:"Tira torta in faccia a Pietro", tipo:"malus", cat:"Festa" },
+];
+
+// ── STATO ──
+let punti = {};      // { playerKey: { eventId: { pts, desc, ts } } }
+let registrazioni = {}; // { playerKey: deviceCode }
+let currentGuest = null;
+let currentEvento = null;
+let selectedOspiti = new Set();
+
+// ── INIT ──
+function init() {
+  onValue(ref(db, "punti"), snap => {
+    punti = snap.exists() ? snap.val() : {};
+    renderGuestList();
+    renderStorico();
+    updateStats();
+    if (currentGuest) aggiornaModalOspite(currentGuest);
+  });
+
+  onValue(ref(db, "registrations"), snap => {
+    registrazioni = snap.exists() ? snap.val() : {};
+    renderToolsRegistrations();
+  });
+
+  onValue(ref(db, "prefesta_sbloccata"), snap => {
+    const sbloccata = snap.exists() && snap.val() === true;
+    const btn = document.getElementById("btn-unlock");
+    if (sbloccata) {
+      btn.textContent = "✅ Punti Pre-Festa Sbloccati";
+      btn.className = "btn-unlock done";
+    }
+  });
+}
+
+// ── CALCOLO PUNTI ──
+function getPuntiOspite(name) {
+  const key = sanitize(name);
+  if (!punti[key]) return 0;
+  return Object.values(punti[key]).reduce((s, e) => s + (e.pts || 0), 0);
+}
+
+function getEventiOspite(name) {
+  const key = sanitize(name);
+  if (!punti[key]) return [];
+  return Object.entries(punti[key]).map(([id, e]) => ({ id, ...e }))
+    .sort((a, b) => (b.ts || 0) - (a.ts || 0));
+}
+
+function updateStats() {
+  const tots = PLAYERS.map(p => getPuntiOspite(p));
+  const totalEvents = PLAYERS.reduce((s, p) => s + getEventiOspite(p).length, 0);
+  const leader = PLAYERS.reduce((a, b) => getPuntiOspite(a) >= getPuntiOspite(b) ? a : b);
+  const leaderPts = getPuntiOspite(leader);
+
+  document.getElementById("stats-bar").innerHTML = `
+    <div class="stat-chip"><span class="stat-num info">${totalEvents}</span><span class="stat-label">Eventi</span></div>
+    <div class="stat-chip"><span class="stat-num pos">${leaderPts}</span><span class="stat-label">Leader pts</span></div>
+    <div class="stat-chip"><span class="stat-num" style="font-size:11px;color:var(--accent-cody);">${leader.split(" ")[0]}</span><span class="stat-label">In testa</span></div>
+  `;
+}
+
+// ── LISTA OSPITI ──
+window.renderGuestList = function() {
+  const q = (document.getElementById("guest-search").value || "").toLowerCase();
+  const list = document.getElementById("guest-list");
+  list.innerHTML = "";
+
+  const sorted = [...PLAYERS]
+    .filter(p => p.toLowerCase().includes(q))
+    .sort((a, b) => getPuntiOspite(b) - getPuntiOspite(a));
+
+  sorted.forEach(name => {
+    const pts = getPuntiOspite(name);
+    const eventi = getEventiOspite(name).length;
+    const div = document.createElement("div");
+    div.className = "guest-item";
+    div.onclick = () => openModalOspite(name);
+    div.innerHTML = `
+      <div class="guest-info">
+        <div class="guest-name">${name}</div>
+        <div class="guest-pts ${pts > 0 ? 'pos' : pts < 0 ? 'neg' : 'zero'}">
+          ${pts > 0 ? '+' : ''}${pts} pt · ${eventi} eventi
+        </div>
+      </div>
+      <div class="guest-arrow">→</div>
+    `;
+    list.appendChild(div);
+  });
+};
+
+// ── MODAL OSPITE ──
+window.openModalOspite = function(name) {
+  currentGuest = name;
+  aggiornaModalOspite(name);
+  document.getElementById("modal-ospite").classList.add("open");
+};
+
+function aggiornaModalOspite(name) {
+  const pts = getPuntiOspite(name);
+  const eventi = getEventiOspite(name);
+
+  document.getElementById("modal-name").textContent = name;
+  document.getElementById("modal-sub").textContent = `${eventi.length} eventi assegnati`;
+
+  const ptsEl = document.getElementById("modal-pts");
+  ptsEl.textContent = (pts > 0 ? '+' : '') + pts + ' pt';
+  ptsEl.className = "modal-pts " + (pts > 0 ? 'pos' : pts < 0 ? 'neg' : 'zero');
+
+  // Bonus grid
+  const bonusGrid = document.getElementById("modal-bonus-grid");
+  bonusGrid.innerHTML = "";
+  EVENTI.filter(e => e.tipo === "bonus").forEach(ev => {
+    const btn = document.createElement("button");
+    btn.className = "evento-btn bonus-btn";
+    btn.innerHTML = `<span class="evento-pts pos">+${ev.pts}</span><span class="evento-desc">${ev.desc}</span>`;
+    btn.onclick = () => assegnaA(name, ev);
+    bonusGrid.appendChild(btn);
+  });
+
+  // Malus grid
+  const malusGrid = document.getElementById("modal-malus-grid");
+  malusGrid.innerHTML = "";
+  EVENTI.filter(e => e.tipo === "malus").forEach(ev => {
+    const btn = document.createElement("button");
+    btn.className = "evento-btn malus-btn";
+    btn.innerHTML = `<span class="evento-pts neg">${ev.pts}</span><span class="evento-desc">${ev.desc}</span>`;
+    btn.onclick = () => assegnaA(name, ev);
+    malusGrid.appendChild(btn);
+  });
+
+  // Storico ospite
+  const stor = document.getElementById("modal-storico");
+  if (eventi.length === 0) {
+    stor.innerHTML = '<div class="empty-state">Nessun evento ancora</div>';
+  } else {
+    stor.innerHTML = "";
+    eventi.forEach(ev => {
+      const div = document.createElement("div");
+      div.className = "storico-item";
+      const d = new Date(ev.ts);
+      const timeStr = d.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+      div.innerHTML = `
+        <div class="storico-pts ${ev.pts > 0 ? 'pos' : 'neg'}">${ev.pts > 0 ? '+' : ''}${ev.pts}</div>
+        <div class="storico-info">
+          <div class="storico-desc">${ev.desc}</div>
+          <div class="storico-time">${timeStr}</div>
+        </div>
+        <button class="btn-annulla" onclick="annulla('${name}','${ev.id}')">Annulla</button>
+      `;
+      stor.appendChild(div);
+    });
+  }
+}
+
+window.closeModal = function() {
+  document.getElementById("modal-ospite").classList.remove("open");
+  currentGuest = null;
+};
+
+// ── ASSEGNA PUNTO A OSPITE ──
+async function assegnaA(name, ev) {
+  const key = sanitize(name);
+  const eventKey = ev.id + (ev.ripetibile ? '_' + Date.now() : '');
+  await set(ref(db, `punti/${key}/${eventKey}`), {
+    pts: ev.pts, desc: ev.desc, ts: Date.now()
+  });
+  showToast(`${ev.pts > 0 ? '+' : ''}${ev.pts} → ${name}`);
+}
+
+// ── ANNULLA ──
+window.annulla = async function(name, eventId) {
+  if (!confirm(`Annullare questo evento per ${name}?`)) return;
+  await remove(ref(db, `punti/${sanitize(name)}/${eventId}`));
+  showToast("✓ Evento annullato", "warn");
+};
+
+// ── LISTA EVENTI (tab per evento) ──
+window.renderEventiList = function() {
+  const q = (document.getElementById("evento-search").value || "").toLowerCase();
+  const list = document.getElementById("eventi-list");
+  list.innerHTML = "";
+
+  const filtered = EVENTI.filter(e => e.desc.toLowerCase().includes(q) || e.cat.toLowerCase().includes(q));
+
+  // Raggruppa per categoria
+  const cats = {};
+  filtered.forEach(e => {
+    if (!cats[e.cat]) cats[e.cat] = [];
+    cats[e.cat].push(e);
+  });
+
+  Object.entries(cats).forEach(([cat, evs]) => {
+    const label = document.createElement("div");
+    label.className = "section-label";
+    label.textContent = cat;
+    list.appendChild(label);
+
+    evs.forEach(ev => {
+      const div = document.createElement("div");
+      div.className = `evento-big ${ev.tipo === 'bonus' ? 'bonus-big' : 'malus-big'}`;
+      div.onclick = () => openEventoModal(ev);
+      div.innerHTML = `
+        <div class="evento-big-header">
+          <div class="evento-big-pts ${ev.pts > 0 ? 'pos' : 'neg'}">${ev.pts > 0 ? '+' : ''}${ev.pts}</div>
+          <div>
+            <div class="evento-big-desc">${ev.desc}</div>
+            <div class="evento-big-type">${ev.cat} · ${ev.tipo === 'bonus' ? 'Bonus' : 'Malus'}${ev.ripetibile ? ' · ripetibile' : ''}</div>
+          </div>
+        </div>
+      `;
+      list.appendChild(div);
+    });
+  });
+};
+
+// ── MODAL EVENTO ──
+window.openEventoModal = function(ev) {
+  currentEvento = ev;
+  selectedOspiti = new Set();
+  document.getElementById("evento-modal-title").textContent = ev.desc;
+  document.getElementById("evento-modal-pts-label").textContent = `${ev.pts > 0 ? '+' : ''}${ev.pts} pt · ${ev.cat}`;
+  document.getElementById("evento-ospite-search").value = "";
+  renderOspiteMulti();
+  document.getElementById("modal-evento").classList.add("open");
+};
+
+window.closeEventoModal = function() {
+  document.getElementById("modal-evento").classList.remove("open");
+  currentEvento = null;
+  selectedOspiti = new Set();
+};
+
+window.renderOspiteMulti = function() {
+  const q = (document.getElementById("evento-ospite-search").value || "").toLowerCase();
+  const list = document.getElementById("ospiti-multi-list");
+  list.innerHTML = "";
+
+  PLAYERS.filter(p => p.toLowerCase().includes(q)).forEach(name => {
+    const checked = selectedOspiti.has(name);
+    const pts = getPuntiOspite(name);
+    const div = document.createElement("div");
+    div.className = "ospite-check" + (checked ? " checked" : "");
+    div.onclick = () => toggleOspite(name, div);
+    div.innerHTML = `
+      <div class="check-box">${checked ? '✓' : ''}</div>
+      <div class="check-label">${name}</div>
+      <div class="check-pts">${pts > 0 ? '+' : ''}${pts} pt</div>
+    `;
+    list.appendChild(div);
+  });
+
+  document.getElementById("evento-assign-btn").textContent =
+    selectedOspiti.size > 0
+      ? `Assegna a ${selectedOspiti.size} ospite${selectedOspiti.size > 1 ? 'i' : ''}`
+      : "Assegna a selezionati";
+  document.getElementById("evento-assign-btn").disabled = selectedOspiti.size === 0;
+};
+
+window.toggleOspite = function(name, el) {
+  if (selectedOspiti.has(name)) {
+    selectedOspiti.delete(name);
+    el.classList.remove("checked");
+    el.querySelector(".check-box").textContent = "";
+  } else {
+    selectedOspiti.add(name);
+    el.classList.add("checked");
+    el.querySelector(".check-box").textContent = "✓";
+  }
+  document.getElementById("evento-assign-btn").textContent =
+    selectedOspiti.size > 0
+      ? `Assegna a ${selectedOspiti.size} ospite${selectedOspiti.size > 1 ? 'i' : ''}`
+      : "Assegna a selezionati";
+  document.getElementById("evento-assign-btn").disabled = selectedOspiti.size === 0;
+};
+
+window.assegnaEvento = async function() {
+  if (!currentEvento || selectedOspiti.size === 0) return;
+  const btn = document.getElementById("evento-assign-btn");
+  btn.disabled = true;
+  btn.textContent = "Salvataggio...";
+
+  for (const name of selectedOspiti) {
+    const key = sanitize(name);
+    const eventKey = currentEvento.id + (currentEvento.ripetibile ? '_' + Date.now() : '');
+    await set(ref(db, `punti/${key}/${eventKey}`), {
+      pts: currentEvento.pts, desc: currentEvento.desc, ts: Date.now()
+    });
+  }
+
+  showToast(`✓ Assegnato a ${selectedOspiti.size} ospiti`);
+  closeEventoModal();
+};
+
+// ── STORICO GLOBALE ──
+window.renderStorico = function() {
+  const q = (document.getElementById("storico-search").value || "").toLowerCase();
+  const list = document.getElementById("storico-list");
+  list.innerHTML = "";
+
+  // Tutti gli eventi con nome ospite
+  const all = [];
+  PLAYERS.forEach(name => {
+    getEventiOspite(name).forEach(ev => {
+      all.push({ name, ...ev });
+    });
+  });
+
+  all.sort((a, b) => (b.ts || 0) - (a.ts || 0));
+  const filtered = all.filter(e => e.name.toLowerCase().includes(q));
+
+  if (filtered.length === 0) {
+    list.innerHTML = '<div class="empty-state">Nessun evento ancora</div>';
+    return;
+  }
+
+  filtered.forEach(ev => {
+    const div = document.createElement("div");
+    div.className = "storico-item";
+    const d = new Date(ev.ts);
+    const timeStr = d.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+    div.innerHTML = `
+      <div class="storico-pts ${ev.pts > 0 ? 'pos' : 'neg'}">${ev.pts > 0 ? '+' : ''}${ev.pts}</div>
+      <div class="storico-info">
+        <div class="storico-desc">${ev.name} — ${ev.desc}</div>
+        <div class="storico-time">${timeStr}</div>
+      </div>
+      <button class="btn-annulla" onclick="annulla('${ev.name}','${ev.id}')">✕</button>
+    `;
+    list.appendChild(div);
+  });
+};
+
+// ── TOOLS ──
+window.sblocca = async function() {
+  const btn = document.getElementById("btn-unlock");
+  if (btn.classList.contains("done")) return;
+  if (!confirm("Sbloccare i punti pre-festa per tutti gli ospiti? Questa azione è irreversibile.")) return;
+  await set(ref(db, "prefesta_sbloccata"), true);
+  showToast("✓ Punti pre-festa sbloccati!");
+};
+
+function renderToolsRegistrations() {
+  const container = document.getElementById("tools-registrations");
+  container.innerHTML = "";
+  const linked = Object.keys(registrazioni).length;
+  const total = PLAYERS.length;
+
+  const stats = document.createElement("div");
+  stats.className = "stats-bar";
+  stats.innerHTML = `
+    <div class="stat-chip"><span class="stat-num pos">${linked}</span><span class="stat-label">Registrati</span></div>
+    <div class="stat-chip"><span class="stat-num" style="color:var(--gold)">${total - linked}</span><span class="stat-label">Mancanti</span></div>
+    <div class="stat-chip"><span class="stat-num info">${total}</span><span class="stat-label">Totale</span></div>
+  `;
+  container.appendChild(stats);
+
+  PLAYERS.forEach(name => {
+    const key = sanitize(name);
+    const code = registrazioni[key];
+    const row = document.createElement("div");
+    row.className = "storico-item";
+    row.innerHTML = `
+      <div class="storico-info">
+        <div class="storico-desc">${name}</div>
+        <div class="storico-time" style="color:${code ? 'var(--green)' : 'var(--text-muted)'}">
+          ${code ? '🔑 ' + code : '— non registrato'}
+        </div>
+      </div>
+      ${code ? `<button class="btn-annulla" onclick="scollegaOspite('${name}')">Scollega</button>` : ''}
+    `;
+    container.appendChild(row);
+  });
+}
+
+window.scollegaOspite = async function(name) {
+  if (!confirm(`Scollegare ${name}?`)) return;
+  const key = sanitize(name);
+  await remove(ref(db, `registrations/${key}`));
+  showToast(`✓ ${name} scollegato`, "warn");
+};
+
+// ── UTILS ──
+window.switchTab = function(tab) {
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  document.querySelectorAll(".tab-content").forEach(t => t.classList.remove("active"));
+  document.getElementById("tab-" + tab).classList.add("active");
+  document.getElementById("content-" + tab).classList.add("active");
+  if (tab === "eventi") renderEventiList();
+  if (tab === "storico") renderStorico();
+};
+
+function sanitize(str) { return str.replace(/[.#$[\]\s]/g, "_"); }
+
+function showToast(msg, type = "ok") {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.className = "toast show" + (type === "error" ? " error" : type === "warn" ? " warn" : "");
+  clearTimeout(window._tt);
+  window._tt = setTimeout(() => { t.className = "toast"; }, 2500);
+}
+
+init();
+renderEventiList();
+</script>
+</body>
+</html>
