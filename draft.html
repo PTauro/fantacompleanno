@@ -471,13 +471,11 @@ function updateBudget() {
   `;
 
   // Bottone salva
-  const canSave = myTeam.length >= 1 && getRemaining() >= 0;
+  const canSave = myTeam.length >= 1;
   document.getElementById("save-btn").disabled = !canSave;
   document.getElementById("save-btn").textContent = canSave
-    ? "✓ Salva Squadra"
-    : myTeam.length === 0
-      ? "Aggiungi almeno 1 giocatore"
-      : "Budget superato!";
+    ? "✓ Salva Squadra (" + myTeam.length + "/5)"
+    : "Aggiungi almeno 1 giocatore";
 }
 
 // ── ROSA (TAB MIA SQUADRA) ──
@@ -604,7 +602,7 @@ window.togglePlayer = function(player) {
   if (idx >= 0) {
     removePlayer(player.name);
   } else {
-    if (myTeam.length >= MAX_PLAYERS) { showToast("Squadra piena! Rimuovi qualcuno prima.", "warn"); return; }
+    if (myTeam.length >= MAX_PLAYERS) { showToast("Hai già 5 giocatori — rimuovine uno per cambiare.", "warn"); return; }
     if (getRemaining() < player.cost) { showToast("Budget insufficiente! ✂️", "error"); return; }
     myTeam.push(player);
     showToast(`+ ${player.name} aggiunto`);
@@ -628,9 +626,7 @@ window.toggleCaptain = function(name) {
 };
 
 window.saveTeam = async function() {
-  if (myTeam.length !== MAX_PLAYERS) { showToast("Seleziona 5 giocatori!", "error"); return; }
-  if (getRemaining() < 0) { showToast("Budget superato!", "error"); return; }
-
+  if (myTeam.length === 0) { showToast("Aggiungi almeno 1 giocatore!", "error"); return; }
   const btn = document.getElementById("save-btn");
   btn.textContent = "Salvataggio...";
   btn.disabled = true;
