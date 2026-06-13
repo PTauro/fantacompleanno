@@ -381,7 +381,7 @@ body {
       <span class="card-icon">⚔️</span>
       <div class="card-title">La tua Fazione</div>
       <div class="card-sub" style="color:var(--text-muted);">Scopri il tuo ruolo segreto</div>
-      <div class="card-badge badge-lock" style="margin-top:8px; font-size:9px;" id="fazione-badge">Apri la busta →</div>
+      <div class="card-badge badge-info" style="margin-top:8px; font-size:9px;" id="fazione-badge">Apri la busta →</div>
     </div>
   </div>
 </div>
@@ -702,8 +702,9 @@ const REG = {
     bonus: [
       { pts: "+150", desc: "Fazione vincente — tutti i membri della fazione con più punti a fine serata", type: "Automatico" },
       { pts: "+150", desc: "Alleanza vincente — alleanza con coefficiente (Media Bonus − Media Malus) più alto", type: "Automatico" },
-      { pts: "x2", desc: "Moltiplicatore (Cuoco di Corte / Umano Preferito) — i tuoi punti contano doppio per la fazione", type: "Ruolo speciale" },
-      { pts: "Spia", desc: "Glitter di Beagle / Fioriera come Lettiera — i tuoi punti vanno alla fazione nemica", type: "Ruolo speciale" },
+      { pts: "x1", desc: "🍖 Dispenser di Croccantini (Cody) / 🚽 Pulitore di Lettiera (Siria) — Ruolo comune. I tuoi punti contribuiscono normalmente al totale della fazione.", type: "Ruolo comune" },
+      { pts: "x2", desc: "👨‍🍳 Cuoco di Corte (Cody) / ❤️ Umano Preferito (Siria) — Ruolo speciale. I tuoi punti raddoppiano per la tua fazione.", type: "Ruolo speciale" },
+      { pts: "Spia", desc: "✨ Glitter di Beagle (spia Siria) / 🌸 Fioriera come Lettiera (spia Cody) — Ruolo speciale. I tuoi punti vanno alla fazione nemica.", type: "Ruolo speciale" },
     ],
     malus: []
   },
