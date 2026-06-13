@@ -301,9 +301,17 @@ body {
 
 <!-- ══ TAB: TOOLS ══ -->
 <div class="tab-content" id="content-tools">
-  <div class="section-label" style="margin-top:8px;">Punti Pre-Festa</div>
+  <div class="section-label" style="margin-top:8px;">Classifica</div>
+  <a href="classifica.html?key=30cody30syria" style="display:block;background:rgba(34,197,94,0.1);border:1.5px solid rgba(34,197,94,0.3);color:var(--green);padding:14px 16px;border-radius:12px;font-weight:700;font-size:14px;text-decoration:none;margin-bottom:12px;">📊 Apri Classifica Live →</a>
+
+  <div class="section-label">Punti Pre-Festa</div>
   <button class="btn-unlock" id="btn-unlock" onclick="sblocca()">
     🔓 Sblocca Punti Pre-Festa
+  </button>
+
+  <div class="section-label">Reset</div>
+  <button onclick="resetPunti()" style="width:100%;background:rgba(239,68,68,0.1);border:1.5px solid rgba(239,68,68,0.4);color:var(--red);padding:14px 16px;border-radius:12px;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:12px;">
+    🗑 Reset Totale Punti
   </button>
 
   <div class="section-label">Gestione Ospiti</div>
@@ -829,6 +837,13 @@ function renderToolsRegistrations() {
     container.appendChild(row);
   });
 }
+
+window.resetPunti = async function() {
+  if (!confirm("RESET TOTALE di tutti i punti assegnati? Azione irreversibile!")) return;
+  if (!confirm("Sei SICURO? Tutti i punti verranno azzerati.")) return;
+  await remove(ref(db, "punti"));
+  showToast("✓ Tutti i punti resettati", "warn");
+};
 
 window.scollegaOspite = async function(name) {
   if (!confirm(`Scollegare ${name}? Verranno cancellati anche la registrazione e la squadra.`)) return;
