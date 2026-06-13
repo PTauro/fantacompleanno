@@ -470,7 +470,9 @@ const EVENTI = [
 ];
 
 // ── STATO ──
-let punti = {};      // { playerKey: { eventId: { pts, desc, ts } } }
+let punti = {};
+let allTeams = {};
+let teams = {};
 let registrazioni = {}; // { playerKey: deviceCode }
 let currentGuest = null;
 let currentEvento = null;
@@ -488,6 +490,11 @@ function init() {
 
   onValue(ref(db, "registrations"), snap => {
     registrazioni = snap.exists() ? snap.val() : {};
+    renderToolsRegistrations();
+  });
+
+  onValue(ref(db, "teams"), snap => {
+    allTeams = snap.exists() ? snap.val() : {};
     renderToolsRegistrations();
   });
 
