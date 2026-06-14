@@ -435,12 +435,30 @@ function getCoeffAlleanza(membri) {
   return (totBonus / conSquadra.length) - (totMalus / conSquadra.length);
 }
 
+// Effetto del ruolo fazione sul totale: a chi vanno i punti e con che moltiplicatore
+// soldato_*        -> propria fazione, x1
+// moltiplicatore_*  -> propria fazione, x2
+// spia_cody         -> Siria, x1 (le mele marce di Cody lavorano per Siria)
+// spia_siria        -> Cody, x1 (le mele marce di Siria lavorano per Cody)
+function getRuoloEffetto(fazioneBase, ruoloId) {
+  if (ruoloId === "moltiplicatore_cody" || ruoloId === "moltiplicatore_siria") {
+    return { target: fazioneBase, multiplier: 2 };
+  }
+  if (ruoloId === "spia_cody") return { target: "siria", multiplier: 1 };
+  if (ruoloId === "spia_siria") return { target: "cody", multiplier: 1 };
+  // soldato_* o ruoloId mancante/non riconosciuto → comportamento di default
+  return { target: fazioneBase, multiplier: 1 };
+}
+
 // Punti totali fazione
 function getPuntiFazione(faz) {
   let tot = 0;
   PLAYERS.forEach(p => {
-    if (fazioni[sanitize(p.name)] === faz) {
-      tot += getPuntiPersonali(p.name).tot;
+    const f = fazioni[sanitize(p.name)];
+    if (!f || !f.fazione) return;
+    const { target, multiplier } = getRuoloEffetto(f.fazione, f.ruoloId);
+    if (target === faz) {
+      tot += getPuntiPersonali(p.name).tot * multiplier;
     }
   });
   return tot;

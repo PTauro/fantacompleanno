@@ -32,6 +32,12 @@ body {
   font-family: 'Space Mono', monospace; font-size: 11px; color: var(--text-muted);
   background: none; border: none; cursor: pointer; letter-spacing: .05em; padding: 6px 4px;
 }
+.btn-close {
+  background: var(--surface); border: 1.5px solid var(--border);
+  color: var(--text-muted); width: 32px; height: 32px; border-radius: 9px;
+  font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; text-decoration: none;
+}
 
 /* ── SLIDES ── */
 .slides-wrap { flex: 1; position: relative; overflow: hidden; }
@@ -191,6 +197,7 @@ body {
 
 <!-- TOP BAR -->
 <div class="topbar">
+  <a href="home.html" class="btn-close" id="btn-close" style="display:none;">✕</a>
   <div class="progress-dots" id="progress-dots"></div>
   <button class="btn-skip" id="btn-skip" onclick="goToLast()">Salta →</button>
 </div>
@@ -535,6 +542,10 @@ function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
 // ── INIT ──
 async function init() {
+  // Mostra il tasto chiusura solo se è una rivisita volontaria (tutorial già completato in passato)
+  if (localStorage.getItem("fc_tutorial_done") === "1") {
+    document.getElementById("btn-close").style.display = "flex";
+  }
   // Se la fazione è già stata estratta, segnalo per l'ultima slide
   const key = sanitize(myName);
   const snap = await get(ref(db, `fazioni/${key}`));
