@@ -342,7 +342,7 @@ body { padding-bottom: 170px !important; }
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, get, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getDatabase, ref, get, set, remove, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCqLFQW8XQioObmxG0oDPc_MFpdFXJxmac",
@@ -382,7 +382,7 @@ const PLAYERS = [
   { name: "Simone Baldassarre", cost: 85, tags: ["affetto", "paternita"] },
   { name: "Desi Ala", cost: 85, tags: ["affetto", "maternita", "coppia"] },
   { name: "Michele Nervo", cost: 65, tags: ["affetto", "paternita", "coppia"] },
-  { name: "Zia Anna", cost: 105, tags: ["affetto", "maternita", "coppia"] },
+  { name: "Zia Anna", cost: 105, tags: ["affetto", "maternita"] },
   { name: "Francesca Terlizzi", cost: 140, tags: ["coppia", "bonus"] },
   { name: "Nicolas Costa", cost: 115, tags: ["coppia", "bonus"] },
   { name: "Giulia Trevisi", cost: 55, tags: ["remoto", "coppia"] },
@@ -487,6 +487,127 @@ async function init() {
 // ── BUDGET ──
 function getSpent() { return myTeam.reduce((s, p) => s + p.cost, 0); }
 function getRemaining() { return BUDGET - getSpent(); }
+
+// ── CAT.2: COPPIE (per "Love is in the Air") ──
+const COPPIE = [
+  ["Eleonora Tauro", "Paolo Bello"],
+  ["Mirco Caione", "Gloria Rinaldi"],
+  ["Dario Caione", "Gabriele Mangione"],
+  ["Desi Ala", "Michele Nervo"],
+  ["Francesca Terlizzi", "Nicolas Costa"],
+  ["Giulia Trevisi", "Andrea Sozzani"],
+  ["Emilio Pulli", "Eleonora Bello"],
+  ["Marta Mignone", "Giuseppe Susca"],
+  ["Annachiara Maci", "Davide Secci"],
+  ["Antonio Borelli", "Marika Giagnotti"],
+  ["Danilo Schiavone", "Ilaria Tenore"],
+  ["Donato Stragapede", "Emily Giancane"],
+  ["Martina Poso", "Maycols Sirsi"],
+  ["Laura Capodieci", "Davide Attanasio"],
+  ["Manuel Palma", "Carlotta D'aversa"],
+  ["Nicolò Spada", "Antonella Lo vecchio"],
+  ["Andrea Scozzi", "Annalisa Ancora"],
+  ["Nicolò Maci", "Silvia Lamusta"],
+  ["Alessio Maci", "Rachele Ponzetta"],
+  ["Erminio Foti", "Sara Colletta"],
+  ["Luca Grasso", "Annalisa Maci"],
+  ["Alessio Caretto", "Silvia Maci"],
+  ["Errico Del monte", "Chiara Del Vecchio"],
+  ["Davide Mogavero", "Marialuce Serra"],
+  ["Francesco Romano", "Mariachiara Longo"],
+  ["Alberto Bianco", "Martina Schiavone"],
+  ["Luca Invidia", "Marika Piconese"],
+  ["Mariacarla Spagnolo", "Lorenzo Taffone"],
+];
+
+// ── CAT.2: CALCOLO BONUS DRAFT ──
+// Ritorna un array di { id, pts, desc } per i bonus applicabili al roster attuale.
+// Tutti gli id NON applicabili vengono rimossi da Firebase (vedi saveTeam) per
+// gestire correttamente le modifiche di squadra dopo un salvataggio precedente.
+function calcolaCat2(roster, captainName) {
+  const results = [];
+  const spent = roster.reduce((s, p) => s + p.cost, 0);
+  const names = roster.map(p => p.name);
+  const hasTag = (tag) => roster.find(p => (p.tags || []).includes(tag));
+
+  // +10 Divisione del budget perfetta — spende esattamente 500
+  if (spent === BUDGET) {
+    results.push({ id: "b_cat2_budget_perfetto", pts: 10, desc: "Divisione del budget perfetta (500/500 Capelli)" });
+  }
+
+  // +10 Pupilli — tutti i capelli spesi, squadra incompleta (<5)
+  if (spent === BUDGET && roster.length < MAX_PLAYERS) {
+    results.push({ id: "b_cat2_pupilli", pts: 10, desc: "Pupilli — 500 Capelli spesi con squadra incompleta" });
+  }
+
+  // +20 (x2 cap) Bonus Maternità
+  { const p = hasTag("maternita");
+    if (p) results.push({ id: "b_cat2_maternita", pts: p.name === captainName ? 40 : 20, desc: `Bonus Maternità — ${p.name} in squadra${p.name === captainName ? " (capitano, x2)" : ""}` });
+  }
+
+  // +20 (x2 cap) Bonus Paternità
+  { const p = hasTag("paternita");
+    if (p) results.push({ id: "b_cat2_paternita", pts: p.name === captainName ? 40 : 20, desc: `Bonus Paternità — ${p.name} in squadra${p.name === captainName ? " (capitano, x2)" : ""}` });
+  }
+
+  // +25 (x2 cap) Bonus Affetto Stabile
+  { const p = hasTag("affetto");
+    if (p) results.push({ id: "b_cat2_affetto", pts: p.name === captainName ? 50 : 25, desc: `Bonus Affetto Stabile — ${p.name} in squadra${p.name === captainName ? " (capitano, x2)" : ""}` });
+  }
+
+  // +50 (x2 cap) Smartworking
+  { const p = hasTag("remoto");
+    if (p) results.push({ id: "b_cat2_smartworking", pts: p.name === captainName ? 100 : 50, desc: `Smartworking — ${p.name} (gioca da remoto)${p.name === captainName ? " (capitano, x2)" : ""}` });
+  }
+
+  // +30 (x2 cap) Love is in the Air — entrambi i partner di una coppia, per ogni coppia completa
+  COPPIE.forEach(([a, b], i) => {
+    if (names.includes(a) && names.includes(b)) {
+      const isCapInCoppia = captainName === a || captainName === b;
+      results.push({ id: `b_cat2_love_${i}`, pts: isCapInCoppia ? 60 : 30, desc: `Love is in the Air — ${a} & ${b} insieme in squadra${isCapInCoppia ? " (capitano, x2)" : ""}` });
+    }
+  });
+
+  // +30 Capellone Underdog — meno della metà del budget, squadra da 5
+  if (spent < BUDGET / 2 && roster.length === MAX_PLAYERS) {
+    results.push({ id: "b_cat2_underdog", pts: 30, desc: `Capellone Underdog — squadra da 5 con solo ${spent}/${BUDGET} Capelli spesi` });
+  }
+
+  // +30 Bonus Stefanuccio
+  if (hasTag("bonus")) {
+    results.push({ id: "b_cat2_stefanuccio", pts: 30, desc: "Bonus Stefanuccio — Stefanuccio in squadra" });
+  }
+
+  // +50 First Lady — Alessia Ala capitana
+  if (captainName === "Alessia Ala") {
+    results.push({ id: "b_cat2_firstlady", pts: 50, desc: "First Lady — Alessia Ala è capitana" });
+  }
+
+  return results;
+}
+
+// Tutti i possibili id Cat.2 (per sapere quali rimuovere se non più applicabili)
+const CAT2_ALL_IDS = [
+  "b_cat2_budget_perfetto", "b_cat2_pupilli", "b_cat2_maternita", "b_cat2_paternita",
+  "b_cat2_affetto", "b_cat2_smartworking", "b_cat2_underdog", "b_cat2_stefanuccio", "b_cat2_firstlady",
+  ...COPPIE.map((_, i) => `b_cat2_love_${i}`)
+];
+
+// Ricalcola e riscrive i bonus Cat.2 su Firebase, rimuovendo quelli non più validi
+async function aggiornaCat2(roster, captainName) {
+  const key = sanitize(myName);
+  const applicabili = calcolaCat2(roster, captainName);
+  const idsApplicabili = new Set(applicabili.map(r => r.id));
+
+  for (const r of applicabili) {
+    await set(ref(db, `punti/${key}/${r.id}`), { pts: r.pts, desc: r.desc, ts: Date.now() });
+  }
+  for (const id of CAT2_ALL_IDS) {
+    if (!idsApplicabili.has(id)) {
+      await remove(ref(db, `punti/${key}/${id}`)).catch(() => {});
+    }
+  }
+}
 
 function updateBudget() {
   const rem = getRemaining();
@@ -687,6 +808,9 @@ window.saveTeam = async function() {
 
   // ── AUTOMATISMO CAT.1: +10 prima volta che si crea la squadra ──
   await assegnaAutomatico(sanitize(myName), "b_squadra_creata", 10, "Crea la sua squadra (draft)");
+
+  // ── AUTOMATISMI CAT.2: ricalcola tutti i bonus draft in base al roster attuale ──
+  await aggiornaCat2(myTeam, myCaptain || myTeam[0].name);
 
   showToast("✓ Squadra salvata!");
   btn.disabled = false;
