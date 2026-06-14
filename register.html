@@ -498,7 +498,11 @@ async function init() {
     // Dispositivo riconosciuto → aggiorna localStorage e vai a home
     myName = alreadyLinked[0];
     localStorage.setItem("fc_player_name", myName);
-    window.location.replace("home.html");
+    if (localStorage.getItem("fc_tutorial_done") === "1") {
+      window.location.replace("home.html");
+    } else {
+      window.location.replace("tutorial.html");
+    }
     return;
   }
 
@@ -578,7 +582,7 @@ async function confirmSelection(name) {
   showToast(`✓ Benvenuto/a, ${name}!`);
 
   setTimeout(() => {
-    window.location.replace("home.html");
+    window.location.replace("tutorial.html");
   }, 1200);
 }
 

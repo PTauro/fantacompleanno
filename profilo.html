@@ -189,6 +189,52 @@ body {
   background:var(--green); animation:pulse 1.5s infinite;
 }
 @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.3} }
+/* ── BOTTOM NAV BAR ── */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
+  background: rgba(13,13,20,0.97); backdrop-filter: blur(16px);
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-around;
+  padding: 8px 4px calc(8px + env(safe-area-inset-bottom, 0px));
+}
+.nav-item {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  text-decoration: none; color: var(--text-muted);
+  padding: 6px 10px; border-radius: 12px; transition: all .2s;
+  flex: 1; min-width: 0;
+}
+.nav-item.active { color: var(--accent-cody); }
+.nav-icon { font-size: 20px; line-height: 1; }
+.nav-label { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: .05em; white-space: nowrap; }
+.nav-item-center {
+  position: relative; top: -10px;
+}
+.nav-item-center .nav-icon {
+  width: 46px; height: 46px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-cody), var(--accent-siria));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; box-shadow: 0 4px 16px rgba(255,107,43,0.35);
+}
+.nav-item-center.active .nav-icon { box-shadow: 0 4px 20px rgba(255,107,43,0.6); }
+.nav-item-center .nav-label { color: var(--text-muted); }
+.nav-item-center.active .nav-label { color: var(--text); }
+
+/* Spazio extra in fondo alla pagina per non sovrapporsi alla nav */
+body { padding-bottom: 90px !important; }
+
+/* ── FAB REGOLAMENTO ── */
+.fab-regolamento {
+  position: fixed; right: 16px; z-index: 199;
+  bottom: 96px;
+  width: 52px; height: 52px; border-radius: 50%;
+  background: var(--surface); border: 1.5px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; text-decoration: none; cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  transition: all .2s;
+}
+.fab-regolamento:hover { border-color: var(--accent-cody); transform: scale(1.05); }
+
 </style>
 </head>
 <body>
@@ -201,7 +247,6 @@ body {
   </div>
   <div style="display:flex;align-items:center;gap:10px;">
     <div class="live-dot">LIVE</div>
-    <button class="btn-home" onclick="window.location.href='home.html'">← Home</button>
   </div>
 </div>
 
@@ -231,19 +276,33 @@ body {
 </div>
 
 <!-- STATS GRID -->
-<div class="stats-grid">
-  <div class="stat-card">
-    <span class="stat-card-num gold" id="pos-camp">—</span>
-    <span class="stat-card-label">Classifica</span>
-  </div>
-  <div class="stat-card">
-    <span class="stat-card-num green" id="pts-squadra">0</span>
-    <span class="stat-card-label">Pts Squadra</span>
+<div class="stats-grid" style="grid-template-columns: 1.3fr 1fr;">
+  <div class="stat-card" style="text-align:left;padding:14px 16px;">
+    <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:2px;">
+      <span class="stat-card-num gold" id="pos-camp" style="font-size:24px;">—</span>
+      <span class="stat-card-label">posizione Classifica</span>
+    </div>
+    <div style="font-size:11px;color:var(--text-muted);">
+      <span id="pts-squadra" class="green" style="color:var(--green);font-family:'Space Mono',monospace;font-weight:700;">0</span> pt squadra — determina la tua posizione
+    </div>
   </div>
   <div class="stat-card">
     <span class="stat-card-num siria" id="pos-alleanza">—</span>
     <span class="stat-card-label">Alleanza</span>
   </div>
+</div>
+
+<!-- AZIONI RAPIDE -->
+<div class="section" style="padding-top:0;padding-bottom:0;">
+  <button onclick="window.location.href='tutorial.html'" style="width:100%;background:var(--surface);border:1.5px solid var(--border);color:var(--text-muted);padding:12px;border-radius:10px;font-family:'Space Grotesk',sans-serif;font-size:13px;cursor:pointer;">
+    🎬 Rivedi il tutorial
+  </button>
+</div>
+
+<!-- FAZIONE -->
+<div class="section">
+  <div class="section-title">La mia fazione</div>
+  <div id="fazione-content"></div>
 </div>
 
 <!-- SQUADRA -->
@@ -372,6 +431,27 @@ const ALLEANZE = {
 
 let punti = {};
 let teams = {};
+let fazioni = {};
+
+const RUOLI = {
+  cody: {
+    soldato: { id:"soldato_cody", nome:"🍖 Dispenser di Croccantini", regola:"Ruolo comune — i tuoi punti contribuiscono normalmente (x1) al totale della fazione Cody.", effetto:"x1" },
+    moltiplicatore: { id:"moltiplicatore_cody", nome:"👨‍🍳 Cuoco di Corte", regola:"Ruolo speciale — i tuoi punti raddoppiano per la tua fazione.", effetto:"x2" },
+    spia: { id:"spia_cody", nome:"✨ Glitter di Beagle", regola:"Ruolo speciale — sei una spia di Siria. I tuoi punti vanno a Siria.", effetto:"spia" }
+  },
+  siria: {
+    soldato: { id:"soldato_siria", nome:"🚽 Pulitore di Lettiera", regola:"Ruolo comune — i tuoi punti contribuiscono normalmente (x1) al totale della fazione Siria.", effetto:"x1" },
+    moltiplicatore: { id:"moltiplicatore_siria", nome:"❤️ Umano Preferito", regola:"Ruolo speciale — i tuoi punti raddoppiano per la tua fazione.", effetto:"x2" },
+    spia: { id:"spia_siria", nome:"🌸 Fioriera come Lettiera", regola:"Ruolo speciale — sei una spia di Cody. I tuoi punti vanno a Cody.", effetto:"spia" }
+  }
+};
+
+function getRuolo(fazione, ruoloId) {
+  for (const tipo of ['soldato','moltiplicatore','spia']) {
+    if (RUOLI[fazione][tipo].id === ruoloId) return RUOLI[fazione][tipo];
+  }
+  return RUOLI[fazione].soldato;
+}
 
 function sanitize(s) { return s.replace(/[.#$[\]]/g, "_"); }
 
@@ -429,6 +509,40 @@ function render() {
   document.getElementById("hero-name").textContent = myName;
   document.getElementById("hero-team").textContent = myTeam ? `✂️ ${myTeam.teamName || "Squadra senza nome"}` : "Nessuna squadra ancora";
 
+  // ── FAZIONE ──
+  const myKeyFaz = sanitize(myName);
+  const fazContainer = document.getElementById("fazione-content");
+  const mioFaz = fazioni[myKeyFaz];
+  if (!mioFaz) {
+    fazContainer.innerHTML = `
+      <div style="background:var(--surface);border:1.5px dashed var(--border);border-radius:14px;padding:16px;text-align:center;cursor:pointer;" onclick="window.location.href='fazione.html'">
+        <div style="font-size:32px;margin-bottom:8px;">✉️</div>
+        <div style="font-size:13px;color:var(--text-muted);">Non hai ancora aperto la tua busta fazione.</div>
+        <div style="font-size:12px;color:var(--accent-siria);margin-top:6px;">Tocca per scoprirla →</div>
+      </div>
+    `;
+  } else {
+    const isCody = mioFaz.fazione === "cody";
+    const ruolo = getRuolo(mioFaz.fazione, mioFaz.ruoloId);
+    const isSpeciale = ruolo.effetto !== "x1";
+    const gradient = isCody ? "linear-gradient(135deg, #1a0800, #2d1200)" : "linear-gradient(135deg, #0d0020, #1a0035)";
+    const borderColor = isCody ? "rgba(255,107,43,0.4)" : "rgba(168,85,247,0.4)";
+    const accentColor = isCody ? "var(--accent-cody)" : "var(--accent-siria)";
+    fazContainer.innerHTML = `
+      <div style="background:${gradient};border:1.5px solid ${borderColor};border-radius:14px;padding:16px;cursor:pointer;" onclick="window.location.href='fazione.html'">
+        <div style="display:flex;align-items:center;gap:14px;">
+          <div style="font-size:40px;flex-shrink:0;">${isCody ? "🐕" : "🐱"}</div>
+          <div style="flex:1;">
+            <div style="font-size:15px;font-weight:800;color:${accentColor};">${isCody ? "Team Cody" : "Team Siria"}</div>
+            <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">${ruolo.nome}</div>
+          </div>
+          <div style="color:var(--text-muted);font-size:16px;">→</div>
+        </div>
+        ${isSpeciale ? `<div style="margin-top:10px;font-family:'Space Mono',monospace;font-size:10px;color:var(--red);background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:100px;padding:4px 10px;display:inline-block;">🔒 Ruolo Speciale</div>` : ''}
+      </div>
+    `;
+  }
+
   // Punti personali
   const pEl = document.getElementById("punti-num");
   pEl.textContent = (pp.tot > 0 ? "+" : "") + pp.tot;
@@ -458,7 +572,7 @@ function render() {
   const sqContainer = document.getElementById("squadra-content");
   sqContainer.innerHTML = "";
   if (!myTeam || !myTeam.roster) {
-    sqContainer.innerHTML = '<div class="empty-state">Non hai ancora creato la squadra.<br><br><button onclick="window.location.href=\'draft.html\'" style="background:linear-gradient(135deg,var(--accent-cody),var(--accent-siria));color:white;padding:12px 24px;border-radius:10px;border:none;font-family:\'Space Grotesk\',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">Crea squadra →</button></div>';
+    sqContainer.innerHTML = '<div class="empty-state">Non hai ancora creato la squadra.<br><br><button onclick="window.location.href=\'squadra.html\'" style="background:linear-gradient(135deg,var(--accent-cody),var(--accent-siria));color:white;padding:12px 24px;border-radius:10px;border:none;font-family:\'Space Grotesk\',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">Crea squadra →</button></div>';
   } else {
     const header = document.createElement("div");
     header.className = "squadra-header";
@@ -491,7 +605,7 @@ function render() {
 
     // Tasto modifica
     const editBtn = document.createElement("button");
-    editBtn.onclick = () => window.location.href = "draft.html";
+    editBtn.onclick = () => window.location.href = "squadra.html";
     editBtn.style.cssText = "width:100%;background:var(--surface);border:1.5px solid var(--border);color:var(--text-muted);padding:12px;border-radius:10px;font-family:'Space Grotesk',sans-serif;font-size:13px;cursor:pointer;margin-top:8px;";
     editBtn.textContent = "✏️ Modifica squadra";
     sqContainer.appendChild(editBtn);
@@ -578,6 +692,36 @@ onValue(ref(db, "teams"), snap => {
   teams = snap.exists() ? snap.val() : {};
   render();
 });
+onValue(ref(db, "fazioni"), snap => {
+  fazioni = snap.exists() ? snap.val() : {};
+  render();
+});
 </script>
+<a href="regolamento.html" class="fab-regolamento" title="Regolamento">📖</a>
+
+<!-- BOTTOM NAV BAR -->
+<div class="bottom-nav">
+  <a href="classifica.html" class="nav-item" data-page="classifica">
+    <span class="nav-icon">📊</span>
+    <span class="nav-label">Classifica</span>
+  </a>
+  <a href="alleanze.html" class="nav-item" data-page="alleanze">
+    <span class="nav-icon">🤝</span>
+    <span class="nav-label">Alleanze</span>
+  </a>
+  <a href="home.html" class="nav-item nav-item-center" data-page="home">
+    <span class="nav-icon">🏠</span>
+    <span class="nav-label">Home</span>
+  </a>
+  <a href="squadra.html" class="nav-item" data-page="squadra">
+    <span class="nav-icon">✂️</span>
+    <span class="nav-label">Squadra</span>
+  </a>
+  <a href="profilo.html" class="nav-item active" data-page="profilo">
+    <span class="nav-icon">👤</span>
+    <span class="nav-label">Profilo</span>
+  </a>
+</div>
+
 </body>
 </html>

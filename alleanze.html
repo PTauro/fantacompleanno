@@ -198,6 +198,52 @@ body {
   opacity: 0; transition: opacity .3s; pointer-events: none; z-index: 300;
 }
 .toast.show { opacity: 1; }
+/* ── BOTTOM NAV BAR ── */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
+  background: rgba(13,13,20,0.97); backdrop-filter: blur(16px);
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-around;
+  padding: 8px 4px calc(8px + env(safe-area-inset-bottom, 0px));
+}
+.nav-item {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  text-decoration: none; color: var(--text-muted);
+  padding: 6px 10px; border-radius: 12px; transition: all .2s;
+  flex: 1; min-width: 0;
+}
+.nav-item.active { color: var(--accent-cody); }
+.nav-icon { font-size: 20px; line-height: 1; }
+.nav-label { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: .05em; white-space: nowrap; }
+.nav-item-center {
+  position: relative; top: -10px;
+}
+.nav-item-center .nav-icon {
+  width: 46px; height: 46px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-cody), var(--accent-siria));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; box-shadow: 0 4px 16px rgba(255,107,43,0.35);
+}
+.nav-item-center.active .nav-icon { box-shadow: 0 4px 20px rgba(255,107,43,0.6); }
+.nav-item-center .nav-label { color: var(--text-muted); }
+.nav-item-center.active .nav-label { color: var(--text); }
+
+/* Spazio extra in fondo alla pagina per non sovrapporsi alla nav */
+body { padding-bottom: 90px !important; }
+
+/* ── FAB REGOLAMENTO ── */
+.fab-regolamento {
+  position: fixed; right: 16px; z-index: 199;
+  bottom: 96px;
+  width: 52px; height: 52px; border-radius: 50%;
+  background: var(--surface); border: 1.5px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; text-decoration: none; cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  transition: all .2s;
+}
+.fab-regolamento:hover { border-color: var(--accent-cody); transform: scale(1.05); }
+
 </style>
 </head>
 <body>
@@ -210,7 +256,6 @@ body {
   </div>
   <div style="display:flex;align-items:center;gap:10px;">
     <div class="live-dot">LIVE</div>
-    <button class="btn-home" onclick="window.location.href='home.html'">← Home</button>
   </div>
 </div>
 
@@ -564,5 +609,31 @@ function init() {
 
 init();
 </script>
+<a href="regolamento.html" class="fab-regolamento" title="Regolamento">📖</a>
+
+<!-- BOTTOM NAV BAR -->
+<div class="bottom-nav">
+  <a href="classifica.html" class="nav-item" data-page="classifica">
+    <span class="nav-icon">📊</span>
+    <span class="nav-label">Classifica</span>
+  </a>
+  <a href="alleanze.html" class="nav-item active" data-page="alleanze">
+    <span class="nav-icon">🤝</span>
+    <span class="nav-label">Alleanze</span>
+  </a>
+  <a href="home.html" class="nav-item nav-item-center" data-page="home">
+    <span class="nav-icon">🏠</span>
+    <span class="nav-label">Home</span>
+  </a>
+  <a href="squadra.html" class="nav-item" data-page="squadra">
+    <span class="nav-icon">✂️</span>
+    <span class="nav-label">Squadra</span>
+  </a>
+  <a href="profilo.html" class="nav-item" data-page="profilo">
+    <span class="nav-icon">👤</span>
+    <span class="nav-label">Profilo</span>
+  </a>
+</div>
+
 </body>
 </html>
