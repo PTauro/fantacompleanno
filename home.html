@@ -260,6 +260,52 @@ body {
   font-size: 12px; color: var(--text-muted);
 }
 .info-chip-small strong { color: var(--text); }
+/* ── BOTTOM NAV BAR ── */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
+  background: rgba(13,13,20,0.97); backdrop-filter: blur(16px);
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-around;
+  padding: 8px 4px calc(8px + env(safe-area-inset-bottom, 0px));
+}
+.nav-item {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  text-decoration: none; color: var(--text-muted);
+  padding: 6px 10px; border-radius: 12px; transition: all .2s;
+  flex: 1; min-width: 0;
+}
+.nav-item.active { color: var(--accent-cody); }
+.nav-icon { font-size: 20px; line-height: 1; }
+.nav-label { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: .05em; white-space: nowrap; }
+.nav-item-center {
+  position: relative; top: -10px;
+}
+.nav-item-center .nav-icon {
+  width: 46px; height: 46px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-cody), var(--accent-siria));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; box-shadow: 0 4px 16px rgba(255,107,43,0.35);
+}
+.nav-item-center.active .nav-icon { box-shadow: 0 4px 20px rgba(255,107,43,0.6); }
+.nav-item-center .nav-label { color: var(--text-muted); }
+.nav-item-center.active .nav-label { color: var(--text); }
+
+/* Spazio extra in fondo alla pagina per non sovrapporsi alla nav */
+body { padding-bottom: 90px !important; }
+
+/* ── FAB REGOLAMENTO ── */
+.fab-regolamento {
+  position: fixed; right: 16px; z-index: 199;
+  bottom: 96px;
+  width: 52px; height: 52px; border-radius: 50%;
+  background: var(--surface); border: 1.5px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; text-decoration: none; cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  transition: all .2s;
+}
+.fab-regolamento:hover { border-color: var(--accent-cody); transform: scale(1.05); }
+
 </style>
 </head>
 <body>
@@ -302,160 +348,32 @@ body {
   </div>
 </div>
 
+<!-- ══ STATO SQUADRA ══ -->
+<div class="alleanza-mini-style" style="margin:12px 20px 0;padding:16px;border-radius:14px;background:linear-gradient(135deg,#150800,#2d1200);border:1.5px solid rgba(255,107,43,0.4);cursor:pointer;" onclick="window.location.href='squadra.html'">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+    <div style="font-size:15px;font-weight:800;">✂️ La tua Squadra</div>
+    <div style="color:var(--text-muted);font-size:18px;">→</div>
+  </div>
+  <div id="squadra-status-text" style="font-size:12px;color:var(--text-muted);margin-bottom:10px;">Caricamento...</div>
+  <div class="draft-countdown" id="draft-countdown-wrap">
+    <span class="draft-cd-label">⏳ DRAFT CHIUDE</span>
+    <span class="draft-cd-timer" id="draft-cd-timer">--:--:--</span>
+  </div>
+</div>
+
 <!-- ══ COME FUNZIONA ══ -->
 <div class="generale-box" style="margin-top:12px;">
   <div class="generale-title">📖 Come funziona il gioco</div>
-
-  <div class="generale-block">
-    <div class="generale-block-title">🏆 Il Campionato</div>
-    <p>Ogni ospite costruisce una <strong>squadra di 5 persone</strong> con un budget di <strong>500 Capelli ✂️</strong>. Durante la festa Pietro assegna punti in tempo reale. Chi ha quella persona in squadra guadagna i suoi punti. Il <strong>Capitano</strong> vale il doppio. Vince chi accumula più punti a fine serata.</p>
+  <p style="font-size:13px;color:var(--text-muted);line-height:1.6;margin-bottom:12px;">
+    Campionato, Alleanze, Fazioni, Bonus e Malus — tutto spiegato passo per passo nel tutorial introduttivo.
+  </p>
+  <div class="info-chips-row" style="margin-bottom:12px;">
+    <div class="info-chip-small">⚡ <strong>Automatico</strong> — app lo assegna da sola</div>
+    <div class="info-chip-small">👑 <strong>Giudizio admin</strong> — Pietro decide</div>
   </div>
-
-  <div class="generale-block">
-    <div class="generale-block-title">⚔️ Le Fazioni — Cody vs Siria</div>
-    <p>Ogni ospite ha una <strong>carta fazione segreta</strong> che può scoprire in qualsiasi momento dal sito — aprendo una busta animata. La carta rivela la fazione (<span style="color:var(--accent-cody)">Team Cody</span> o <span style="color:var(--accent-siria)">Team Siria</span>) e il ruolo segreto. Nessuno sa la fazione degli altri. A fine serata si rivela tutto: la fazione con più punti vince <strong>+150 pt campionato</strong> a tutti i suoi membri.</p>
-  </div>
-
-  <div class="generale-block">
-    <div class="generale-block-title">🤝 Le Alleanze</div>
-    <p>Ogni ospite è assegnato da Pietro a uno di <strong>6 gruppi fissi</strong>. Il punteggio si calcola come <strong>(Media Bonus membri) − (Media Malus membri)</strong> — il coefficiente più alto vince. Nessun vantaggio per i gruppi più grandi. L'alleanza vincente porta <strong>+150 pt campionato</strong> a tutti i suoi membri.</p>
-  </div>
-
-  <div class="generale-block">
-    <div class="generale-block-title">✅ Come si guadagnano punti (Bonus)</div>
-    <p>I punti si guadagnano in <strong>6 categorie</strong>: prima della festa (quiz, draft, outfit spoiler), con la squadra che costruisci, con l'outfit che indossi, con le azioni durante la festa, con le sfide e giochi, e con alleanze e fazioni. Alcuni bonus sono <strong>automatici</strong> (l'app li registra da sola), altri richiedono il <strong>giudizio di Pietro</strong>.</p>
-    <div class="info-chips-row">
-      <div class="info-chip-small">⚡ <strong>Automatico</strong> — app lo assegna da sola</div>
-      <div class="info-chip-small">👑 <strong>Giudizio admin</strong> — Pietro decide</div>
-    </div>
-  </div>
-
-  <div class="generale-block">
-    <div class="generale-block-title">❌ Come si perdono punti (Malus)</div>
-    <p>Stessa logica dei bonus — ci sono malus automatici (ritardo, non creare la squadra, spoilerare la fazione) e malus a giudizio di Pietro (rifiutare sfide, sprecare cibo, essere palesemente annoiato). Alcuni malus sono <strong>molto pesanti</strong> — leggiti bene il regolamento prima della festa.</p>
-  </div>
-
-  <div class="generale-block">
-    <div class="generale-block-title">🎭 Bonus Ad Personam</div>
-    <p>Alcuni ospiti hanno <strong>sfide personalizzate</strong> create apposta per loro. Solo i diretti interessati possono ottenerle. Controlla nel regolamento se sei tra i fortunati — o gli sfortunati.</p>
-  </div>
-</div>
-
-<!-- ══ AZIONI PRINCIPALI ══ -->
-<div class="section">
-  <div class="section-title">Cosa vuoi fare?</div>
-
-  <!-- DRAFT -->
-  <div class="action-card action-card-draft" onclick="window.location.href='draft.html'">
-    <span class="card-icon">✂️</span>
-    <div class="card-title">Crea la tua Squadra</div>
-    <div class="card-sub">500 Capelli di budget. Scegli 5 giocatori, nomina il capitano.</div>
-    <div class="draft-countdown" id="draft-countdown-wrap">
-      <span class="draft-cd-label">⏳ DRAFT CHIUDE</span>
-      <span class="draft-cd-timer" id="draft-cd-timer">--:--:--</span>
-    </div>
-    <div class="card-badge badge-warn" id="draft-badge">Da completare</div>
-    <div class="card-arrow">→</div>
-  </div>
-
-  <!-- CLASSIFICA -->
-  <div class="action-card action-card-regolamento" onclick="window.location.href='classifica.html'" style="margin-bottom:12px;border-color:rgba(34,197,94,0.3);background:linear-gradient(135deg,#001a0a,#003018);">
-    <span class="card-icon">📊</span>
-    <div class="card-title">Classifica Live</div>
-    <div class="card-sub">Campionato, Alleanze e Fazioni in tempo reale.</div>
-    <div class="card-arrow">→</div>
-  </div>
-
-  <!-- GRIGLIA 2 COL -->
-  <div class="card-grid">
-    <!-- ALLEANZE -->
-    <div class="action-card-small action-card-alleanze" onclick="window.location.href='alleanze.html'">
-      <span class="card-icon">🤝</span>
-      <div class="card-title">Alleanze</div>
-      <div class="card-sub" style="color:var(--text-muted);">Vedi il tuo gruppo</div>
-      <div class="card-badge badge-lock" style="margin-top:8px; font-size:9px;">Presto disponibile</div>
-    </div>
-
-    <!-- FAZIONE -->
-    <div class="action-card-small action-card-fazione" onclick="window.location.href='fazione.html'">
-      <span class="card-icon">⚔️</span>
-      <div class="card-title">La tua Fazione</div>
-      <div class="card-sub" style="color:var(--text-muted);">Scopri il tuo ruolo segreto</div>
-      <div class="card-badge badge-info" style="margin-top:8px; font-size:9px;" id="fazione-badge">Apri la busta →</div>
-    </div>
-  </div>
-</div>
-
-<!-- ══ REGOLAMENTO ══ -->
-<div class="section" style="padding-top:0;">
-  <div class="section-title">Regolamento</div>
-
-  <!-- CAT 1 -->
-  <div class="action-card action-card-regolamento" onclick="openReg('cat1')" style="margin-bottom:8px;">
-    <span class="card-icon">🎯</span>
-    <div class="card-title">Cat. 1 — Prepariamoci alla Festa</div>
-    <div class="card-sub">Punti pre-festa: quiz, registrazione, draft, outfit spoiler...</div>
-    <div class="card-arrow">→</div>
-  </div>
-
-  <!-- CAT 2 -->
-  <div class="action-card action-card-regolamento" onclick="openReg('cat2')" style="margin-bottom:8px;">
-    <span class="card-icon">✂️</span>
-    <div class="card-title">Cat. 2 — Un Draft Perfetto</div>
-    <div class="card-sub">Bonus e malus legati alla costruzione della squadra.</div>
-    <div class="card-arrow">→</div>
-  </div>
-
-  <!-- CAT 3 -->
-  <div class="action-card action-card-regolamento" onclick="openReg('cat3')" style="margin-bottom:8px;">
-    <span class="card-icon">👗</span>
-    <div class="card-title">Cat. 3 — Outfit Perfetto</div>
-    <div class="card-sub">Bonus leggendari, alti, medi, piccoli. E i malus peggiori.</div>
-    <div class="card-arrow">→</div>
-  </div>
-
-  <!-- CAT 4 -->
-  <div class="action-card action-card-regolamento" onclick="openReg('cat4')" style="margin-bottom:8px;">
-    <span class="card-icon">🎉</span>
-    <div class="card-title">Cat. 4 — Let's Party</div>
-    <div class="card-sub">Bonus e malus durante la festa. Flash mob, serenate, sfide...</div>
-    <div class="card-arrow">→</div>
-  </div>
-
-  <!-- CAT 5 -->
-  <div class="action-card action-card-regolamento" onclick="openReg('cat5')" style="margin-bottom:8px;">
-    <span class="card-icon">🎮</span>
-    <div class="card-title">Cat. 5 — Sfide e Giochi</div>
-    <div class="card-sub">Karaoke, PS2/Switch, Clash Royale, asta. Vinci o perdi punti.</div>
-    <div class="card-arrow">→</div>
-  </div>
-
-  <!-- CAT 6 -->
-  <div class="action-card action-card-regolamento" onclick="openReg('cat6')" style="margin-bottom:8px;">
-    <span class="card-icon">⚔️</span>
-    <div class="card-title">Cat. 6 — Alleanze e Fazioni</div>
-    <div class="card-sub">Come funzionano i premi finali. +150 pt per i vincitori.</div>
-    <div class="card-arrow">→</div>
-  </div>
-
-  <!-- BONUS AD PERSONAM -->
-  <div class="action-card action-card-regolamento" onclick="openReg('adpersonam')">
-    <span class="card-icon">🎭</span>
-    <div class="card-title">Bonus Ad Personam</div>
-    <div class="card-sub">Sfide personalizzate per singoli invitati. Solo per i diretti interessati.</div>
-    <div class="card-arrow">→</div>
-  </div>
-</div>
-
-<!-- ══ MODAL REGOLAMENTO ══ -->
-<div class="modal-overlay" id="reg-modal">
-  <div class="modal-box">
-    <div class="modal-header">
-      <div class="modal-title" id="modal-title">Regolamento</div>
-      <button class="btn-close" onclick="closeReg()">✕</button>
-    </div>
-    <div id="modal-content"></div>
-  </div>
+  <button onclick="window.location.href='tutorial.html'" style="width:100%;background:rgba(168,85,247,0.1);border:1.5px solid rgba(168,85,247,0.3);color:var(--accent-siria);padding:12px;border-radius:10px;font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">
+    🎬 Rivedi il tutorial
+  </button>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -509,7 +427,6 @@ body {
     }
   }
 
-  // Parte subito e aggiorna ogni secondo
   updateCountdowns();
   setInterval(updateCountdowns, 1000);
 </script>
@@ -530,284 +447,61 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// ── INIT ──
 async function init() {
   const myName = localStorage.getItem("fc_player_name");
   if (!myName) { window.location.href = "register.html"; return; }
-
-  // Se non c'è nome → vai a register (che gestisce tutto)
-  // La verifica Firebase avviene in register.html
 
   document.getElementById("player-name-display").textContent = myName;
   const initials = myName.split(" ").map(w => w[0]).join("").slice(0,2).toUpperCase();
   document.getElementById("avatar-circle").textContent = initials;
 
   // Controlla se ha già una squadra
-  const key = myName.replace(/[.#$[\]\s]/g, "_");
+  const key = myName.replace(/[.#$[\]]/g, "_");
   const snap = await get(ref(db, `teams/${key}`));
+  const pill = document.getElementById("pill-squad");
+  const statusText = document.getElementById("squadra-status-text");
+
   if (snap.exists()) {
     const t = snap.val();
-    const pill = document.getElementById("pill-squad");
+    const n = (t.roster || []).length;
     pill.textContent = `✅ ${t.teamName || "Squadra creata"}`;
     pill.className = "pill ok";
-    document.getElementById("draft-badge").textContent = "Modifica squadra";
-    document.getElementById("draft-badge").className = "card-badge badge-ok";
+    statusText.textContent = `${t.teamName || "Squadra creata"} — ${n}/5 giocatori. Tocca per modificare.`;
+  } else {
+    pill.textContent = "⏳ Squadra non creata";
+    pill.className = "pill neutral";
+    statusText.textContent = "Non hai ancora creato la tua squadra. Tocca per iniziare il draft.";
   }
 }
 
-// ── REGOLAMENTO DATA ──
-const REG = {
-  cat1: {
-    title: "Cat. 1 — Prepariamoci alla Festa",
-    bonus: [
-      { pts: "+30", desc: "Risolve il mistero location", detail: "Hai completato il quiz e trovato le coordinate della location. Il regno di Casa Tauro ti accoglie.", type: "Automatico" },
-      { pts: "+5", desc: "Accede al sito e si abbina al nome", detail: "Hai aperto il sito, trovato il tuo nome e completato la registrazione. Sei ufficialmente nel gioco.", type: "Automatico" },
-      { pts: "+10", desc: "Crea la sua squadra (draft)", detail: "Hai costruito la tua squadra e l&#39;hai salvata. Il draft è completo.", type: "Automatico" },
-      { pts: "+20", desc: "Visualizza la pagina della tua alleanza", detail: "Hai aperto la sezione Alleanze e visto il tuo gruppo. Sai con chi combatti.", type: "Automatico" },
-      { pts: "+5", desc: "Nome originale squadra", detail: "Il nome della tua squadra riporta al festeggiato o lo fa ridere. Giudica Pietro.", type: "Giudizio admin" },
-      { pts: "+20", desc: "Agente in missione", detail: "Hai pescato un ruolo speciale nella fazione — Moltiplicatore o Spia. Non rivelarlo a nessuno.", type: "Automatico" },
-      { pts: "+10", desc: "Spoiler outfit", detail: "Hai pubblicato una foto del tuo outfit sul gruppo ufficiale entro le 15:00 del 27 giugno.", type: "Automatico" },
-    ],
-    malus: [
-      { pts: "-30", desc: "Non risolve il mistero location", detail: "Non hai completato il quiz o non hai trovato le coordinate. Malus automatico.", type: "Automatico" },
-      { pts: "-20", desc: "Si perde e chiede la location", detail: "Hai chiesto informazioni sulla location invece di trovarla da solo. Vergogna.", type: "Giudizio admin" },
-      { pts: "-30", desc: "Non accede al sito / non si abbina", detail: "Non hai completato la registrazione sul sito.", type: "Automatico" },
-      { pts: "-30", desc: "Non crea la squadra", detail: "Il draft è chiuso e non hai costruito la tua squadra. Malus automatico.", type: "Automatico" },
-      { pts: "-20", desc: "Non visualizza la pagina alleanza", detail: "Non hai mai aperto la sezione Alleanze.", type: "Automatico" },
-      { pts: "-30", desc: "Non pesca la carta fazione", detail: "Non hai aperto la busta fazione sul sito.", type: "Automatico" },
-      { pts: "-10", desc: "Squadra senza alleanza", detail: "La tua squadra non è in nessuna alleanza — malus fisso anche se vinci da solo.", type: "Automatico" },
-      { pts: "-30", desc: "Non conferma partecipazione", detail: "Non hai confermato la tua presenza alla festa.", type: "Automatico" },
-    ]
-  },
-  cat2: {
-    title: "Cat. 2 — Un Draft Perfetto",
-    note: "I punti con (x2 cap) raddoppiano se il giocatore coinvolto è il tuo capitano. Budget: 500 Capelli ✂️ — la squadra può essere incompleta.",
-    bonus: [
-      { pts: "+10", desc: "Divisione del budget perfetta", detail: "Hai speso esattamente tutti i 500 Capelli — zero avanzati. Precisione chirurgica.", type: "Automatico" },
-      { pts: "+10", desc: "Pupilli", detail: "Hai speso tutti i Capelli ma la squadra è incompleta (meno di 5 giocatori). Efficiente ma senza sprechi.", type: "Automatico" },
-      { pts: "+20 (x2 cap)", desc: "Bonus Maternità", detail: "Hai inserito in squadra un giocatore che ha figli. Cuore grande.", type: "Automatico" },
-      { pts: "+20 (x2 cap)", desc: "Bonus Paternità", detail: "Hai inserito in squadra un giocatore padre. Rispetto.", type: "Automatico" },
-      { pts: "+25 (x2 cap)", desc: "Bonus Affetto Stabile", detail: "Hai inserito un parente o affetto stabile del festeggiato. Chi ama Pietro vince.", type: "Automatico" },
-      { pts: "+30 (x2 cap)", desc: "Love is in the Air", detail: "Hai inserito entrambi i partner di una coppia in squadra. Il bonus vale su entrambi.", type: "Automatico" },
-      { pts: "+50 (x2 cap)", desc: "Smartworking", detail: "Hai inserito partecipanti che giocano a distanza. Chi gioca da remoto e manda foto outfit ottiene punti outfit x2.", type: "Automatico" },
-      { pts: "+30", desc: "Capellone Underdog", detail: "Hai speso meno della metà del budget ma hai comunque 5 giocatori. Sfida accettata.", type: "Automatico" },
-      { pts: "+30", desc: "Bonus Stefanuccio", detail: "Hai Stefanuccio nella tua squadra. Punto fisso per chi crede.", type: "Automatico" },
-      { pts: "+50", desc: "First Lady", detail: "Hai nominato Alessia capitana. Il bonus è già raddoppiato (25x2). Solo lei può essere la First Lady.", type: "Automatico" },
-    ],
-    malus: []
-  },
-  cat3: {
-    title: "Cat. 3 — Outfit Perfetto per una Festa Imperfetta",
-    note: "Chi gioca da remoto e invia foto outfit sul gruppo ufficiale ottiene tutti i punti outfit x2.",
-    bonus: [
-      { pts: "+500", desc: "Orbit Orbit — astronauta completo", detail: "Vestiti da astronauta completo. Casco, tuta, tutto. Non vale un costume da Halloween con elmetto.", type: "Leggendario" },
-      { pts: "+500", desc: "Epoca PLATINO — capelli biondo platino", detail: "Tingiti i capelli di biondo platino per la festa. Deve essere permanente o semi-permanente, non spray.", type: "Leggendario" },
-      { pts: "+350", desc: "Cosplay anime/manga completo", detail: "Vestiti interamente da cosplay anime o manga. Deve essere un personaggio riconoscibile e il look deve essere completo.", type: "Leggendario" },
-      { pts: "+300", desc: "Impero Romano — soldato completo", detail: "Vestiti da soldato romano completo. Tunica, elmo, scudo o lancia. Non vale solo la toga.", type: "Leggendario" },
-      { pts: "+200", desc: "Una serata memorabile — pigiama", detail: "Arriva alla festa in pigiama. Deve essere un vero pigiama da notte, non un tuta.", type: "Bonus Alto" },
-      { pts: "+150", desc: "Epoca Metallara — look completo", detail: "Vestiti come un vero metallato. Capelli, borchie, band tee, stivali. Deve essere autentico, non una parodia.", type: "Bonus Alto" },
-      { pts: "+150", desc: "Epoca Truzza — autentico", detail: "Riesuma i vestiti da truzzo anni &#39;00. Tuta Adidas, catena d&#39;oro, cappellino. Deve essere autentico.", type: "Bonus Alto" },
-      { pts: "+100", desc: "Daltonico per scelta — scarpe diverse", detail: "Indossi scarpe di colore diverso — una per piede. Deve essere evidente, non due tonalità simili.", type: "Bonus Medio" },
-      { pts: "+100", desc: "Overdressed — ricevimento dal re", detail: "Vestiti come per un ricevimento dal re d&#39;Inghilterra. Abito da sera, guanti, tutto. Deve essere esagerato.", type: "Bonus Medio" },
-      { pts: "+80", desc: "Random Element — capo fuori contesto", detail: "Un capo completamente fuori contesto nell&#39;outfit. Esempio classico: tuta sportiva + giacca e cravatta. Non vale solo un accessorio.", type: "Bonus Medio" },
-      { pts: "+80", desc: "Molto Comodo ma Tedesco — infradito+calze", detail: "Infradito + pantaloncini corti + calze lunghe bianche. Il combo turistico tedesco per eccellenza.", type: "Bonus Medio" },
-      { pts: "+70", desc: "Beagle Fun — colori di Cody", detail: "Sopra e sotto con i colori di Cody: nero, arancione e bianco. Entrambi i capi devono rispettare la palette.", type: "Bonus Medio" },
-      { pts: "+70", desc: "Outfit di Gruppo — 3+ persone abbinate", detail: "3 o più persone abbinano l&#39;outfit in modo coordinato. Il bonus è cumulabile per ogni gruppo.", type: "Bonus Medio" },
-      { pts: "+50", desc: "Cambio Outfit totale", detail: "Il tuo outfit cambia totalmente durante la festa. Non valgono solo le scarpe o un accessorio.", type: "Bonus Medio" },
-      { pts: "+50", desc: "Scapezzolata", detail: "L&#39;outfit mette in vista i capezzoli. Applicabile a tutti i generi.", type: "Bonus Medio" },
-      { pts: "+50", desc: "Accessorio d'Oro — estraneo all'outfit", detail: "Un accessorio completamente estraneo al resto dell&#39;outfit. Deve essere ovviamente fuori posto.", type: "Bonus Medio" },
-      { pts: "+50", desc: "Outfit Abbinato — con partner/figlio/affetto", detail: "Il tuo outfit è abbinato a quello di un partner, figlio o affetto stabile. Cumulabile.", type: "Bonus Medio" },
-      { pts: "+50", desc: "Molto Comodo Grazie — infradito o ciabatte", detail: "Indossi infradito o ciabatte estive. Semplice, comodo, elegante a modo suo.", type: "Bonus Medio" },
-      { pts: "+50", desc: "Pronto a Tutto ma Veramente — costume SOTTO", detail: "Porti il costume da bagno indossato SOTTO l&#39;outfit. Se combinato con Pronto a Tutto vale +85 totale.", type: "Bonus Medio" },
-      { pts: "+35", desc: "Pronto a Tutto — costume con sé", detail: "Porti con te un costume da bagno. Non deve essere indossato per questo bonus.", type: "Bonus Piccolo" },
-      { pts: "+45", desc: "Outfit Perfetto — richiama gusti di Pietro", detail: "Il tuo outfit contiene un elemento che richiama i gusti del festeggiato: musica, hobby, lavoro, passioni. Giudica Pietro.", type: "Bonus Piccolo" },
-      { pts: "+20", desc: "Elemento Floreale", detail: "Il tuo outfit ha una fantasia floreale oppure sei addobbato con fiori veri o finti.", type: "Bonus Piccolo" },
-    ],
-    malus: [
-      { pts: "-1000", desc: "Non si veste — arriva nudo/a", detail: "Arriva alla festa nudo o nuda. Nessuna giustificazione accettata. Neanche &#39;fa caldo&#39;.", type: "Malus" },
-      { pts: "-750", desc: "Riferimenti fascisti o nazisti", detail: "Vestiti con riferimenti espliciti a fascismo o nazismo. Malus pesantissimo e meritato.", type: "Malus" },
-      { pts: "-500", desc: "Cane sbagliato — non Beagle", detail: "Vestiti con riferimenti a cani che non sono Beagle. Cody non perdona.", type: "Malus" },
-      { pts: "-300", desc: "Milan o Juve — tradimento calcistico", detail: "Riferimenti a Milan o Juventus nell&#39;outfit. Tradimento calcistico imperdonabile.", type: "Malus" },
-      { pts: "-30", desc: "Total Black o Total White", detail: "Outfit completamente nero o completamente bianco. Zero fantasia.", type: "Malus" },
-      { pts: "-20", desc: "Nessun bonus outfit", detail: "A fine serata non hai ottenuto nessun bonus nella categoria outfit. Potevi fare di meglio.", type: "Malus" },
-      { pts: "-10", desc: "Niente costume da bagno", detail: "Non hai portato il costume da bagno con te. Non eri pronto a tutto.", type: "Malus" },
-    ]
-  },
-  cat4: {
-    title: "Cat. 4 — Let's Party",
-    bonus: [
-      { pts: "+1500", desc: "Imbucato Speciale — Caparezza", detail: "Convinci Caparezza (Michele Salvemini) a venire alla festa. Deve essere fisicamente presente. Il bonus più alto della serata.", type: "Giudizio admin" },
-      { pts: "+780", desc: "Proposta di matrimonio con anello", detail: "Chiedi al tuo partner di sposarti con un anello vero durante la festa. Deve avvenire in modo pubblico.", type: "Giudizio admin" },
-      { pts: "+250", desc: "Auguri di Spessore PT2 — VIP", detail: "Porti un video di auguri da un personaggio famoso su WhatsApp. NO intelligenza artificiale — deve essere autentico.", type: "Giudizio admin" },
-      { pts: "+150", desc: "Serenata — canta e dedica", detail: "Canti e dedichi una canzone al tuo affetto stabile durante la festa. Deve essere applaudita.", type: "Giudizio admin" },
-      { pts: "+150", desc: "Auguri di Spessore — personaggio del paese", detail: "Porti un video di auguri da un personaggio di spessore del paese su WhatsApp.", type: "Giudizio admin" },
-      { pts: "+80", desc: "FLASH MOB — 35+ persone", detail: "Convinci 35 o più persone a ballare una canzone con i tuoi passi. Sei tu l&#39;organizzatore.", type: "Giudizio admin" },
-      { pts: "+70", desc: "Tripletta — 3 sfide consecutive", detail: "Vinci 3 sfide consecutive senza mai perdere. Automatico via app.", type: "Automatico" },
-      { pts: "+60", desc: "Animatore Provetto", detail: "Chiedi una canzone al DJ e riesci a farti seguire nei passi da 10 o più persone.", type: "Giudizio admin" },
-      { pts: "+50", desc: "Vocalist per Sbaglio", detail: "Prendi il microfono, lanci un brano e porti 5 o più persone in pista.", type: "Giudizio admin" },
-      { pts: "+50", desc: "Influencer di Spessore — TikTok", detail: "Lanci un trend TikTok con 10 o più persone che ti seguono. Il bonus va solo a chi pubblica.", type: "Giudizio admin" },
-      { pts: "+50", desc: "Ben Idratato e Rinfrescato — corpo intero", detail: "Ti bagni il corpo intero durante la festa. Piscina, fontana, secchio — tutto vale.", type: "Giudizio admin" },
-      { pts: "+40", desc: "Guanto di Sfida", detail: "Sfidi uno o più invitati a una sfida o gioco durante la festa. Devi essere tu a lanciare il guanto.", type: "Giudizio admin" },
-      { pts: "+35", desc: "Brindisi in rima applaudito", detail: "Fai un brindisi in rima per il festeggiato che viene applaudito dal pubblico.", type: "Giudizio admin" },
-      { pts: "+30", desc: "Regalo Assurdo Improvvisato (max 5€)", detail: "Fai un regalo improvvisato al festeggiato con budget massimo 5 euro. Deve essere assurdo e creativo.", type: "Giudizio admin" },
-      { pts: "+30", desc: "Ben Idratato — parte del corpo", detail: "Ti bagni una parte del corpo durante la festa.", type: "Giudizio admin" },
-      { pts: "+25", desc: "Fatti Trascinare — balli (RIPETIBILE)", detail: "Sei tra chi balla nelle iniziative di gruppo: Flash Mob, TikTok, Animatore, Vocalist. Ripetibile per ogni iniziativa.", type: "Giudizio admin" },
-      { pts: "+20", desc: "Discorso applaudito", detail: "Fai un discorso per il festeggiato che viene applaudito dal pubblico.", type: "Giudizio admin" },
-      { pts: "+20", desc: "Storia Instagram taggando Pietro", detail: "Pubblichi una storia Instagram taggando il festeggiato durante la festa.", type: "Automatico" },
-      { pts: "+20", desc: "Fortunato nella Sfortuna — ruota", detail: "La ruota delle sfide ti sorteggia come partecipante. Non dipende da te — è fortuna pura.", type: "Automatico" },
-      { pts: "+15", desc: "Foto con Pietro (non la torta)", detail: "Ti fai una foto con il festeggiato durante la serata. Non vale quella al taglio della torta.", type: "Giudizio admin" },
-      { pts: "+15", desc: "Piatto Pulito — finisce tutto", detail: "Finisci tutto il buffet senza buttare niente. Zero sprechi.", type: "Giudizio admin" },
-      { pts: "+10", desc: "Applausi for no reason", detail: "Fai partire un applauso generale con la formula &#39;un applauso per...&#39; e la gente applaude.", type: "Giudizio admin" },
-      { pts: "+10", desc: "Arriva puntuale", detail: "Arrivi all&#39;orario stabilito per la festa. Né prima né dopo.", type: "Automatico" },
-    ],
-    malus: [
-      { pts: "-450", desc: "Risponde No alla proposta", detail: "Risponde No alla proposta di matrimonio del partner durante la festa. Brutale.", type: "Giudizio admin" },
-      { pts: "-300", desc: "Tira la torta in faccia a Pietro", detail: "Tira la torta in faccia al festeggiato. Imperdonabile.", type: "Giudizio admin" },
-      { pts: "-150", desc: "Spreco collettivo buffet (A TUTTI)", detail: "Avanza troppo cibo dal buffet — malus assegnato A TUTTI i presenti.", type: "Giudizio admin" },
-      { pts: "-150", desc: "Palesemente annoiato", detail: "Si mostra palesemente annoiato durante la festa. Lo vedi dalla faccia.", type: "Giudizio admin" },
-      { pts: "-150", desc: "Spoilera il ruolo speciale fazione", detail: "Rivela ad altri il proprio ruolo speciale nella fazione. Malus automatico.", type: "Automatico" },
-      { pts: "-80", desc: "Spoilera la fazione segreta", detail: "Rivela ad altri la propria fazione (Cody o Siria). Malus automatico.", type: "Automatico" },
-      { pts: "-80", desc: "Oltre 1 ora di ritardo", detail: "Arriva con più di un&#39;ora di ritardo rispetto all&#39;orario stabilito.", type: "Automatico" },
-      { pts: "-70", desc: "Imbarazzato per serenata romantica", detail: "Riceve una serenata romantica e si mostra palesemente imbarazzato invece di godersi il momento.", type: "Giudizio admin" },
-      { pts: "-50", desc: "Rifiuta il guanto di sfida", detail: "Rifiuta di partecipare a una sfida quando viene sfidata/o direttamente.", type: "Giudizio admin" },
-      { pts: "-50", desc: "Zero bonus festa a fine serata", detail: "A fine serata non hai ottenuto nessun bonus nella categoria festa.", type: "Automatico" },
-      { pts: "-50", desc: "Non mangia nulla", detail: "Arriva, sta alla festa, ma non mangia nulla. Non una cosa.", type: "Giudizio admin" },
-      { pts: "-50", desc: "Polemica con admin o festeggiato", detail: "Protesta o fa polemica con Pietro o l&#39;admin riguardo a bonus o malus assegnati.", type: "Giudizio admin" },
-      { pts: "-30", desc: "Spreco cibo personale", detail: "Avanza cibo dal proprio piatto personale.", type: "Giudizio admin" },
-      { pts: "-30", desc: "Interrompe sfida in corso", detail: "Interrompe una sfida o un gioco in corso.", type: "Giudizio admin" },
-      { pts: "-20", desc: "Un'ora di ritardo", detail: "Arriva con circa un&#39;ora di ritardo rispetto all&#39;orario stabilito.", type: "Automatico" },
-      { pts: "-20", desc: "Non beve alcool durante la festa", detail: "Passa l&#39;intera serata senza bere alcolici. Acqua e succhi non contano.", type: "Giudizio admin" },
-      { pts: "-15", desc: "Assente dalla foto taglio torta", detail: "Non è presente nella foto di rito al taglio della torta di compleanno.", type: "Giudizio admin" },
-      { pts: "-15", desc: "Completamente asciutto a fine festa", detail: "Finisce la festa senza essersi bagnato nemmeno una volta.", type: "Automatico" },
-      { pts: "-15", desc: "Perde il guanto di sfida", detail: "Accetta la sfida ma la perde. Automatico via app.", type: "Automatico" },
-      { pts: "-10", desc: "30 minuti di ritardo", detail: "Arriva con circa 30 minuti di ritardo rispetto all&#39;orario stabilito.", type: "Automatico" },
-      { pts: "-5", desc: "Non mangia la torta di compleanno", detail: "Non mangia nemmeno un pezzo della torta di compleanno del festeggiato.", type: "Giudizio admin" },
-    ]
-  },
-  cat5: {
-    title: "Cat. 5 — Sfide e Giochi",
-    note: "Le sfide vengono organizzate fisicamente durante la festa: karaoke, giochi PS2/Switch, Clash Royale, asta. L'app aggiorna i punti in tempo reale con due tap dal pannello admin.",
-    bonus: [
-      { pts: "+70", desc: "Tripletta — 3 sfide consecutive", detail: "Vinci 3 sfide consecutive senza mai perdere. Il bonus scatta automaticamente dopo la terza vittoria.", type: "Automatico" },
-      { pts: "+30", desc: "Vittoria singola sfida", detail: "Vinci una sfida tra quelle organizzate durante la festa. Ripetibile per ogni vittoria.", type: "Automatico" },
-    ],
-    malus: [
-      { pts: "-50", desc: "Rifiuta il guanto di sfida", detail: "Viene sfidata/o direttamente ma rifiuta di partecipare alla sfida.", type: "Automatico" },
-      { pts: "-15", desc: "Perde una sfida", detail: "Accetta la sfida ma la perde. Ripetibile per ogni sconfitta.", type: "Automatico" },
-    ]
-  },
-  cat6: {
-    title: "Cat. 6 — Alleanze e Fazioni",
-    note: "Il premio finale viene assegnato a fine serata. +150 pt campionato a tutti i membri della fazione/alleanza vincente.",
-    bonus: [
-      { pts: "+150", desc: "Fazione vincente", detail: "Sei nel team (Cody o Siria) con più punti totali a fine serata. Tutti i membri ricevono +150 pt campionato.", type: "Automatico" },
-      { pts: "+150", desc: "Alleanza vincente", detail: "La tua alleanza ha il coefficiente (Media Bonus − Media Malus squadre) più alto. Tutti i membri ricevono +150 pt campionato.", type: "Automatico" },
-      { pts: "x1", desc: "🍖 Dispenser di Croccantini / 🚽 Pulitore di Lettiera", detail: "Ruolo comune — i tuoi punti personali contribuiscono normalmente (x1) al totale della tua fazione.", type: "Ruolo comune" },
-      { pts: "x2", desc: "👨‍🍳 Cuoco di Corte / ❤️ Umano Preferito", detail: "Ruolo speciale Moltiplicatore — i tuoi punti personali contano x2 per il totale della tua fazione.", type: "Ruolo speciale" },
-      { pts: "Spia", desc: "✨ Glitter di Beagle / 🌸 Fioriera come Lettiera", detail: "Ruolo speciale Spia — i tuoi punti vanno alla fazione nemica invece che alla tua.", type: "Ruolo speciale" },
-    ],
-    malus: []
-  },
-  adpersonam: {
-    title: "🎭 Bonus Ad Personam",
-    note: "Sfide personalizzate — solo per i diretti interessati. Gli altri non possono ottenerle.",
-    bonus: [
-      { pts: "+300 a testa", desc: "Alessia & Francesca — ONED Big Fan", detail: "Cantano insieme 1 strofa + ritornello di una canzone degli One Direction. Devono farlo in coppia, in pubblico, senza base.", type: "Ad Personam" },
-      { pts: "+100", desc: "Madre (Anna) — Solo Cose Belle", detail: "Non prepara nessun discorso scritto per il festeggiato. Se parla, deve essere spontaneo. Se porta un foglio con appunti: -20.", type: "Ad Personam" },
-      { pts: "+150", desc: "Nicolas — Dilemma Etico", detail: "Si presenta alla festa con una maglietta di Juventus o Milan. Il bonus vale solo se la indossa fisicamente.", type: "Ad Personam" },
-      { pts: "+200 / +1000 con divise", desc: "Marta & Beppe — Io Sono Il Mio Lavoro", detail: "Ripetono insieme la demo di sicurezza di volo 2 volte complete. Se lo fanno con le divise da lavoro il bonus sale a +1000.", type: "Ad Personam" },
-      { pts: "+150", desc: "Antonio — Orgoglio Partenopeo", detail: "Indossa la maglietta del Napoli con il numero 10 di Maradona E canta U Soldat Nnamurato. Entrambe le cose.", type: "Ad Personam" },
-      { pts: "+300 / -1000 se mostra tutto", desc: "Danilo — Ma In Tutto Questo Danilo è Nudo", detail: "Propone uno spogliarello al festeggiato durante la festa. Se si ferma prima di mostrare tutto: +300. Se mostra tutto: -1000.", type: "Ad Personam" },
-      { pts: "+100 a testa", desc: "Martina P & Maicol — Una Cosa Mai Vista", detail: "Arrivano ESATTAMENTE all&#39;orario stabilito — né un minuto prima né un minuto dopo. Entrambi devono arrivare insieme.", type: "Ad Personam" },
-      { pts: "+150", desc: "Davide A (Attanasio) — Bronzo di Riace", detail: "Esegue 50 piegamenti + 50 squat durante la festa E convince 3 persone a farlo con lui (25 pt per convincere, 25 per farli fare).", type: "Ad Personam" },
-      { pts: "+800", desc: "Manuel — Dilemma Etico PT2", detail: "Canta Bandiera Rossa in pubblico tra le 21:30 e le 23:00 con almeno 2 ritornelli completi.", type: "Ad Personam" },
-      { pts: "+200", desc: "Nicolo Spada — Una Cosa Mai Sentita", detail: "Non viene mai sorpreso a parlare ad alta voce durante tutta la durata della festa. Deve essere costantemente a voce bassa.", type: "Ad Personam" },
-      { pts: "+450", desc: "Erminio — Una Verità Scomoda", detail: "Recita il discorso completo sul FantaSanPio al microfono davanti a tutti: &#39;Io Erminio Foti, nel pieno delle mie facoltà mentali...&#39; — testo completo.", type: "Ad Personam" },
-      { pts: "+300", desc: "Davide M — BATURINA BA BA", detail: "Si esibisce live nel suo mitico pezzo per almeno 45 secondi consecutivi. Deve essere dal vivo, non in playback.", type: "Ad Personam" },
-    ],
-    malus: []
-  }
-};
-
-window.openRegwindow.openReg = function(cat) {
-  const data = REG[cat];
-  document.getElementById("modal-title").textContent = data.title;
-
-  let html = "";
-
-  if (data.note) {
-    html += `<div style="background:rgba(168,85,247,0.1);border:1px solid rgba(168,85,247,0.3);border-radius:10px;padding:12px;margin-bottom:16px;font-size:13px;color:var(--accent-siria);line-height:1.5;">${data.note}</div>`;
-  }
-
-  if (data.bonus.length > 0) {
-    html += `<div class="reg-section"><div class="reg-section-title">✅ Bonus</div>`;
-    data.bonus.forEach((r, i) => {
-      const id = "bonus_" + cat + "_" + i;
-      html += `
-        <div class="reg-row" style="flex-direction:column;gap:0;cursor:pointer;" onclick="toggleDetail('${id}')">
-          <div style="display:flex;align-items:center;gap:10px;width:100%;">
-            <div class="reg-pts pos" style="flex-shrink:0;">${r.pts}</div>
-            <div style="flex:1;">
-              <div class="reg-desc">${r.desc}</div>
-              <div class="reg-type">${r.type}</div>
-            </div>
-            <div style="color:var(--text-muted);font-size:12px;flex-shrink:0;" id="arrow_${id}">▼</div>
-          </div>
-          <div id="${id}" style="display:none;margin-top:10px;padding:10px 12px;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.2);border-radius:8px;font-size:12px;color:var(--text-muted);line-height:1.6;">${r.detail || ''}</div>
-        </div>`;
-    });
-    html += `</div>`;
-  }
-
-  if (data.malus && data.malus.length > 0) {
-    html += `<div class="reg-section"><div class="reg-section-title" style="color:var(--red);">❌ Malus</div>`;
-    data.malus.forEach((r, i) => {
-      const id = "malus_" + cat + "_" + i;
-      html += `
-        <div class="reg-row" style="flex-direction:column;gap:0;cursor:pointer;" onclick="toggleDetail('${id}')">
-          <div style="display:flex;align-items:center;gap:10px;width:100%;">
-            <div class="reg-pts neg" style="flex-shrink:0;">${r.pts}</div>
-            <div style="flex:1;">
-              <div class="reg-desc">${r.desc}</div>
-              <div class="reg-type">${r.type}</div>
-            </div>
-            <div style="color:var(--text-muted);font-size:12px;flex-shrink:0;" id="arrow_${id}">▼</div>
-          </div>
-          <div id="${id}" style="display:none;margin-top:10px;padding:10px 12px;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-radius:8px;font-size:12px;color:var(--text-muted);line-height:1.6;">${r.detail || ''}</div>
-        </div>`;
-    });
-    html += `</div>`;
-  }
-
-  document.getElementById("modal-content").innerHTML = html;
-  document.getElementById("reg-modal").classList.add("open");
-};
-
-window.toggleDetail = function(id) {
-  const el = document.getElementById(id);
-  const arrow = document.getElementById("arrow_" + id);
-  if (el.style.display === "none") {
-    el.style.display = "block";
-    arrow.textContent = "▲";
-  } else {
-    el.style.display = "none";
-    arrow.textContent = "▼";
-  }
-};
-
-window.closeReg = function() {
-  document.getElementById("reg-modal").classList.remove("open");
-};
-
-window.showComingSoon = function(nome) {
-  const t = document.getElementById("toast");
-  t.textContent = `⏳ ${nome} disponibile presto!`;
-  t.className = "toast show";
-  clearTimeout(window._tt);
-  window._tt = setTimeout(() => { t.className = "toast"; }, 2500);
-};
-
 init();
 </script>
+
+<a href="regolamento.html" class="fab-regolamento" title="Regolamento">📖</a>
+
+<!-- BOTTOM NAV BAR -->
+<div class="bottom-nav">
+  <a href="classifica.html" class="nav-item" data-page="classifica">
+    <span class="nav-icon">📊</span>
+    <span class="nav-label">Classifica</span>
+  </a>
+  <a href="alleanze.html" class="nav-item" data-page="alleanze">
+    <span class="nav-icon">🤝</span>
+    <span class="nav-label">Alleanze</span>
+  </a>
+  <a href="home.html" class="nav-item nav-item-center active" data-page="home">
+    <span class="nav-icon">🏠</span>
+    <span class="nav-label">Home</span>
+  </a>
+  <a href="squadra.html" class="nav-item" data-page="squadra">
+    <span class="nav-icon">✂️</span>
+    <span class="nav-label">Squadra</span>
+  </a>
+  <a href="profilo.html" class="nav-item" data-page="profilo">
+    <span class="nav-icon">👤</span>
+    <span class="nav-label">Profilo</span>
+  </a>
+</div>
+
 </body>
 </html>
