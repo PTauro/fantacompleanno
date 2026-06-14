@@ -311,6 +311,12 @@ body {
   <button class="btn-unlock" id="btn-unlock" onclick="sblocca()">
     🔓 Sblocca Punti Pre-Festa
   </button>
+  <button onclick="applicaMalusPreFesta()" style="width:100%;background:rgba(245,158,11,0.1);border:1.5px solid rgba(245,158,11,0.4);color:var(--gold);padding:14px 16px;border-radius:12px;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-top:8px;margin-bottom:12px;">
+    📋 Applica Malus Pre-Festa Mancanti
+  </button>
+  <div style="font-size:11px;color:var(--text-muted);margin-top:-6px;margin-bottom:12px;line-height:1.5;">
+    Da premere a draft chiuso, PRIMA di sbloccare i punti: assegna -30/-20 a chi non si è registrato, non ha fatto squadra, non ha pescato la fazione o non ha visto la pagina alleanza. Sicuro da ripetere — non duplica.
+  </div>
 
   <div class="section-label">Reset</div>
   <button onclick="resetPunti()" style="width:100%;background:rgba(239,68,68,0.1);border:1.5px solid rgba(239,68,68,0.4);color:var(--red);padding:14px 16px;border-radius:12px;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:12px;">
@@ -951,6 +957,47 @@ window.resetFazioniTutte = async function() {
   if (!confirm("Sei SICURO? Tutte le carte fazione verranno cancellate.")) return;
   await remove(ref(db, "fazioni"));
   showToast("✓ Fazioni resettate", "warn");
+};
+
+// ── MALUS PRE-FESTA MANCANTI ──
+// Controlla, per ogni ospite, le azioni automatiche Cat.1 che mancano alla chiusura del draft
+// e assegna il malus corrispondente (una sola volta, tracciato in autoEvents).
+window.applicaMalusPreFesta = async function() {
+  if (!confirm("Applicare i malus pre-festa a chi non ha completato le azioni automatiche (registrazione, squadra, fazione, alleanza)?\n\nVa fatto a draft chiuso. Azione sicura: non duplica malus già dati.")) return;
+
+  const [snapReg, snapTeams, snapFaz, snapAuto] = await Promise.all([
+    get(ref(db, "registrations")),
+    get(ref(db, "teams")),
+    get(ref(db, "fazioni")),
+    get(ref(db, "autoEvents")),
+  ]);
+  const regs = snapReg.exists() ? snapReg.val() : {};
+  const tms = snapTeams.exists() ? snapTeams.val() : {};
+  const fzs = snapFaz.exists() ? snapFaz.val() : {};
+  const autoE = snapAuto.exists() ? snapAuto.val() : {};
+
+  const MALUS = [
+    { id: "m_non_registrato",     pts: -30, desc: "Non accede al sito / non si abbina", check: key => !!regs[key] },
+    { id: "m_squadra_non_creata", pts: -30, desc: "Non crea la squadra",                 check: key => !!tms[key]  },
+    { id: "m_fazione_non_pescata",pts: -30, desc: "Non pesca la carta fazione",          check: key => !!fzs[key]  },
+    { id: "m_alleanza_non_vista", pts: -20, desc: "Non visualizza la pagina alleanza",   check: key => !!(autoE[key] && autoE[key].b_alleanza_vista) },
+  ];
+
+  let applicati = 0;
+  for (const name of PLAYERS) {
+    const key = sanitize(name);
+    for (const m of MALUS) {
+      const giàFatto = m.check(key);
+      const giàAssegnato = !!(autoE[key] && autoE[key][m.id]);
+      if (!giàFatto && !giàAssegnato) {
+        await set(ref(db, `punti/${key}/${m.id}`), { pts: m.pts, desc: m.desc, ts: Date.now() });
+        await set(ref(db, `autoEvents/${key}/${m.id}`), true);
+        applicati++;
+      }
+    }
+  }
+
+  showToast(applicati > 0 ? `✓ Applicati ${applicati} malus pre-festa` : "✓ Nessun malus da applicare — tutti in regola!", applicati > 0 ? "warn" : "ok");
 };
 
 window.resetFazioneSingola = async function(name) {

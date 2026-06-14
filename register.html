@@ -382,6 +382,17 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
+// ── AUTOMATISMI PRE-FESTA ──
+// Assegna un punto automatico una sola volta per ospite (controlla autoEvents/{key}/{eventId})
+async function assegnaAutomatico(key, eventId, pts, desc) {
+  const flagRef = ref(db, `autoEvents/${key}/${eventId}`);
+  const snap = await get(flagRef);
+  if (snap.exists()) return false;
+  await set(ref(db, `punti/${key}/${eventId}`), { pts, desc, ts: Date.now() });
+  await set(flagRef, true);
+  return true;
+}
+
 // ── LISTA OSPITI (da game design doc) ──
 const PLAYERS = [
   { name: "Alessia", cost: 175 },
@@ -578,6 +589,20 @@ async function confirmSelection(name) {
   // Salva su localStorage
   localStorage.setItem("fc_player_name", name);
   myName = name;
+
+  // ── AUTOMATISMI CAT.1 ──
+  const key = name.replace(/[.#$[\]]/g, '_');
+  await assegnaAutomatico(key, "b_registrazione", 5, "Accede al sito e si abbina al nome");
+
+  // Quiz mistero location: legge l'esito salvato da quiz.html prima della registrazione
+  const quizSolved = localStorage.getItem("fc_quiz_solved");
+  if (quizSolved === "true") {
+    await assegnaAutomatico(key, "b_quiz_location", 30, "Risolve il mistero location");
+  } else if (quizSolved === "false") {
+    await assegnaAutomatico(key, "m_quiz_location", -30, "Non risolve il mistero location");
+  }
+  // Se quizSolved è null (quiz.html non ha ancora salvato nulla), non si assegna né bonus né malus qui:
+  // ci penserà il batch admin "Applica malus pre-festa" a fine draft.
 
   showToast(`✓ Benvenuto/a, ${name}!`);
 

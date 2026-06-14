@@ -232,6 +232,16 @@ if (!myName) window.location.replace("register.html");
 
 function sanitize(s) { return s.replace(/[.#$[\]]/g, "_"); }
 
+// ── AUTOMATISMI PRE-FESTA ──
+async function assegnaAutomatico(key, eventId, pts, desc) {
+  const flagRef = ref(db, `autoEvents/${key}/${eventId}`);
+  const snap = await get(flagRef);
+  if (snap.exists()) return false;
+  await set(ref(db, `punti/${key}/${eventId}`), { pts, desc, ts: Date.now() });
+  await set(flagRef, true);
+  return true;
+}
+
 // ── COSTI GIOCATORI (per regola segreta ruoli speciali) ──
 const PLAYER_COSTS = {
   "Alessia":175,"Madre (Anna)":150,"Eleonora Sorella":90,"Paolo":110,
@@ -463,6 +473,11 @@ window.apriBusta = async function() {
   const key = sanitize(myName);
   await set(ref(db, `fazioni/${key}`), { fazione, ruoloId: ruolo.id, nome: myName, ts: Date.now() });
   await sleep(300);
+
+  // ── AUTOMATISMO CAT.1: +20 se è stato pescato un ruolo speciale (Moltiplicatore o Spia) ──
+  if (ruolo.effetto !== "x1") {
+    await assegnaAutomatico(key, "b_agente_missione", 20, "Agente in missione (ruolo speciale)");
+  }
 
   fazioneCompleted = true;
   renderCartaRivelata(fazione, ruolo);

@@ -357,6 +357,16 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
+// ── AUTOMATISMI PRE-FESTA ──
+async function assegnaAutomatico(key, eventId, pts, desc) {
+  const flagRef = ref(db, `autoEvents/${key}/${eventId}`);
+  const snap = await get(flagRef);
+  if (snap.exists()) return false;
+  await set(ref(db, `punti/${key}/${eventId}`), { pts, desc, ts: Date.now() });
+  await set(flagRef, true);
+  return true;
+}
+
 // ── LISTA GIOCATORI ──
 const PLAYERS = [
   { name: "Alessia", cost: 175, tags: ["affetto", "first-lady"] },
@@ -674,6 +684,9 @@ window.saveTeam = async function() {
     owner: myName,
     savedAt: Date.now()
   });
+
+  // ── AUTOMATISMO CAT.1: +10 prima volta che si crea la squadra ──
+  await assegnaAutomatico(sanitize(myName), "b_squadra_creata", 10, "Crea la sua squadra (draft)");
 
   showToast("✓ Squadra salvata!");
   btn.disabled = false;

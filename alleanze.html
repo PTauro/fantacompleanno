@@ -293,7 +293,7 @@ body { padding-bottom: 90px !important; }
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getDatabase, ref, get, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCqLFQW8XQioObmxG0oDPc_MFpdFXJxmac",
@@ -307,6 +307,16 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
+
+// ── AUTOMATISMI PRE-FESTA ──
+async function assegnaAutomatico(key, eventId, pts, desc) {
+  const flagRef = ref(db, `autoEvents/${key}/${eventId}`);
+  const snap = await get(flagRef);
+  if (snap.exists()) return false;
+  await set(ref(db, `punti/${key}/${eventId}`), { pts, desc, ts: Date.now() });
+  await set(flagRef, true);
+  return true;
+}
 
 const myName = localStorage.getItem("fc_player_name");
 if (!myName) window.location.replace("register.html");
@@ -594,6 +604,9 @@ window.switchTab = function(tab) {
 
 // ── INIT ──
 function init() {
+  // ── AUTOMATISMO CAT.1: +20 prima volta che si visualizza la pagina alleanza ──
+  assegnaAutomatico(sanitize(myName), "b_alleanza_vista", 20, "Visualizza la pagina della tua alleanza");
+
   onValue(ref(db, "punti"), snap => {
     punti = snap.exists() ? snap.val() : {};
     renderMiaAlleanza();
