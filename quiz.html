@@ -374,6 +374,7 @@
     const normalized = val.replace(/\s/g, '');
     const correct = CORRECT_LAT + ',' + CORRECT_LNG;
     if (normalized === correct) {
+      localStorage.setItem("fc_quiz_solved", "true");
       showScreen('screen-success');
       return;
     }
@@ -382,6 +383,7 @@
     fb.className = 'feedback-box show wrong-fb';
     if (coordAttempts >= 3) {
       fb.textContent = 'Tentativi esauriti. Malus assegnato.';
+      localStorage.setItem("fc_quiz_solved", "false");
       setTimeout(function() { showScreen('screen-fail'); }, 1500);
     } else {
       fb.textContent = 'Risposta errata. Hai ancora ' + (3 - coordAttempts) + ' tentativo/i.';
@@ -390,6 +392,7 @@
 
   function handleResa() {
     if (confirm('Sei sicuro di volerti arrendere? Riceverai -30 punti.')) {
+      localStorage.setItem("fc_quiz_solved", "false");
       showScreen('screen-resa');
     }
   }
