@@ -319,6 +319,22 @@ body {
     Da premere a draft chiuso, PRIMA di sbloccare i punti: assegna -30/-20 a chi non si è registrato, non ha fatto squadra, non ha pescato la fazione o non ha visto la pagina alleanza. Sicuro da ripetere — non duplica.
   </div>
 
+  <div class="section-label">Rivelazione Finale Fazioni</div>
+  <button class="btn-unlock" id="btn-reveal-ruoli" onclick="rivelaRuoli()">
+    🎭 Rivela Ruoli e Spie (Fazioni)
+  </button>
+  <div style="font-size:11px;color:var(--text-muted);margin-top:6px;margin-bottom:12px;line-height:1.5;">
+    Momento clou di fine serata: prima che premi questo bottone, la tab Fazioni mostra i totali "a faccia in su" (solo appartenenza, senza moltiplicatori né spie). Dopo, si ricalcola in diretta con ruoli speciali e scambio spie — guarda la classifica ribaltarsi sul grande schermo!
+  </div>
+
+  <div class="section-label">Bonus Alleanze Finale</div>
+  <button class="btn-unlock" id="btn-bonus-alleanze" onclick="assegnaBonusAlleanze()">
+    🏆 Assegna Bonus Alleanze (150/100/50)
+  </button>
+  <div style="font-size:11px;color:var(--text-muted);margin-top:6px;margin-bottom:12px;line-height:1.5;">
+    Calcola il podio delle 6 alleanze (stesso coefficiente della tab Alleanze) e assegna al PUNTEGGIO CAMPIONATO di ogni squadra appartenente a un'alleanza in podio: +150 (1ª), +100 (2ª), +50 (3ª). Non raddoppiato dal capitano. Puoi ripremere dopo correzioni — si ricalcola da zero senza duplicare.
+  </div>
+
   <div class="section-label">Reset</div>
   <button onclick="resetPunti()" style="width:100%;background:rgba(239,68,68,0.1);border:1.5px solid rgba(239,68,68,0.4);color:var(--red);padding:14px 16px;border-radius:12px;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:12px;">
     🗑 Reset Totale Punti
@@ -359,6 +375,13 @@ body {
     </div>
 
     <button class="btn-annulla" style="width:100%;margin-bottom:14px;justify-content:center;" id="btn-reset-ospite">🗑 Reset Punti — questa persona</button>
+
+    <div class="section-label">✏️ Punti Personalizzati (Cash or Trash, premi fine serata, ecc.)</div>
+    <div style="display:flex;gap:8px;margin-bottom:14px;">
+      <input type="number" id="custom-pts" placeholder="pt (es. 150 o -50)" style="width:120px;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;color:var(--text);font-family:'Space Mono',monospace;font-size:14px;outline:none;">
+      <input type="text" id="custom-desc" placeholder="Descrizione (es. Cash or Trash — vince)" style="flex:1;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:13px;outline:none;">
+      <button id="btn-custom-assegna" style="background:var(--gold);border:none;color:#1a1500;font-weight:800;border-radius:10px;padding:10px 16px;cursor:pointer;font-family:'Space Grotesk',sans-serif;font-size:13px;">Assegna</button>
+    </div>
 
     <div class="section-label">Assegna Bonus</div>
     <div class="eventi-grid" id="modal-bonus-grid"></div>
@@ -434,6 +457,49 @@ const PLAYERS = [
   "Alberto Bianco","Martina Schiavone","Luca Invidia","Marika Piconese","Stefanuccio","Andrea De Matteis","Lorenzo Taffone"
 ];
 
+// ── ALLEANZE (per il calcolo bonus finale 150/100/50) ──
+const ALLEANZE = {
+  "💰 ISEE Allargato": ["Alessia Ala","Anna Maria Caione (madre)","Eleonora Tauro","Paolo Bello","Mattia Caione","Mirco Caione","Gloria Rinaldi","Dario Caione","Gabriele Mangione","Federica Ala","Simone Baldassarre","Desi Ala","Michele Nervo","Zia Anna"],
+  "💥 Bombette di Cisternino ASAP": ["Francesca Terlizzi","Nicolas Costa","Giulia Trevisi","Andrea Sozzani","Emilio Pulli","Eleonora Bello","Marta Mignone","Giuseppe Susca","Annachiara Maci","Davide Secci"],
+  "😈 Il Buono Il Bello e il Danilo": ["Antonio Borelli","Marika Giagnotti","Danilo Schiavone","Ilaria Tenore","Donato Stragapede","Emily Giancane"],
+  "💸 Cuoricini Broke": ["Martina Poso","Maycols Sirsi","Laura Capodieci","Davide Attanasio","Manuel Palma","Carlotta D'aversa","Nicolò Spada","Antonella Lo vecchio","Beatrice Gloria","Mariacarla Spagnolo","Mattia Martina","Lorenzo Taffone"],
+  "⚽ FantaSanPio 08:00 AM": ["Andrea Scozzi","Annalisa Ancora","Roberto Sciurti","Nicolò Maci","Silvia Lamusta","Alessio Maci","Rachele Ponzetta","Erminio Foti","Sara Colletta","Luca Grasso","Annalisa Maci","Alessio Caretto","Silvia Maci","Errico Del monte","Chiara Del Vecchio","Daniele Padula","Davide Mogavero","Marialuce Serra","Andrea De Matteis"],
+  "🏆 Guinness World Record Partecipazione": ["Francesco Romano","Mariachiara Longo","Alberto Bianco","Martina Schiavone","Luca Invidia","Marika Piconese","Stefanuccio"],
+};
+
+// Versioni "raw" — usate SOLO per calcolare il podio alleanze al momento dell'assegnazione,
+// quindi NON includono alleanzaBonusFinale (eviterebbe un circolo: il bonus che determina se stesso)
+function getPuntiPersonaliRaw(name) {
+  const key = sanitize(name);
+  if (!punti[key]) return { bonus: 0, malus: 0 };
+  let bonus = 0, malus = 0;
+  Object.values(punti[key]).forEach(e => {
+    if (e.pts > 0) bonus += e.pts;
+    else malus += Math.abs(e.pts);
+  });
+  return { bonus, malus };
+}
+function getPuntiSquadraRaw(ownerName) {
+  const team = allTeams[sanitize(ownerName)];
+  if (!team || !team.roster) return { bonus: 0, malus: 0 };
+  let bonus = 0, malus = 0;
+  team.roster.forEach(playerName => {
+    const isCap = team.captain === playerName;
+    const pp = getPuntiPersonaliRaw(playerName);
+    const mult = isCap ? 2 : 1;
+    bonus += pp.bonus * mult;
+    malus += pp.malus * mult;
+  });
+  return { bonus, malus };
+}
+function getCoeffAlleanzaRaw(membri) {
+  const conSquadra = membri.filter(m => allTeams[sanitize(m)]);
+  if (conSquadra.length === 0) return 0;
+  const totBonus = conSquadra.reduce((s, m) => s + getPuntiSquadraRaw(m).bonus, 0);
+  const totMalus = conSquadra.reduce((s, m) => s + getPuntiSquadraRaw(m).malus, 0);
+  return (totBonus / conSquadra.length) - (totMalus / conSquadra.length);
+}
+
 // ── EVENTI RAPIDI ──
 const EVENTI = [
   // ── PRE-FESTA ──
@@ -474,12 +540,10 @@ const EVENTI = [
   { id:"b_brindisi", pts:35, desc:"Brindisi in rima (applaudito)", tipo:"bonus", cat:"Festa" },
   { id:"b_discorso", pts:20, desc:"Discorso applaudito", tipo:"bonus", cat:"Festa" },
   { id:"b_serenata", pts:150, desc:"Serenata — canta e dedica", tipo:"bonus", cat:"Festa" },
-  { id:"b_guanto_sfida", pts:40, desc:"Lancia Guanto di Sfida", tipo:"bonus", cat:"Festa" },
   { id:"b_flashmob", pts:80, desc:"Flash Mob 35+ persone", tipo:"bonus", cat:"Festa" },
   { id:"b_animatore", pts:60, desc:"Animatore Provetto — DJ + 10 persone", tipo:"bonus", cat:"Festa" },
   { id:"b_vocalist", pts:50, desc:"Vocalist per Sbaglio — 5+ in pista", tipo:"bonus", cat:"Festa" },
   { id:"b_influencer", pts:50, desc:"Influencer TikTok — 10+ persone", tipo:"bonus", cat:"Festa" },
-  { id:"b_regalo_assurdo", pts:30, desc:"Regalo Assurdo (max 5€)", tipo:"bonus", cat:"Festa" },
   { id:"b_fatti_trascinare", pts:25, desc:"Fatti Trascinare (balla)", tipo:"bonus", cat:"Festa", ripetibile:true },
   { id:"b_piatto_pulito", pts:15, desc:"Piatto Pulito — finisce tutto", tipo:"bonus", cat:"Festa" },
   { id:"b_applausi", pts:10, desc:"Applausi for no reason", tipo:"bonus", cat:"Festa" },
@@ -487,11 +551,13 @@ const EVENTI = [
   { id:"b_auguri_paese", pts:150, desc:"Video auguri personaggio del paese", tipo:"bonus", cat:"Festa" },
   { id:"b_auguri_vip", pts:250, desc:"Video auguri VIP (NO IA)", tipo:"bonus", cat:"Festa" },
   { id:"b_caparezza", pts:1500, desc:"Imbucato: Caparezza 🎸", tipo:"bonus", cat:"Leggendario" },
-  { id:"b_fortunato", pts:20, desc:"Fortunato nella Sfortuna (ruota)", tipo:"bonus", cat:"Festa" },
 
   // ── GIOCHI ──
-  { id:"b_tripletta", pts:70, desc:"Tripletta — 3 sfide consecutive vinte", tipo:"bonus", cat:"Giochi" },
-  { id:"b_vittoria_sfida", pts:30, desc:"Vince una sfida", tipo:"bonus", cat:"Giochi", ripetibile:true },
+  { id:"b_tripletta", pts:70, desc:"INGIOCABILI — 3 guanti di sfida consecutivi", tipo:"bonus", cat:"Giochi" },
+  { id:"b_guanto_sfida", pts:40, desc:"Lancia Guanto di Sfida", tipo:"bonus", cat:"Giochi", ripetibile:true },
+  { id:"b_vince_ruota", pts:30, desc:"Vince sfida alla ruota", tipo:"bonus", cat:"Giochi", ripetibile:true },
+  { id:"b_vittoria_sfida", pts:30, desc:"Vittoria in guanto di sfida", tipo:"bonus", cat:"Giochi", ripetibile:true },
+  { id:"b_fortunato", pts:20, desc:"Fortunato nella Sfortuna (ruota)", tipo:"bonus", cat:"Giochi", ripetibile:true },
 
   // ── AD PERSONAM ──
   { id:"b_ap_oned", pts:300, desc:"HS Big Fun — Alessia Ala & Francesca Terlizzi (Harry Styles in coppia)", tipo:"bonus", cat:"Ad Personam", ripetibile:false },
@@ -507,6 +573,13 @@ const EVENTI = [
   { id:"b_ap_spada", pts:200, desc:"Una Cosa Mai Sentita — Nicolò Spada (mai ad alta voce)", tipo:"bonus", cat:"Ad Personam" },
   { id:"b_ap_erminio", pts:450, desc:"Una Verità Scomoda — Erminio Foti (discorso FantaSanPio al mic)", tipo:"bonus", cat:"Ad Personam" },
   { id:"b_ap_davide_m", pts:300, desc:"BATURINA BA BA — Davide Mogavero (esibizione live 45 sec)", tipo:"bonus", cat:"Ad Personam" },
+  { id:"b_ap_buonastrada_1", pts:150, desc:"Buona Strada PT1 — Donato Stragapede & Emily Giancane (vestiti da esploratore e guida)", tipo:"bonus", cat:"Ad Personam" },
+  { id:"b_ap_buonastrada_2", pts:200, desc:"Buona Strada PT2 — Donato & Emily (montano e smontano una tenda in 4 min)", tipo:"bonus", cat:"Ad Personam" },
+  { id:"b_ap_buonastrada_3", pts:350, desc:"Buona Strada PT3 — Donato & Emily (cucinano pane col metodo trapper, fuori location)", tipo:"bonus", cat:"Ad Personam" },
+  { id:"b_ap_mariachiara", pts:75, desc:"Restyling Totale — Mariachiara Longo (senza tacchi)", tipo:"bonus", cat:"Ad Personam" },
+  { id:"b_ap_mariachiara_tacchetti", pts:150, desc:"Restyling Totale — Mariachiara Longo (con tacchetti da calcio)", tipo:"bonus", cat:"Ad Personam" },
+  { id:"b_ap_eleonora_t", pts:150, desc:"Mucho Más — Eleonora Tauro (traduce in spagnolo gli annunci pubblici del festeggiato)", tipo:"bonus", cat:"Ad Personam", ripetibile:true },
+  { id:"m_ap_buonastrada_fuoco", pts:-1500, desc:"Buona Strada — Donato & Emily danno fuoco a qualcosa/qualcuno", tipo:"malus", cat:"Ad Personam" },
 
   // ── MALUS RITARDO ──
   { id:"m_ritardo_30", pts:-10, desc:"30 min di ritardo", tipo:"malus", cat:"Ritardo" },
@@ -540,7 +613,9 @@ const EVENTI = [
 
   // ── MALUS GIOCHI ──
   { id:"m_rifiuta_sfida", pts:-50, desc:"Rifiuta guanto di sfida", tipo:"malus", cat:"Giochi" },
-  { id:"m_perde_sfida", pts:-15, desc:"Perde una sfida", tipo:"malus", cat:"Giochi", ripetibile:true },
+  { id:"m_si_sottrae_ruota", pts:-50, desc:"Si sottrae alla sfida della ruota", tipo:"malus", cat:"Giochi" },
+  { id:"m_perde_sfida", pts:-15, desc:"Perde il guanto di sfida", tipo:"malus", cat:"Giochi", ripetibile:true },
+  { id:"m_perde_sfida_ruota", pts:-15, desc:"Perde sfida alla ruota", tipo:"malus", cat:"Giochi", ripetibile:true },
 
   // ── MALUS FAZIONE ──
   { id:"m_spoiler_ruolo", pts:-150, desc:"Spoilera ruolo speciale fazione", tipo:"malus", cat:"Fazione" },
@@ -597,6 +672,18 @@ function init() {
     if (sbloccata) {
       btn.textContent = "✅ Punti Pre-Festa Sbloccati";
       btn.className = "btn-unlock done";
+    }
+  });
+
+  onValue(ref(db, "ruoli_rivelati"), snap => {
+    const rivelato = snap.exists() && snap.val() === true;
+    const btn = document.getElementById("btn-reveal-ruoli");
+    if (rivelato) {
+      btn.textContent = "✅ Ruoli e Spie Rivelati";
+      btn.className = "btn-unlock done";
+    } else {
+      btn.textContent = "🎭 Rivela Ruoli e Spie (Fazioni)";
+      btn.className = "btn-unlock";
     }
   });
 }
@@ -671,6 +758,7 @@ function aggiornaModalOspite(name) {
   document.getElementById("modal-name").textContent = name;
   document.getElementById("modal-sub").textContent = `${eventi.length} eventi assegnati`;
   document.getElementById("btn-reset-ospite").onclick = () => resetPuntiOspite(name);
+  document.getElementById("btn-custom-assegna").onclick = () => assegnaPersonalizzato(name);
 
   const ptsEl = document.getElementById("modal-pts");
   ptsEl.textContent = (pts > 0 ? '+' : '') + pts + ' pt';
@@ -736,6 +824,24 @@ window.resetPuntiOspite = async function(name) {
   showToast(`✓ Punti di ${name} resettati`, "warn");
   aggiornaModalOspite(name);
 };
+
+// ── PUNTI PERSONALIZZATI (Cash or Trash, premi fine serata, ecc.) ──
+async function assegnaPersonalizzato(name) {
+  const ptsInput = document.getElementById("custom-pts");
+  const descInput = document.getElementById("custom-desc");
+  const pts = parseInt(ptsInput.value, 10);
+  const desc = (descInput.value || "").trim();
+  if (!Number.isFinite(pts) || pts === 0) { showToast("Inserisci un valore di punti valido", "warn"); return; }
+  if (!desc) { showToast("Inserisci una descrizione", "warn"); return; }
+
+  const key = sanitize(name);
+  const eventId = `custom_${Date.now()}`;
+  await set(ref(db, `punti/${key}/${eventId}`), { pts, desc, ts: Date.now() });
+  showToast(`${pts > 0 ? '+' : ''}${pts} → ${name}`);
+  ptsInput.value = "";
+  descInput.value = "";
+  aggiornaModalOspite(name);
+}
 
 // ── ASSEGNA PUNTO A OSPITE ──
 async function assegnaA(name, ev) {
@@ -919,6 +1025,49 @@ window.sblocca = async function() {
   showToast("✓ Punti pre-festa sbloccati!");
 };
 
+window.rivelaRuoli = async function() {
+  const snap = await get(ref(db, "ruoli_rivelati"));
+  const giàRivelato = snap.exists() && snap.val() === true;
+  if (!giàRivelato) {
+    if (!confirm("🎭 Rivelare ruoli e spie nella tab Fazioni?\n\nDa questo momento la classifica fazioni mostrerà moltiplicatori e scambio spie in tempo reale — è il momento clou, fallo davanti a tutti!")) return;
+    await set(ref(db, "ruoli_rivelati"), true);
+    showToast("🎭 Ruoli e spie rivelati — guarda la classifica!");
+  } else {
+    if (!confirm("Tornare alla visualizzazione 'a faccia in su' (senza ruoli/spie)? Utile solo per test/provve.")) return;
+    await remove(ref(db, "ruoli_rivelati"));
+    showToast("✓ Tornato alla visualizzazione pre-rivelazione", "warn");
+  }
+};
+
+// ── BONUS ALLEANZE FINALE (150/100/50 al podio) ──
+window.assegnaBonusAlleanze = async function() {
+  // Calcola il coefficiente di ogni alleanza (stessa formula della tab Alleanze)
+  const ranking = Object.entries(ALLEANZE)
+    .map(([nome, membri]) => ({ nome, coeff: getCoeffAlleanzaRaw(membri), membri }))
+    .sort((a, b) => b.coeff - a.coeff);
+
+  const podio = ranking.slice(0, 3);
+  const premi = [150, 100, 50];
+
+  const riepilogo = podio.map((a, i) => `${i+1}°: ${a.nome} (coeff ${a.coeff.toFixed(1)}) → +${premi[i]}`).join("\n");
+  if (!confirm(`🏆 Assegnare il Bonus Alleanze Finale?\n\n${riepilogo}\n\nIl bonus va al punteggio CAMPIONATO di ogni squadra dei membri delle alleanze in podio (non raddoppiato dal capitano). Si può ripetere in sicurezza.`)) return;
+
+  // Reset completo, poi riscrivi solo il podio — idempotente anche dopo correzioni punti
+  await remove(ref(db, "alleanzaBonusFinale"));
+
+  const writes = [];
+  podio.forEach((a, i) => {
+    a.membri.forEach(m => {
+      if (allTeams[sanitize(m)]) {
+        writes.push(set(ref(db, `alleanzaBonusFinale/${sanitize(m)}`), { pts: premi[i], alleanza: a.nome }));
+      }
+    });
+  });
+  await Promise.all(writes);
+
+  showToast(`✓ Bonus assegnato — 1°: ${podio[0]?.nome || '—'}`, "ok");
+};
+
 function renderToolsRegistrations() {
   const container = document.getElementById("tools-registrations");
   container.innerHTML = "";
@@ -981,6 +1130,8 @@ window.resetTotaleGioco = async function() {
     remove(ref(db, "punti")),
     remove(ref(db, "autoEvents")),
     remove(ref(db, "prefesta_sbloccata")),
+    remove(ref(db, "ruoli_rivelati")),
+    remove(ref(db, "alleanzaBonusFinale")),
   ]);
   showToast("✓ Reset totale completato — tutti torneranno al quiz", "warn");
 };

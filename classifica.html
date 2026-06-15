@@ -396,6 +396,8 @@ let punti = {};   // punti personali per ospite
 let teams = {};   // squadre draft
 let fazioni = {}; // fazioni assegnate
 let prefestaSbloccata = false; // diventa true quando Pietro preme "Sblocca Punti Pre-Festa"
+let ruoliRivelati = false; // diventa true quando Pietro preme "Rivela Ruoli e Spie" — attiva moltiplicatori e scambio spie nella tab Fazioni
+let alleanzaBonusFinale = {}; // { nameKey: {pts, alleanza} } — bonus 150/100/50 assegnato a fine serata alle squadre dei membri delle alleanze 1ª/2ª/3ª
 const myName = localStorage.getItem("fc_player_name");
 
 function sanitize(s) { return s.replace(/[.#$[\]]/g, "_"); }
@@ -437,7 +439,11 @@ function getPuntiPersonali(name) {
 function getPuntiSquadra(ownerName) {
   const key = sanitize(ownerName);
   const team = teams[key];
-  if (!team || !team.roster) return { bonus: 0, malus: 0, tot: 0 };
+  if (!team || !team.roster) {
+    // Anche senza roster, il bonus alleanza finale (se presente) resta valido
+    const extra = (alleanzaBonusFinale[key] && alleanzaBonusFinale[key].pts) || 0;
+    return { bonus: extra, malus: 0, tot: extra };
+  }
 
   let bonus = 0, malus = 0;
   team.roster.forEach(playerName => {
@@ -447,6 +453,13 @@ function getPuntiSquadra(ownerName) {
     bonus += pp.bonus * mult;
     malus += pp.malus * mult;
   });
+
+  // ── BONUS ALLEANZA FINALE (+150/+100/+50) ──
+  // Assegnato a fine serata da Pietro in base al podio alleanze (getCoeffAlleanza).
+  // Va al PUNTEGGIO CAMPIONATO di chi possiede questa squadra — NON moltiplicato dal capitano.
+  const extra = (alleanzaBonusFinale[key] && alleanzaBonusFinale[key].pts) || 0;
+  bonus += extra;
+
   return { bonus, malus, tot: bonus - malus };
 }
 
@@ -473,6 +486,20 @@ function getRuoloEffetto(fazioneBase, ruoloId) {
   if (ruoloId === "spia_siria") return { target: "cody", multiplier: 1 };
   // soldato_* o ruoloId mancante/non riconosciuto → comportamento di default
   return { target: fazioneBase, multiplier: 1 };
+}
+
+// Punti totali fazione — SENZA effetti ruolo (niente x2 moltiplicatore, niente scambio spie)
+// Usata per il "primo reveal" prima che Pietro sveli ruoli e spie a fine serata
+function getPuntiFazioneRaw(faz) {
+  let tot = 0;
+  PLAYERS.forEach(p => {
+    const f = fazioni[sanitize(p.name)];
+    if (!f || !f.fazione) return;
+    if (f.fazione === faz) {
+      tot += getPuntiPersonali(p.name).tot;
+    }
+  });
+  return tot;
 }
 
 // Punti totali fazione
@@ -594,11 +621,13 @@ function renderCampionato() {
     const div = document.createElement("div");
     const posC = i === 0 ? "gold" : i === 1 ? "silver" : i === 2 ? "bronze" : "";
     const isMe = p.name === myName;
+    const ab = alleanzaBonusFinale[sanitize(p.name)];
+    const abBadge = ab ? ` <span style="color:var(--gold);font-family:'Space Mono',monospace;font-size:11px;" title="${ab.alleanza || ''}">🏆+${ab.pts}</span>` : '';
     div.className = "rank-row" + (isMe ? " me" : "") + (i === 0 ? " top1" : "");
     div.innerHTML = `
       <div class="rank-pos ${posC}">${i + 1}</div>
       <div class="rank-info">
-        <div class="rank-name">${p.name}${isMe ? " 👤" : ""}</div>
+        <div class="rank-name">${p.name}${isMe ? " 👤" : ""}${abBadge}</div>
         <div class="rank-team">${p.teamName || 'Nessuna squadra'}</div>
       </div>
       <div>
@@ -688,16 +717,20 @@ function renderFazioni() {
     return;
   }
 
-  const ptsCody = getPuntiFazione("cody");
-  const ptsSiria = getPuntiFazione("siria");
+  const ptsCody = ruoliRivelati ? getPuntiFazione("cody") : getPuntiFazioneRaw("cody");
+  const ptsSiria = ruoliRivelati ? getPuntiFazione("siria") : getPuntiFazioneRaw("siria");
   const tot = Math.max(ptsCody + ptsSiria, 1);
   const pctCody = Math.round((ptsCody / tot) * 100);
   const pctSiria = 100 - pctCody;
 
+  const banner = ruoliRivelati
+    ? `<div style="margin-top:16px;background:rgba(168,85,247,0.1);border:1px solid rgba(168,85,247,0.3);border-radius:10px;padding:12px 14px;font-size:12px;color:var(--accent-siria);">🎭 Ruoli rivelati — moltiplicatori e spie sono ora conteggiati nel totale!</div>`
+    : `<div style="margin-top:16px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;font-size:12px;color:var(--text-muted);">⚠️ Totale "a faccia in su" — non considera ancora ruoli speciali e spie. La rivelazione finale può ribaltare tutto!</div>`;
+
   container.innerHTML = `
     <div class="fazione-card fazione-cody">
       <div class="fazione-header">
-        <div class="fazione-name">🐕 Team Cody</div>
+        <div class="fazione-name" style="display:flex;align-items:center;gap:8px;"><img src="badge_team_cody.jpg" alt="" style="width:28px;height:28px;border-radius:50%;object-fit:cover;">Team Cody</div>
         <div class="fazione-pts">${ptsCody > 0 ? '+' : ''}${ptsCody}</div>
       </div>
       <div class="fazione-bar-wrap"><div class="fazione-bar-fill" style="width:${pctCody}%"></div></div>
@@ -706,16 +739,14 @@ function renderFazioni() {
 
     <div class="fazione-card fazione-siria">
       <div class="fazione-header">
-        <div class="fazione-name">🐱 Team Siria</div>
+        <div class="fazione-name" style="display:flex;align-items:center;gap:8px;"><img src="badge_team_siria.jpg" alt="" style="width:28px;height:28px;border-radius:50%;object-fit:cover;">Team Siria</div>
         <div class="fazione-pts">${ptsSiria > 0 ? '+' : ''}${ptsSiria}</div>
       </div>
       <div class="fazione-bar-wrap"><div class="fazione-bar-fill" style="width:${pctSiria}%"></div></div>
       <div class="fazione-label">${pctSiria}% dei punti totali</div>
     </div>
 
-    <div style="margin-top:16px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;font-size:12px;color:var(--text-muted);">
-      ⚠️ Le fazioni sono segrete — i totali mostrano solo il punteggio aggregato senza rivelare chi è in quale fazione.
-    </div>
+    ${banner}
   `;
 }
 
@@ -768,6 +799,19 @@ function init() {
     renderCampionato();
     renderAlleanze();
     renderFazioni();
+  });
+
+  // Ascolta la rivelazione ruoli/spie (momento clou di fine serata)
+  onValue(ref(db, "ruoli_rivelati"), snap => {
+    ruoliRivelati = snap.exists() && snap.val() === true;
+    renderFazioni();
+  });
+
+  // Ascolta il bonus alleanze finale (150/100/50 a fine serata)
+  onValue(ref(db, "alleanzaBonusFinale"), snap => {
+    alleanzaBonusFinale = snap.exists() ? snap.val() : {};
+    renderCampionato();
+    renderAlleanze();
   });
 
 }
