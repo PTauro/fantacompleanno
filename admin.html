@@ -454,7 +454,7 @@ const PLAYERS = [
   "Nicolò Spada","Antonella Lo vecchio","Beatrice Gloria","Mariacarla Spagnolo","Mattia Martina","Andrea Scozzi",
   "Annalisa Ancora","Roberto Sciurti","Nicolò Maci","Silvia Lamusta","Alessio Maci","Rachele Ponzetta","Erminio Foti","Sara Colletta","Luca Grasso","Annalisa Maci","Alessio Caretto","Silvia Maci","Errico Del monte",
   "Chiara Del Vecchio","Daniele Padula","Davide Mogavero","Marialuce Serra","Francesco Romano","Mariachiara Longo",
-  "Alberto Bianco","Martina Schiavone","Luca Invidia","Marika Piconese","Stefanuccio","Andrea De Matteis","Lorenzo Taffone"
+  "Alberto Bianco","Martina Schiavone","Luca Invidia","Marika Piconese","Stefanuccio","Lorenzo Taffone"
 ];
 
 // ── ALLEANZE (per il calcolo bonus finale 150/100/50) ──
@@ -463,7 +463,7 @@ const ALLEANZE = {
   "💥 Bombette di Cisternino ASAP": ["Francesca Terlizzi","Nicolas Costa","Giulia Trevisi","Andrea Sozzani","Emilio Pulli","Eleonora Bello","Marta Mignone","Giuseppe Susca","Annachiara Maci","Davide Secci"],
   "😈 Il Buono Il Bello e il Danilo": ["Antonio Borelli","Marika Giagnotti","Danilo Schiavone","Ilaria Tenore","Donato Stragapede","Emily Giancane"],
   "💸 Cuoricini Broke": ["Martina Poso","Maycols Sirsi","Laura Capodieci","Davide Attanasio","Manuel Palma","Carlotta D'aversa","Nicolò Spada","Antonella Lo vecchio","Beatrice Gloria","Mariacarla Spagnolo","Mattia Martina","Lorenzo Taffone"],
-  "⚽ FantaSanPio 08:00 AM": ["Andrea Scozzi","Annalisa Ancora","Roberto Sciurti","Nicolò Maci","Silvia Lamusta","Alessio Maci","Rachele Ponzetta","Erminio Foti","Sara Colletta","Luca Grasso","Annalisa Maci","Alessio Caretto","Silvia Maci","Errico Del monte","Chiara Del Vecchio","Daniele Padula","Davide Mogavero","Marialuce Serra","Andrea De Matteis"],
+  "⚽ FantaSanPio 08:00 AM": ["Andrea Scozzi","Annalisa Ancora","Roberto Sciurti","Nicolò Maci","Silvia Lamusta","Alessio Maci","Rachele Ponzetta","Erminio Foti","Sara Colletta","Luca Grasso","Annalisa Maci","Alessio Caretto","Silvia Maci","Errico Del monte","Chiara Del Vecchio","Daniele Padula","Davide Mogavero","Marialuce Serra"],
   "🏆 Guinness World Record Partecipazione": ["Francesco Romano","Mariachiara Longo","Alberto Bianco","Martina Schiavone","Luca Invidia","Marika Piconese","Stefanuccio"],
 };
 
@@ -672,6 +672,9 @@ function init() {
     if (sbloccata) {
       btn.textContent = "✅ Punti Pre-Festa Sbloccati";
       btn.className = "btn-unlock done";
+    } else {
+      btn.textContent = "🔓 Sblocca Punti Pre-Festa";
+      btn.className = "btn-unlock";
     }
   });
 
