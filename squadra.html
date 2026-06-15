@@ -541,31 +541,30 @@ function calcolaCat2(roster, captainName) {
     results.push({ id: "b_cat2_pupilli", pts: 10, desc: "Pupilli — 500 Capelli spesi con squadra incompleta" });
   }
 
-  // +20 (x2 cap) Bonus Maternità
+  // +20 Bonus Maternità
   { const p = hasTag("maternita");
-    if (p) results.push({ id: "b_cat2_maternita", pts: p.name === captainName ? 40 : 20, desc: `Bonus Maternità — ${p.name} in squadra${p.name === captainName ? " (capitano, x2)" : ""}` });
+    if (p) results.push({ id: "b_cat2_maternita", pts: 20, desc: `Bonus Maternità — ${p.name} in squadra` });
   }
 
-  // +20 (x2 cap) Bonus Paternità
+  // +20 Bonus Paternità
   { const p = hasTag("paternita");
-    if (p) results.push({ id: "b_cat2_paternita", pts: p.name === captainName ? 40 : 20, desc: `Bonus Paternità — ${p.name} in squadra${p.name === captainName ? " (capitano, x2)" : ""}` });
+    if (p) results.push({ id: "b_cat2_paternita", pts: 20, desc: `Bonus Paternità — ${p.name} in squadra` });
   }
 
-  // +25 (x2 cap) Bonus Affetto Stabile
+  // +25 Bonus Affetto Stabile
   { const p = hasTag("affetto");
-    if (p) results.push({ id: "b_cat2_affetto", pts: p.name === captainName ? 50 : 25, desc: `Bonus Affetto Stabile — ${p.name} in squadra${p.name === captainName ? " (capitano, x2)" : ""}` });
+    if (p) results.push({ id: "b_cat2_affetto", pts: 25, desc: `Bonus Affetto Stabile — ${p.name} in squadra` });
   }
 
-  // +50 (x2 cap) Smartworking
+  // +50 Smartworking
   { const p = hasTag("remoto");
-    if (p) results.push({ id: "b_cat2_smartworking", pts: p.name === captainName ? 100 : 50, desc: `Smartworking — ${p.name} (gioca da remoto)${p.name === captainName ? " (capitano, x2)" : ""}` });
+    if (p) results.push({ id: "b_cat2_smartworking", pts: 50, desc: `Smartworking — ${p.name} (gioca da remoto)` });
   }
 
-  // +30 (x2 cap) Love is in the Air — entrambi i partner di una coppia, per ogni coppia completa
+  // +30 Love is in the Air — entrambi i partner di una coppia, per ogni coppia completa
   COPPIE.forEach(([a, b], i) => {
     if (names.includes(a) && names.includes(b)) {
-      const isCapInCoppia = captainName === a || captainName === b;
-      results.push({ id: `b_cat2_love_${i}`, pts: isCapInCoppia ? 60 : 30, desc: `Love is in the Air — ${a} & ${b} insieme in squadra${isCapInCoppia ? " (capitano, x2)" : ""}` });
+      results.push({ id: `b_cat2_love_${i}`, pts: 30, desc: `Love is in the Air — ${a} & ${b} insieme in squadra` });
     }
   });
 
@@ -574,14 +573,14 @@ function calcolaCat2(roster, captainName) {
     results.push({ id: "b_cat2_underdog", pts: 30, desc: `Capellone Underdog — squadra da 5 con solo ${spent}/${BUDGET} Capelli spesi` });
   }
 
-  // +30 Bonus Stefanuccio
-  if (hasTag("bonus")) {
+  // +30 Bonus Stefanuccio — solo se Stefanuccio è specificamente in squadra
+  if (names.includes("Stefanuccio")) {
     results.push({ id: "b_cat2_stefanuccio", pts: 30, desc: "Bonus Stefanuccio — Stefanuccio in squadra" });
   }
 
-  // +50 First Lady — Alessia Ala capitana
+  // +20 First Lady — Alessia Ala capitana
   if (captainName === "Alessia Ala") {
-    results.push({ id: "b_cat2_firstlady", pts: 50, desc: "First Lady — Alessia Ala è capitana" });
+    results.push({ id: "b_cat2_firstlady", pts: 20, desc: "First Lady — Alessia Ala è capitana" });
   }
 
   return results;
