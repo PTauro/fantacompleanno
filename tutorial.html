@@ -476,7 +476,7 @@ window.apriBusta = async function() {
 
   const preview = document.getElementById("carta-preview");
   preview.className = `carta-preview ${fazione}-preview esce`;
-  preview.textContent = fazione === "cody" ? "🐕" : "🐱";
+  preview.innerHTML = `<img src="badge_team_${fazione}.jpg" alt="" style="width:90px;height:90px;border-radius:10px;object-fit:cover;">`;
   await sleep(800);
 
   spawnParticles(fazione);
@@ -498,7 +498,7 @@ window.apriBusta = async function() {
 function renderCartaRivelata(fazione, ruolo) {
   const wrap = document.getElementById("slides-wrap");
   const isCody = fazione === "cody";
-  const fazioneNome = isCody ? "🐕 Team Cody" : "🐱 Team Siria";
+  const fazioneNome = isCody ? "Team Cody" : "Team Siria";
   const fazioneClass = isCody ? "carta-cody" : "carta-siria";
   const isSpeciale = ruolo.effetto !== "x1";
 
