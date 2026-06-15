@@ -1,527 +1,69 @@
-<!DOCTYPE html>
-<html lang="it">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FantaCompleanno — Regolamento</title>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700;800&family=Space+Mono:wght@400;700&display=swap');
+/* ============================================================
+   FantaCompleanno — theme.css
+   "Regno di Casa Tauro" — restyle leggibilità + identità grafica
+   ------------------------------------------------------------
+   Caricato DOPO il <style> interno di ogni pagina (vedi <link>
+   in <head>): a parità di specificità CSS, le regole qui sotto
+   vincono sulla cascata, senza !important e senza tocare HTML/JS.
+   Nessuna variabile esistente viene rimossa: solo affinata.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&display=swap');
 
 :root {
-  --bg: #0a0a0f; --surface: #13131a; --border: #1e1e2e;
-  --accent-cody: #ff6b2b; --accent-siria: #a855f7;
-  --text: #f0f0f5; --text-muted: #6b6b8a;
-  --green: #22c55e; --red: #ef4444; --gold: #f59e0b;
+  /* Testo secondario: contrasto migliorato su sfondo scuro (era #6b6b8a) */
+  --text-muted: #a3a3cf;
+  /* Bordi leggermente più definiti (era #1e1e2e) */
+  --border: #262638;
+  /* Nuova superficie "alta" per elementi in evidenza (hero, badge) */
+  --surface-2: #1a1a28;
 }
-* { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* ── SFONDO GLOBALE: gradiente soft Cody (arancio) / Siria (viola) ── */
 body {
-  font-family: 'Space Grotesk', sans-serif;
-  background: var(--bg); color: var(--text);
-  min-height: 100vh;
+  background:
+    radial-gradient(circle at 10% -8%, rgba(255, 107, 43, 0.07), transparent 38%),
+    radial-gradient(circle at 92% 102%, rgba(168, 85, 247, 0.09), transparent 42%),
+    var(--bg);
+  line-height: 1.5;
 }
 
-/* NAV TOP */
-.nav {
-  position: sticky; top: 0; z-index: 50;
-  background: rgba(10,10,15,0.97); backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border);
-  padding: 14px 20px; display: flex; align-items: center; justify-content: space-between;
-}
-.nav-label { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--accent-cody); letter-spacing:.1em; }
-.nav-title { font-size: 17px; font-weight: 800; }
-.btn-back {
-  background: var(--surface); border: 1.5px solid var(--border);
-  color: var(--text-muted); width: 36px; height: 36px; border-radius: 10px;
-  font-size: 16px; cursor: pointer; display:flex; align-items:center; justify-content:center;
+/* ── LEGGIBILITÀ TESTO: paragrafi e descrizioni più "ariosi" ── */
+.card-sub,
+.reg-desc,
+.busta-sub,
+.slide-text,
+.carta-ruolo-desc,
+.cat-sub,
+p {
+  line-height: 1.6;
 }
 
-/* SEARCH */
-.search-wrap { padding: 14px 20px 0; position: relative; }
-.search-input {
-  width: 100%; background: var(--surface); border: 1.5px solid var(--border);
-  border-radius: 12px; padding: 12px 14px 12px 40px;
-  color: var(--text); font-family: 'Space Grotesk', sans-serif;
-  font-size: 14px; outline: none; transition: border-color .2s;
-}
-.search-input:focus { border-color: var(--accent-cody); }
-.search-input::placeholder { color: var(--text-muted); }
-.search-icon { position: absolute; left: 34px; top: 50%; transform: translateY(-50%); font-size: 15px; pointer-events: none; }
-
-/* CATEGORY ACCORDION */
-.section { padding: 16px 20px; }
-.cat-accordion {
-  background: var(--surface); border: 1.5px solid var(--border);
-  border-radius: 14px; margin-bottom: 10px; overflow: hidden;
-}
-.cat-header {
-  padding: 16px; display: flex; align-items: center; gap: 12px;
-  cursor: pointer; transition: background .2s;
-}
-.cat-header:hover { background: rgba(255,255,255,0.02); }
-.cat-icon { font-size: 24px; flex-shrink: 0; }
-.cat-info { flex: 1; }
-.cat-title { font-size: 15px; font-weight: 800; }
-.cat-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-.cat-chevron { color: var(--text-muted); font-size: 14px; transition: transform .3s; flex-shrink: 0; }
-.cat-accordion.open .cat-chevron { transform: rotate(180deg); }
-
-.cat-body { display: none; padding: 0 16px 16px; }
-.cat-accordion.open .cat-body { display: block; animation: slideDown .25s ease; }
-@keyframes slideDown { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
-
-.cat-note {
-  background: rgba(168,85,247,0.1); border: 1px solid rgba(168,85,247,0.3);
-  border-radius: 10px; padding: 12px; margin-bottom: 12px; font-size: 12px;
-  color: var(--accent-siria); line-height: 1.5;
+/* ── TITOLI: tocco "Regno di Casa Tauro" (Cinzel) ──
+   Applicato solo a titoli grandi/brevi, verificati uno a uno:
+   non tocca etichette piccole (.section-title, .nav-title ecc.) */
+.player-name,
+.busta-title,
+.slide-title,
+.modal-title,
+.generale-title,
+.cat-title,
+.card-title,
+.carta-fazione-name,
+.carta-ruolo-name {
+  font-family: 'Cinzel', serif;
+  letter-spacing: 0.02em;
 }
 
-/* SUB SECTION (bonus/malus) */
-.sub-section-title {
-  font-family: 'Space Mono', monospace; font-size: 11px;
-  letter-spacing: .12em; text-transform: uppercase; margin: 14px 0 8px;
+/* ── CARD: leggero respiro extra ── */
+.action-card {
+  padding: 22px;
 }
 
-/* ITEM ACCORDION (inner) */
-.item-row {
-  background: var(--bg); border: 1px solid var(--border);
-  border-radius: 10px; margin-bottom: 6px; overflow: hidden;
+/* ── FOCUS/SELEZIONE più leggibili su input e select ── */
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid rgba(168, 85, 247, 0.4);
+  outline-offset: 1px;
 }
-.item-header {
-  display: flex; align-items: center; gap: 10px; padding: 12px 14px;
-  cursor: pointer; transition: background .15s;
-}
-.item-header:hover { background: rgba(255,255,255,0.02); }
-.item-pts { font-family: 'Space Mono', monospace; font-size: 14px; font-weight: 700; min-width: 60px; flex-shrink: 0; }
-.item-pts.pos { color: var(--green); }
-.item-pts.neg { color: var(--red); }
-.item-info { flex: 1; min-width: 0; }
-.item-desc { font-size: 13px; font-weight: 600; }
-.item-type { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
-.item-chevron { color: var(--text-muted); font-size: 11px; transition: transform .25s; flex-shrink: 0; }
-.item-row.open .item-chevron { transform: rotate(180deg); }
-.item-detail {
-  display: none; padding: 0 14px 12px; font-size: 12px; color: var(--text-muted); line-height: 1.6;
-}
-.item-row.open .item-detail { display: block; }
-.item-detail-inner {
-  padding: 10px 12px; border-radius: 8px;
-}
-.item-row.open.bonus-item .item-detail-inner { background: rgba(34,197,94,0.06); border: 1px solid rgba(34,197,94,0.2); }
-.item-row.open.malus-item .item-detail-inner { background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.2); }
-
-.empty-results { text-align: center; padding: 30px 20px; color: var(--text-muted); font-size: 13px; }
-
-/* ── BOTTOM NAV BAR ── */
-.bottom-nav {
-  position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
-  background: rgba(13,13,20,0.97); backdrop-filter: blur(16px);
-  border-top: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: space-around;
-  padding: 8px 4px calc(8px + env(safe-area-inset-bottom, 0px));
-}
-.nav-item {
-  display: flex; flex-direction: column; align-items: center; gap: 3px;
-  text-decoration: none; color: var(--text-muted);
-  padding: 6px 10px; border-radius: 12px; transition: all .2s;
-  flex: 1; min-width: 0;
-}
-.nav-item.active { color: var(--accent-cody); }
-.nav-icon { font-size: 20px; line-height: 1; }
-.nav-label { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: .05em; white-space: nowrap; }
-.nav-item-center {
-  position: relative; top: -10px;
-}
-.nav-item-center .nav-icon {
-  width: 46px; height: 46px; border-radius: 50%;
-  background: linear-gradient(135deg, var(--accent-cody), var(--accent-siria));
-  display: flex; align-items: center; justify-content: center;
-  font-size: 22px; box-shadow: 0 4px 16px rgba(255,107,43,0.35);
-}
-.nav-item-center.active .nav-icon { box-shadow: 0 4px 20px rgba(255,107,43,0.6); }
-.nav-item-center .nav-label { color: var(--text-muted); }
-.nav-item-center.active .nav-label { color: var(--text); }
-
-/* Spazio extra in fondo alla pagina per non sovrapporsi alla nav */
-body { padding-bottom: 90px !important; }
-
-/* ── FAB REGOLAMENTO ── */
-.fab-regolamento {
-  position: fixed; right: 16px; z-index: 199;
-  bottom: 96px;
-  width: 52px; height: 52px; border-radius: 50%;
-  background: var(--surface); border: 1.5px solid var(--border);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 22px; text-decoration: none; cursor: pointer;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
-  transition: all .2s;
-}
-.fab-regolamento:hover { border-color: var(--accent-cody); transform: scale(1.05); }
-
-</style>
-<link rel="stylesheet" href="theme.css">
-</head>
-<body>
-
-<!-- NAV -->
-<div class="nav">
-  <div>
-    <div class="nav-label">// REGOLAMENTO //</div>
-    <div class="nav-title">📖 Tutte le regole</div>
-  </div>
-  <button class="btn-back" onclick="window.location.href='home.html'">✕</button>
-</div>
-
-<!-- SEARCH -->
-<div class="search-wrap">
-  <span class="search-icon">🔍</span>
-  <input class="search-input" id="search" type="text" placeholder="Cerca un bonus, malus, regola..." oninput="renderAll()" autocomplete="off">
-</div>
-
-<!-- CATEGORIES -->
-<div class="section" id="categories"></div>
-
-<!-- BOTTOM NAV BAR -->
-<div class="bottom-nav">
-  <a href="classifica.html" class="nav-item" data-page="classifica">
-    <span class="nav-icon">📊</span>
-    <span class="nav-label">Classifica</span>
-  </a>
-  <a href="alleanze.html" class="nav-item" data-page="alleanze">
-    <span class="nav-icon">🤝</span>
-    <span class="nav-label">Alleanze</span>
-  </a>
-  <a href="home.html" class="nav-item nav-item-center" data-page="home">
-    <span class="nav-icon">🏠</span>
-    <span class="nav-label">Home</span>
-  </a>
-  <a href="squadra.html" class="nav-item" data-page="squadra">
-    <span class="nav-icon">✂️</span>
-    <span class="nav-label">Squadra</span>
-  </a>
-  <a href="profilo.html" class="nav-item" data-page="profilo">
-    <span class="nav-icon">👤</span>
-    <span class="nav-label">Profilo</span>
-  </a>
-</div>
-
-
-<script>
-const REG = {
-  cat1: {
-    title: "Cat. 1 — Prepariamoci alla Festa",
-    bonus: [
-      { pts: "+30", desc: "Risolve il mistero location", detail: "Hai completato il quiz e trovato le coordinate della location. Il regno di Casa Tauro ti accoglie.", type: "Automatico" },
-      { pts: "+5", desc: "Accede al sito e si abbina al nome", detail: "Hai aperto il sito, trovato il tuo nome e completato la registrazione. Sei ufficialmente nel gioco.", type: "Automatico" },
-      { pts: "+10", desc: "Crea la sua squadra (draft)", detail: "Hai costruito la tua squadra e l&#39;hai salvata. Il draft è completo.", type: "Automatico" },
-      { pts: "+20", desc: "Visualizza la pagina della tua alleanza", detail: "Hai aperto la sezione Alleanze e visto il tuo gruppo. Sai con chi combatti.", type: "Automatico" },
-      { pts: "+5", desc: "Nome originale squadra", detail: "Il nome della tua squadra riporta al festeggiato o lo fa ridere. Giudica Pietro.", type: "Giudizio admin" },
-      { pts: "+20", desc: "Agente in missione", detail: "Hai pescato un ruolo speciale nella fazione — Moltiplicatore o Spia. Non rivelarlo a nessuno.", type: "Automatico" },
-      { pts: "+10", desc: "Spoiler outfit", detail: "Hai pubblicato una foto del tuo outfit sul gruppo ufficiale entro le 15:00 del 27 giugno.", type: "Automatico" },
-    ],
-    malus: [
-      { pts: "-30", desc: "Non risolve il mistero location", detail: "Non hai completato il quiz o non hai trovato le coordinate. Malus automatico.", type: "Automatico" },
-      { pts: "-20", desc: "Si perde e chiede la location", detail: "Hai chiesto informazioni sulla location invece di trovarla da solo. Vergogna.", type: "Giudizio admin" },
-      { pts: "-30", desc: "Non accede al sito / non si abbina", detail: "Non hai completato la registrazione sul sito.", type: "Automatico" },
-      { pts: "-30", desc: "Non crea la squadra", detail: "Il draft è chiuso e non hai costruito la tua squadra. Malus automatico.", type: "Automatico" },
-      { pts: "-20", desc: "Non visualizza la pagina alleanza", detail: "Non hai mai aperto la sezione Alleanze.", type: "Automatico" },
-      { pts: "-30", desc: "Non pesca la carta fazione", detail: "Non hai aperto la busta fazione sul sito.", type: "Automatico" },
-      { pts: "-30", desc: "Non conferma partecipazione", detail: "Non hai confermato la tua presenza alla festa.", type: "Automatico" },
-    ]
-  },
-  cat2: {
-    title: "Cat. 2 — Un Draft Perfetto",
-    note: "I punti con (x2 cap) raddoppiano se il giocatore coinvolto è il tuo capitano. Budget: 500 Capelli ✂️ — la squadra può essere incompleta.",
-    bonus: [
-      { pts: "+10", desc: "Divisione del budget perfetta", detail: "Hai speso esattamente tutti i 500 Capelli — zero avanzati. Precisione chirurgica.", type: "Automatico" },
-      { pts: "+10", desc: "Pupilli", detail: "Hai speso tutti i Capelli ma la squadra è incompleta (meno di 5 giocatori). Efficiente ma senza sprechi.", type: "Automatico" },
-      { pts: "+20 (x2 cap)", desc: "Bonus Maternità", detail: "Hai inserito in squadra un giocatore che ha figli. Cuore grande.", type: "Automatico" },
-      { pts: "+20 (x2 cap)", desc: "Bonus Paternità", detail: "Hai inserito in squadra un giocatore padre. Rispetto.", type: "Automatico" },
-      { pts: "+25 (x2 cap)", desc: "Bonus Affetto Stabile", detail: "Hai inserito un parente o affetto stabile del festeggiato. Chi ama Pietro vince.", type: "Automatico" },
-      { pts: "+30 (x2 cap)", desc: "Love is in the Air", detail: "Hai inserito entrambi i partner di una coppia in squadra. Il bonus vale su entrambi.", type: "Automatico" },
-      { pts: "+50 (x2 cap)", desc: "Smartworking", detail: "Hai inserito partecipanti che giocano a distanza. Chi gioca da remoto e manda foto outfit ottiene punti outfit x2.", type: "Automatico" },
-      { pts: "+30", desc: "Capellone Underdog", detail: "Hai speso meno della metà del budget ma hai comunque 5 giocatori. Sfida accettata.", type: "Automatico" },
-      { pts: "+30", desc: "Bonus Stefanuccio", detail: "Hai Stefanuccio nella tua squadra. Punto fisso per chi crede.", type: "Automatico" },
-      { pts: "+50", desc: "First Lady", detail: "Hai nominato Alessia capitana. Il bonus è già raddoppiato (25x2). Solo lei può essere la First Lady.", type: "Automatico" },
-    ],
-    malus: []
-  },
-  cat3: {
-    title: "Cat. 3 — Outfit Perfetto per una Festa Imperfetta",
-    note: "Chi gioca da remoto e invia foto outfit sul gruppo ufficiale ottiene tutti i punti outfit x2.",
-    bonus: [
-      { pts: "+500", desc: "Orbit Orbit — astronauta completo", detail: "Vestiti da astronauta completo. Casco, tuta, tutto. Non vale un costume da Halloween con elmetto.", type: "Leggendario" },
-      { pts: "+500", desc: "Epoca PLATINO — capelli biondo platino", detail: "Tingiti i capelli di biondo platino per la festa. Deve essere permanente o semi-permanente, non spray.", type: "Leggendario" },
-      { pts: "+350", desc: "Cosplay anime/manga completo", detail: "Vestiti interamente da cosplay anime o manga. Deve essere un personaggio riconoscibile e il look deve essere completo.", type: "Leggendario" },
-      { pts: "+300", desc: "Impero Romano — soldato completo", detail: "Vestiti da soldato romano completo. Tunica, elmo, scudo o lancia. Non vale solo la toga.", type: "Leggendario" },
-      { pts: "+200", desc: "Una serata memorabile — pigiama", detail: "Arriva alla festa in pigiama. Deve essere un vero pigiama da notte, non un tuta.", type: "Bonus Alto" },
-      { pts: "+150", desc: "Epoca Metallara — look completo", detail: "Vestiti come un vero metallato. Capelli, borchie, band tee, stivali. Deve essere autentico, non una parodia.", type: "Bonus Alto" },
-      { pts: "+150", desc: "Epoca Truzza — autentico", detail: "Riesuma i vestiti da truzzo anni &#39;00. Tuta Adidas, catena d&#39;oro, cappellino. Deve essere autentico.", type: "Bonus Alto" },
-      { pts: "+100", desc: "Daltonico per scelta — scarpe diverse", detail: "Indossi scarpe di colore diverso — una per piede. Deve essere evidente, non due tonalità simili.", type: "Bonus Medio" },
-      { pts: "+100", desc: "Overdressed — ricevimento dal re", detail: "Vestiti come per un ricevimento dal re d&#39;Inghilterra. Abito da sera, guanti, tutto. Deve essere esagerato.", type: "Bonus Medio" },
-      { pts: "+80", desc: "Random Element — capo fuori contesto", detail: "Un capo completamente fuori contesto nell&#39;outfit. Esempio classico: tuta sportiva + giacca e cravatta. Non vale solo un accessorio.", type: "Bonus Medio" },
-      { pts: "+80", desc: "Molto Comodo ma Tedesco — infradito+calze", detail: "Infradito + pantaloncini corti + calze lunghe bianche. Il combo turistico tedesco per eccellenza.", type: "Bonus Medio" },
-      { pts: "+70", desc: "Beagle Fun — colori di Cody", detail: "Sopra e sotto con i colori di Cody: nero, arancione e bianco. Entrambi i capi devono rispettare la palette.", type: "Bonus Medio" },
-      { pts: "+70", desc: "Outfit di Gruppo — 3+ persone abbinate", detail: "3 o più persone abbinano l&#39;outfit in modo coordinato. Il bonus è cumulabile per ogni gruppo.", type: "Bonus Medio" },
-      { pts: "+50", desc: "Cambio Outfit totale", detail: "Il tuo outfit cambia totalmente durante la festa. Non valgono solo le scarpe o un accessorio.", type: "Bonus Medio" },
-      { pts: "+50", desc: "Scapezzolata", detail: "L&#39;outfit mette in vista i capezzoli. Applicabile a tutti i generi.", type: "Bonus Medio" },
-      { pts: "+50", desc: "Accessorio d'Oro — estraneo all'outfit", detail: "Un accessorio completamente estraneo al resto dell&#39;outfit. Deve essere ovviamente fuori posto.", type: "Bonus Medio" },
-      { pts: "+50", desc: "Outfit Abbinato — con partner/figlio/affetto", detail: "Il tuo outfit è abbinato a quello di un partner, figlio o affetto stabile. Cumulabile.", type: "Bonus Medio" },
-      { pts: "+50", desc: "Molto Comodo Grazie — infradito o ciabatte", detail: "Indossi infradito o ciabatte estive. Semplice, comodo, elegante a modo suo.", type: "Bonus Medio" },
-      { pts: "+50", desc: "Pronto a Tutto ma Veramente — costume SOTTO", detail: "Porti il costume da bagno indossato SOTTO l&#39;outfit. Se combinato con Pronto a Tutto vale +85 totale.", type: "Bonus Medio" },
-      { pts: "+35", desc: "Pronto a Tutto — costume con sé", detail: "Porti con te un costume da bagno. Non deve essere indossato per questo bonus.", type: "Bonus Piccolo" },
-      { pts: "+45", desc: "Outfit Perfetto — richiama gusti di Pietro", detail: "Il tuo outfit contiene un elemento che richiama i gusti del festeggiato: musica, hobby, lavoro, passioni. Giudica Pietro.", type: "Bonus Piccolo" },
-      { pts: "+20", desc: "Elemento Floreale", detail: "Il tuo outfit ha una fantasia floreale oppure sei addobbato con fiori veri o finti.", type: "Bonus Piccolo" },
-    ],
-    malus: [
-      { pts: "-1000", desc: "Non si veste — arriva nudo/a", detail: "Arriva alla festa nudo o nuda. Nessuna giustificazione accettata. Neanche &#39;fa caldo&#39;.", type: "Malus" },
-      { pts: "-750", desc: "Riferimenti fascisti o nazisti", detail: "Vestiti con riferimenti espliciti a fascismo o nazismo. Malus pesantissimo e meritato.", type: "Malus" },
-      { pts: "-500", desc: "Cane sbagliato — non Beagle", detail: "Vestiti con riferimenti a cani che non sono Beagle. Cody non perdona.", type: "Malus" },
-      { pts: "-300", desc: "Milan o Juve — tradimento calcistico", detail: "Riferimenti a Milan o Juventus nell&#39;outfit. Tradimento calcistico imperdonabile.", type: "Malus" },
-      { pts: "-30", desc: "Total Black o Total White", detail: "Outfit completamente nero o completamente bianco. Zero fantasia.", type: "Malus" },
-      { pts: "-20", desc: "Nessun bonus outfit", detail: "A fine serata non hai ottenuto nessun bonus nella categoria outfit. Potevi fare di meglio.", type: "Malus" },
-      { pts: "-10", desc: "Niente costume da bagno", detail: "Non hai portato il costume da bagno con te. Non eri pronto a tutto.", type: "Malus" },
-    ]
-  },
-  cat4: {
-    title: "Cat. 4 — Let's Party",
-    bonus: [
-      { pts: "+1500", desc: "Imbucato Speciale — Caparezza", detail: "Convinci Caparezza (Michele Salvemini) a venire alla festa. Deve essere fisicamente presente. Il bonus più alto della serata.", type: "Giudizio admin" },
-      { pts: "+780", desc: "Proposta di matrimonio con anello", detail: "Chiedi al tuo partner di sposarti con un anello vero durante la festa. Deve avvenire in modo pubblico.", type: "Giudizio admin" },
-      { pts: "+250", desc: "Auguri di Spessore PT2 — VIP", detail: "Porti un video di auguri da un personaggio famoso su WhatsApp. NO intelligenza artificiale — deve essere autentico.", type: "Giudizio admin" },
-      { pts: "+150", desc: "Serenata — canta e dedica", detail: "Canti e dedichi una canzone al tuo affetto stabile durante la festa. Deve essere applaudita.", type: "Giudizio admin" },
-      { pts: "+150", desc: "Auguri di Spessore — personaggio del paese", detail: "Porti un video di auguri da un personaggio di spessore del paese su WhatsApp.", type: "Giudizio admin" },
-      { pts: "+80", desc: "FLASH MOB — 35+ persone", detail: "Convinci 35 o più persone a ballare una canzone con i tuoi passi. Sei tu l&#39;organizzatore.", type: "Giudizio admin" },
-      { pts: "+70", desc: "Tripletta — 3 sfide consecutive", detail: "Vinci 3 sfide consecutive senza mai perdere. Automatico via app.", type: "Automatico" },
-      { pts: "+60", desc: "Animatore Provetto", detail: "Chiedi una canzone al DJ e riesci a farti seguire nei passi da 10 o più persone.", type: "Giudizio admin" },
-      { pts: "+50", desc: "Vocalist per Sbaglio", detail: "Prendi il microfono, lanci un brano e porti 5 o più persone in pista.", type: "Giudizio admin" },
-      { pts: "+50", desc: "Influencer di Spessore — TikTok", detail: "Lanci un trend TikTok con 10 o più persone che ti seguono. Il bonus va solo a chi pubblica.", type: "Giudizio admin" },
-      { pts: "+50", desc: "Ben Idratato e Rinfrescato — corpo intero", detail: "Ti bagni il corpo intero durante la festa. Piscina, fontana, secchio — tutto vale.", type: "Giudizio admin" },
-      { pts: "+40", desc: "Guanto di Sfida", detail: "Sfidi uno o più invitati a una sfida o gioco durante la festa. Devi essere tu a lanciare il guanto.", type: "Giudizio admin" },
-      { pts: "+35", desc: "Brindisi in rima applaudito", detail: "Fai un brindisi in rima per il festeggiato che viene applaudito dal pubblico.", type: "Giudizio admin" },
-      { pts: "+30", desc: "Regalo Assurdo Improvvisato (max 5€)", detail: "Fai un regalo improvvisato al festeggiato con budget massimo 5 euro. Deve essere assurdo e creativo.", type: "Giudizio admin" },
-      { pts: "+30", desc: "Ben Idratato — parte del corpo", detail: "Ti bagni una parte del corpo durante la festa.", type: "Giudizio admin" },
-      { pts: "+25", desc: "Fatti Trascinare — balli (RIPETIBILE)", detail: "Sei tra chi balla nelle iniziative di gruppo: Flash Mob, TikTok, Animatore, Vocalist. Ripetibile per ogni iniziativa.", type: "Giudizio admin" },
-      { pts: "+20", desc: "Discorso applaudito", detail: "Fai un discorso per il festeggiato che viene applaudito dal pubblico.", type: "Giudizio admin" },
-      { pts: "+20", desc: "Storia Instagram taggando Pietro", detail: "Pubblichi una storia Instagram taggando il festeggiato durante la festa.", type: "Automatico" },
-      { pts: "+20", desc: "Fortunato nella Sfortuna — ruota", detail: "La ruota delle sfide ti sorteggia come partecipante. Non dipende da te — è fortuna pura.", type: "Automatico" },
-      { pts: "+15", desc: "Foto con Pietro (non la torta)", detail: "Ti fai una foto con il festeggiato durante la serata. Non vale quella al taglio della torta.", type: "Giudizio admin" },
-      { pts: "+15", desc: "Piatto Pulito — finisce tutto", detail: "Finisci tutto il buffet senza buttare niente. Zero sprechi.", type: "Giudizio admin" },
-      { pts: "+10", desc: "Applausi for no reason", detail: "Fai partire un applauso generale con la formula &#39;un applauso per...&#39; e la gente applaude.", type: "Giudizio admin" },
-      { pts: "+10", desc: "Arriva puntuale", detail: "Arrivi all&#39;orario stabilito per la festa. Né prima né dopo.", type: "Automatico" },
-    ],
-    malus: [
-      { pts: "-450", desc: "Risponde No alla proposta", detail: "Risponde No alla proposta di matrimonio del partner durante la festa. Brutale.", type: "Giudizio admin" },
-      { pts: "-300", desc: "Tira la torta in faccia a Pietro", detail: "Tira la torta in faccia al festeggiato. Imperdonabile.", type: "Giudizio admin" },
-      { pts: "-150", desc: "Spreco collettivo buffet (A TUTTI)", detail: "Avanza troppo cibo dal buffet — malus assegnato A TUTTI i presenti.", type: "Giudizio admin" },
-      { pts: "-150", desc: "Palesemente annoiato", detail: "Si mostra palesemente annoiato durante la festa. Lo vedi dalla faccia.", type: "Giudizio admin" },
-      { pts: "-150", desc: "Spoilera il ruolo speciale fazione", detail: "Rivela ad altri il proprio ruolo speciale nella fazione. Malus automatico.", type: "Automatico" },
-      { pts: "-80", desc: "Spoilera la fazione segreta", detail: "Rivela ad altri la propria fazione (Cody o Siria). Malus automatico.", type: "Automatico" },
-      { pts: "-80", desc: "Oltre 1 ora di ritardo", detail: "Arriva con più di un&#39;ora di ritardo rispetto all&#39;orario stabilito.", type: "Automatico" },
-      { pts: "-70", desc: "Imbarazzato per serenata romantica", detail: "Riceve una serenata romantica e si mostra palesemente imbarazzato invece di godersi il momento.", type: "Giudizio admin" },
-      { pts: "-50", desc: "Rifiuta il guanto di sfida", detail: "Rifiuta di partecipare a una sfida quando viene sfidata/o direttamente.", type: "Giudizio admin" },
-      { pts: "-50", desc: "Zero bonus festa a fine serata", detail: "A fine serata non hai ottenuto nessun bonus nella categoria festa.", type: "Automatico" },
-      { pts: "-50", desc: "Non mangia nulla", detail: "Arriva, sta alla festa, ma non mangia nulla. Non una cosa.", type: "Giudizio admin" },
-      { pts: "-50", desc: "Polemica con admin o festeggiato", detail: "Protesta o fa polemica con Pietro o l&#39;admin riguardo a bonus o malus assegnati.", type: "Giudizio admin" },
-      { pts: "-30", desc: "Spreco cibo personale", detail: "Avanza cibo dal proprio piatto personale.", type: "Giudizio admin" },
-      { pts: "-30", desc: "Interrompe sfida in corso", detail: "Interrompe una sfida o un gioco in corso.", type: "Giudizio admin" },
-      { pts: "-20", desc: "Un'ora di ritardo", detail: "Arriva con circa un&#39;ora di ritardo rispetto all&#39;orario stabilito.", type: "Automatico" },
-      { pts: "-20", desc: "Non beve alcool durante la festa", detail: "Passa l&#39;intera serata senza bere alcolici. Acqua e succhi non contano.", type: "Giudizio admin" },
-      { pts: "-15", desc: "Assente dalla foto taglio torta", detail: "Non è presente nella foto di rito al taglio della torta di compleanno.", type: "Giudizio admin" },
-      { pts: "-15", desc: "Completamente asciutto a fine festa", detail: "Finisce la festa senza essersi bagnato nemmeno una volta.", type: "Automatico" },
-      { pts: "-15", desc: "Perde il guanto di sfida", detail: "Accetta la sfida ma la perde. Automatico via app.", type: "Automatico" },
-      { pts: "-10", desc: "30 minuti di ritardo", detail: "Arriva con circa 30 minuti di ritardo rispetto all&#39;orario stabilito.", type: "Automatico" },
-      { pts: "-5", desc: "Non mangia la torta di compleanno", detail: "Non mangia nemmeno un pezzo della torta di compleanno del festeggiato.", type: "Giudizio admin" },
-    ]
-  },
-  cat5: {
-    title: "Cat. 5 — Sfide e Giochi",
-    note: "Le sfide vengono organizzate fisicamente durante la festa: karaoke, giochi PS2/Switch, Clash Royale, asta. L'app aggiorna i punti in tempo reale con due tap dal pannello admin.",
-    bonus: [
-      { pts: "+70", desc: "Tripletta — 3 sfide consecutive", detail: "Vinci 3 sfide consecutive senza mai perdere. Il bonus scatta automaticamente dopo la terza vittoria.", type: "Automatico" },
-      { pts: "+30", desc: "Vittoria singola sfida", detail: "Vinci una sfida tra quelle organizzate durante la festa. Ripetibile per ogni vittoria.", type: "Automatico" },
-    ],
-    malus: [
-      { pts: "-50", desc: "Rifiuta il guanto di sfida", detail: "Viene sfidata/o direttamente ma rifiuta di partecipare alla sfida.", type: "Automatico" },
-      { pts: "-15", desc: "Perde una sfida", detail: "Accetta la sfida ma la perde. Ripetibile per ogni sconfitta.", type: "Automatico" },
-    ]
-  },
-  cat6: {
-    title: "Cat. 6 — Alleanze e Fazioni",
-    note: "Il premio finale viene assegnato a fine serata. +150 pt campionato a tutti i membri della fazione/alleanza vincente.",
-    bonus: [
-      { pts: "+150", desc: "Fazione vincente", detail: "Sei nel team (Cody o Siria) con più punti totali a fine serata. Tutti i membri ricevono +150 pt campionato.", type: "Automatico" },
-      { pts: "+150", desc: "Alleanza vincente", detail: "La tua alleanza ha il coefficiente (Media Bonus − Media Malus squadre) più alto. Tutti i membri ricevono +150 pt campionato.", type: "Automatico" },
-      { pts: "x1", desc: "🍖 Dispenser di Croccantini / 🚽 Pulitore di Lettiera", detail: "Ruolo comune — i tuoi punti personali contribuiscono normalmente (x1) al totale della tua fazione.", type: "Ruolo comune" },
-      { pts: "x2", desc: "👨‍🍳 Cuoco di Corte / ❤️ Umano Preferito", detail: "Ruolo speciale Moltiplicatore — i tuoi punti personali contano x2 per il totale della tua fazione.", type: "Ruolo speciale" },
-      { pts: "Spia", desc: "✨ Glitter di Beagle / 🌸 Fioriera come Lettiera", detail: "Ruolo speciale Spia — i tuoi punti vanno alla fazione nemica invece che alla tua.", type: "Ruolo speciale" },
-    ],
-    malus: []
-  },
-  adpersonam: {
-    title: "🎭 Bonus Ad Personam",
-    note: "Sfide personalizzate — solo per i diretti interessati. Gli altri non possono ottenerle.",
-    bonus: [
-      { pts: "+300 a testa", desc: "Alessia Ala & Francesca Terlizzi — HS Big Fun", detail: "Cantano insieme 1 strofa + ritornello di una canzone di Harry Styles. Devono farlo in coppia, in pubblico, senza base.", type: "Ad Personam" },
-      { pts: "+100", desc: "Anna Maria Caione (madre) — Solo Cose Belle", detail: "Non prepara nessun discorso scritto per il festeggiato. Se parla, deve essere spontaneo. Se porta un foglio con appunti: -20.", type: "Ad Personam" },
-      { pts: "+150", desc: "Nicolas Costa — Dilemma Etico", detail: "Si presenta alla festa con una maglietta di Juventus o Milan. Il bonus vale solo se la indossa fisicamente.", type: "Ad Personam" },
-      { pts: "+200", desc: "Marta Mignone & Giuseppe Susca — Io Sono Il Mio Lavoro", detail: "Ripetono insieme la demo di sicurezza di volo 2 volte complete. Bonus base: +200. Se lo fanno con le divise da lavoro, il bonus sale a +1000 totali.", type: "Ad Personam" },
-      { pts: "+150", desc: "Antonio Borelli — Orgoglio Partenopeo", detail: "Indossa la maglietta del Napoli con il numero 10 di Maradona E canta U Soldat Nnamurato. Entrambe le cose.", type: "Ad Personam" },
-      { pts: "+300", desc: "Danilo Schiavone — Ma In Tutto Questo Danilo è Nudo", detail: "Propone uno spogliarello al festeggiato durante la festa. Se si ferma prima di mostrare tutto: +300. Se mostra tutto: -1000 (malus, non bonus).", type: "Ad Personam" },
-      { pts: "+100 a testa", desc: "Martina Poso & Maycols Sirsi — Una Cosa Mai Vista", detail: "Arrivano ESATTAMENTE all&#39;orario stabilito — né un minuto prima né un minuto dopo. Entrambi devono arrivare insieme.", type: "Ad Personam" },
-      { pts: "+150", desc: "Davide Attanasio — Bronzo di Riace", detail: "Esegue 50 piegamenti + 50 squat durante la festa E convince 3 persone a farlo con lui (25 pt per convincere, 25 per farli fare).", type: "Ad Personam" },
-      { pts: "+800", desc: "Manuel Palma — Dilemma Etico PT2", detail: "Canta Bandiera Rossa in pubblico tra le 21:30 e le 23:00 con almeno 2 ritornelli completi.", type: "Ad Personam" },
-      { pts: "+200", desc: "Nicolò Spada — Una Cosa Mai Sentita", detail: "Non viene mai sorpreso a parlare ad alta voce durante tutta la durata della festa. Deve essere costantemente a voce bassa.", type: "Ad Personam" },
-      { pts: "+450", desc: "Erminio Foti — Una Verità Scomoda", detail: "Recita il discorso completo al microfono davanti a tutti, parola per parola: &#171;Io Erminio Foti, nel pieno delle mie facoltà mentali, capace d&#39;intendere e di volere, ammetto qui, davanti a tutti voi, che quest&#39;anno, nell&#39;edizione del FantaSanPio 25/26, ho avuto una fortuna assurda, più di quanta nessun altro — compreso Nicolò Maci — abbia mai avuto. Reputo il vero vincitore del fantacalcio la squadra più titolata, forte e sfortunata, composta dalla coppia del festeggiato Pietro, a cui voglio molto bene, e il suo fidato compagno Tata: siete voi i veri vincitori. Io sono solo una persona molto sculata.&#187;", type: "Ad Personam" },
-      { pts: "+300", desc: "Davide Mogavero — BATURINA BA BA", detail: "Si esibisce live nel suo mitico pezzo per almeno 45 secondi consecutivi. Deve essere dal vivo, non in playback.", type: "Ad Personam" },
-    ],
-    malus: []
-  }
-};
-
-const CAT_META = {
-  cat1: { icon: "🎯" },
-  cat2: { icon: "✂️" },
-  cat3: { icon: "👗" },
-  cat4: { icon: "🎉" },
-  cat5: { icon: "🎮" },
-  cat6: { icon: "⚔️" },
-  adpersonam: { icon: "🎭" },
-};
-
-const CAT_ORDER = ["cat1","cat2","cat3","cat4","cat5","cat6","adpersonam"];
-
-let openCats = new Set();
-let openItems = new Set();
-
-function matchQuery(text, q) {
-  return text.toLowerCase().includes(q);
-}
-
-function renderAll() {
-  const q = (document.getElementById("search").value || "").toLowerCase().trim();
-  const container = document.getElementById("categories");
-  container.innerHTML = "";
-
-  let anyResult = false;
-
-  CAT_ORDER.forEach(catKey => {
-    const data = REG[catKey];
-    const meta = CAT_META[catKey];
-
-    // Filtra bonus/malus in base alla query
-    let bonus = data.bonus || [];
-    let malus = data.malus || [];
-
-    if (q) {
-      bonus = bonus.filter(r => matchQuery(r.desc + " " + (r.detail||"") + " " + r.type, q));
-      malus = malus.filter(r => matchQuery(r.desc + " " + (r.detail||"") + " " + r.type, q));
-    }
-
-    const totalCount = (data.bonus||[]).length + (data.malus||[]).length;
-    const visibleCount = bonus.length + malus.length;
-
-    // Se c'è una query e questa categoria non ha risultati, salta (a meno che il titolo combaci)
-    if (q && visibleCount === 0 && !matchQuery(data.title, q)) return;
-
-    anyResult = true;
-    const isOpen = openCats.has(catKey) || (q && visibleCount > 0);
-
-    const acc = document.createElement("div");
-    acc.className = "cat-accordion" + (isOpen ? " open" : "");
-    acc.id = "cat_" + catKey;
-
-    const header = document.createElement("div");
-    header.className = "cat-header";
-    header.onclick = () => toggleCat(catKey);
-    header.innerHTML = `
-      <div class="cat-icon">${meta.icon}</div>
-      <div class="cat-info">
-        <div class="cat-title">${data.title}</div>
-        <div class="cat-sub">${totalCount} regole${q && visibleCount !== totalCount ? ` · ${visibleCount} corrispondenti` : ''}</div>
-      </div>
-      <div class="cat-chevron">▼</div>
-    `;
-    acc.appendChild(header);
-
-    const body = document.createElement("div");
-    body.className = "cat-body";
-
-    if (data.note) {
-      const note = document.createElement("div");
-      note.className = "cat-note";
-      note.textContent = data.note;
-      body.appendChild(note);
-    }
-
-    if (bonus.length > 0) {
-      const label = document.createElement("div");
-      label.className = "sub-section-title";
-      label.style.color = "var(--green)";
-      label.textContent = "✅ Bonus";
-      body.appendChild(label);
-      bonus.forEach((r, i) => body.appendChild(renderItem(r, catKey, "bonus", i)));
-    }
-
-    if (malus.length > 0) {
-      const label = document.createElement("div");
-      label.className = "sub-section-title";
-      label.style.color = "var(--red)";
-      label.textContent = "❌ Malus";
-      body.appendChild(label);
-      malus.forEach((r, i) => body.appendChild(renderItem(r, catKey, "malus", i)));
-    }
-
-    acc.appendChild(body);
-    container.appendChild(acc);
-  });
-
-  if (!anyResult) {
-    container.innerHTML = '<div class="empty-results">🔍 Nessun risultato per la tua ricerca.</div>';
-  }
-}
-
-function renderItem(r, catKey, tipo, i) {
-  const id = tipo + "_" + catKey + "_" + i;
-  const isOpen = openItems.has(id);
-
-  const row = document.createElement("div");
-  row.className = "item-row " + tipo + "-item" + (isOpen ? " open" : "");
-  row.id = "item_" + id;
-
-  const header = document.createElement("div");
-  header.className = "item-header";
-  header.onclick = (e) => { e.stopPropagation(); toggleItem(id); };
-  header.innerHTML = `
-    <div class="item-pts ${tipo === 'bonus' ? 'pos' : 'neg'}">${r.pts}</div>
-    <div class="item-info">
-      <div class="item-desc">${r.desc}</div>
-      <div class="item-type">${r.type}</div>
-    </div>
-    <div class="item-chevron">▼</div>
-  `;
-  row.appendChild(header);
-
-  const detail = document.createElement("div");
-  detail.className = "item-detail";
-  detail.innerHTML = `<div class="item-detail-inner">${r.detail || ''}</div>`;
-  row.appendChild(detail);
-
-  return row;
-}
-
-window.toggleCat = function(catKey) {
-  if (openCats.has(catKey)) openCats.delete(catKey);
-  else openCats.add(catKey);
-  renderAll();
-};
-
-window.toggleItem = function(id) {
-  if (openItems.has(id)) openItems.delete(id);
-  else openItems.add(id);
-  renderAll();
-};
-
-renderAll();
-</script>
-</body>
-</html>

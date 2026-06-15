@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FantaCompleanno — Accedi al Gioco</title>
+<title>FantaCompleanno — La Mia Squadra</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700;800&family=Space+Mono:wght@400;700&display=swap');
 
@@ -11,365 +11,340 @@
   --bg: #0a0a0f; --surface: #13131a; --border: #1e1e2e;
   --accent-cody: #ff6b2b; --accent-siria: #a855f7;
   --text: #f0f0f5; --text-muted: #6b6b8a;
-  --green: #22c55e; --red: #ef4444;
+  --green: #22c55e; --red: #ef4444; --gold: #f59e0b;
 }
-
 * { margin: 0; padding: 0; box-sizing: border-box; }
-
 body {
   font-family: 'Space Grotesk', sans-serif;
   background: var(--bg); color: var(--text);
-  min-height: 100vh; display: flex; align-items: center;
-  justify-content: center; padding: 20px; overflow-x: hidden;
+  min-height: 100vh; padding-bottom: 100px;
 }
 
-.screen { display: none; width: 100%; max-width: 480px; animation: fadeIn .4s ease; }
-.screen.active { display: block; }
-
-@keyframes fadeIn { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
-
-/* ── TYPOGRAPHY ── */
-.label {
-  font-family: 'Space Mono', monospace;
-  font-size: 11px; color: var(--text-muted);
-  letter-spacing: .15em; text-transform: uppercase; margin-bottom: 8px;
+/* ── NAV ── */
+.nav {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(10,10,15,0.95); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 20px; display: flex; align-items: center; justify-content: space-between;
 }
-.headline { font-size: 22px; font-weight: 800; line-height: 1.25; margin-bottom: 8px; }
-.subline { font-size: 14px; color: var(--text-muted); line-height: 1.5; margin-bottom: 28px; }
-.cody { color: var(--accent-cody); }
-.siria { color: var(--accent-siria); }
+.nav-title { font-family: 'Space Mono', monospace; font-size: 13px; color: var(--text-muted); }
+.nav-name { font-size: 15px; font-weight: 700; }
 
-/* ── CARD ── */
-.card {
-  background: var(--surface); border: 1.5px solid var(--border);
-  border-radius: 14px; padding: 20px; margin-bottom: 14px;
+/* ── BUDGET BAR ── */
+.budget-bar {
+  background: var(--surface); border-bottom: 1px solid var(--border);
+  padding: 14px 20px;
 }
+.budget-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.budget-label { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--text-muted); letter-spacing: .1em; }
+.budget-amount { font-family: 'Space Mono', monospace; font-size: 20px; font-weight: 700; }
+.budget-amount.ok { color: var(--green); }
+.budget-amount.warn { color: var(--gold); }
+.budget-amount.over { color: var(--red); }
+.bar-track { width: 100%; height: 4px; background: var(--border); border-radius: 2px; }
+.bar-fill { height: 100%; border-radius: 2px; transition: width .3s ease, background .3s; }
 
-/* ── CODE BADGE ── */
-.code-badge {
-  display: flex; align-items: center; justify-content: space-between;
-  background: rgba(168,85,247,0.08); border: 1.5px solid rgba(168,85,247,0.3);
-  border-radius: 10px; padding: 14px 16px; margin-bottom: 20px;
+/* ── TABS ── */
+.tabs {
+  display: flex; border-bottom: 1px solid var(--border);
+  background: var(--surface); position: sticky; top: 57px; z-index: 40;
 }
-.code-badge .code-label { font-size: 11px; color: var(--text-muted); font-family: 'Space Mono', monospace; letter-spacing: .1em; }
-.code-badge .code-value { font-family: 'Space Mono', monospace; font-size: 22px; font-weight: 700; color: var(--accent-siria); letter-spacing: .15em; }
+.tab {
+  flex: 1; padding: 12px; text-align: center;
+  font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700;
+  color: var(--text-muted); cursor: pointer; transition: all .2s;
+  border-bottom: 2px solid transparent;
+}
+.tab.active { color: var(--accent-cody); border-bottom-color: var(--accent-cody); }
+
+/* ── CONTENT ── */
+.tab-content { display: none; padding: 16px 20px; }
+.tab-content.active { display: block; }
 
 /* ── SEARCH ── */
 .search-wrap { position: relative; margin-bottom: 12px; }
+.search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 15px; pointer-events: none; }
 .search-input {
   width: 100%; background: var(--surface); border: 1.5px solid var(--border);
-  border-radius: 10px; padding: 14px 14px 14px 42px;
+  border-radius: 10px; padding: 12px 12px 12px 40px;
   color: var(--text); font-family: 'Space Grotesk', sans-serif;
-  font-size: 15px; outline: none; transition: border-color .2s;
+  font-size: 14px; outline: none; transition: border-color .2s;
 }
 .search-input:focus { border-color: var(--accent-siria); }
 .search-input::placeholder { color: var(--text-muted); }
-.search-icon {
-  position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
-  font-size: 16px; pointer-events: none;
-}
 
-/* ── PLAYER LIST ── */
-.player-list { max-height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
-.player-list::-webkit-scrollbar { width: 4px; }
-.player-list::-webkit-scrollbar-track { background: transparent; }
-.player-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+/* ── PLAYER CARDS ── */
+.player-grid { display: flex; flex-direction: column; gap: 8px; }
 
-.player-item {
+.player-card {
   background: var(--surface); border: 1.5px solid var(--border);
-  border-radius: 10px; padding: 14px 16px;
-  cursor: pointer; transition: all .2s;
-  display: flex; align-items: center; justify-content: space-between;
-}
-.player-item:hover { border-color: var(--accent-cody); background: #1a1000; }
-.player-item.taken {
-  opacity: 0.4; cursor: not-allowed; pointer-events: none;
-}
-.player-name { font-size: 15px; font-weight: 600; }
-.player-meta { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-.player-cost {
-  font-family: 'Space Mono', monospace; font-size: 13px;
-  color: var(--accent-cody); white-space: nowrap;
-}
-.taken-badge {
-  font-family: 'Space Mono', monospace; font-size: 10px;
-  color: var(--text-muted); background: var(--border);
-  padding: 3px 8px; border-radius: 100px;
-}
-.no-results { text-align: center; padding: 24px; color: var(--text-muted); font-size: 14px; }
-
-/* ── CONFIRM MODAL ── */
-.modal-overlay {
-  display: none; position: fixed; inset: 0;
-  background: rgba(0,0,0,0.8); z-index: 100;
-  align-items: flex-end; justify-content: center;
-  padding: 20px;
-}
-.modal-overlay.open { display: flex; }
-.modal-box {
-  background: var(--surface); border: 1.5px solid var(--border);
-  border-radius: 20px 20px 20px 20px; padding: 28px 24px;
-  width: 100%; max-width: 480px; animation: slideUp .3s ease;
-}
-@keyframes slideUp { from { transform: translateY(40px); opacity:0; } to { transform:translateY(0); opacity:1; } }
-.modal-name { font-size: 28px; font-weight: 800; margin-bottom: 6px; }
-.modal-sub { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; line-height: 1.5; }
-
-/* ── BUTTONS ── */
-.btn-primary {
-  width: 100%; background: linear-gradient(135deg, var(--accent-cody), var(--accent-siria));
-  color: white; padding: 16px; border-radius: 12px; border: none;
-  font-family: 'Space Grotesk', sans-serif; font-size: 16px; font-weight: 700;
-  cursor: pointer; transition: opacity .2s; margin-bottom: 10px;
-}
-.btn-primary:hover { opacity: .85; }
-.btn-ghost {
-  width: 100%; background: transparent; border: 1.5px solid var(--border);
-  color: var(--text-muted); padding: 14px; border-radius: 12px;
-  font-family: 'Space Grotesk', sans-serif; font-size: 14px;
-  cursor: pointer; transition: all .2s;
-}
-.btn-ghost:hover { border-color: var(--text-muted); color: var(--text); }
-
-/* ── WELCOME SCREEN ── */
-.welcome-emoji { font-size: 72px; text-align: center; display: block; margin-bottom: 20px; }
-.info-row {
-  display: flex; gap: 10px; margin-bottom: 10px;
-}
-.info-chip {
-  background: var(--surface); border: 1.5px solid var(--border);
-  border-radius: 8px; padding: 10px 14px; flex: 1;
-  font-size: 12px; text-align: center;
-}
-.info-chip .chip-icon { font-size: 20px; display: block; margin-bottom: 4px; }
-.info-chip .chip-label { color: var(--text-muted); font-size: 11px; }
-
-/* ── ADMIN SCREEN ── */
-.admin-header {
+  border-radius: 12px; padding: 14px 16px;
   display: flex; align-items: center; gap: 12px;
-  padding: 32px 0 20px;
+  cursor: pointer; transition: all .2s;
 }
-.admin-badge {
-  background: rgba(255,107,43,0.15); border: 1.5px solid var(--accent-cody);
-  color: var(--accent-cody); font-family: 'Space Mono', monospace;
-  font-size: 11px; padding: 4px 10px; border-radius: 100px;
+.player-card:hover { border-color: var(--accent-cody); background: #150a00; }
+.player-card.selected { border-color: var(--accent-cody); background: #150a00; }
+.player-card.captain { border-color: var(--gold); background: #150d00; }
+.player-card.disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
+.player-card.full:not(.selected) { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+
+.player-avatar {
+  width: 40px; height: 40px; border-radius: 10px;
+  background: var(--border); display: flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 800; font-family: 'Space Mono', monospace;
+  color: var(--text-muted); flex-shrink: 0; transition: all .2s;
 }
-.admin-list { display: flex; flex-direction: column; gap: 6px; max-height: 65vh; overflow-y: auto; }
-.admin-player-row {
-  background: var(--surface); border: 1.5px solid var(--border);
-  border-radius: 10px; padding: 14px 16px;
-  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+.player-card.selected .player-avatar { background: rgba(255,107,43,0.2); color: var(--accent-cody); }
+.player-card.captain .player-avatar { background: rgba(245,158,11,0.2); color: var(--gold); }
+
+.player-info { flex: 1; min-width: 0; }
+.player-name { font-size: 14px; font-weight: 700; }
+.player-tags { display: flex; gap: 6px; margin-top: 4px; flex-wrap: wrap; }
+.tag {
+  font-size: 10px; font-family: 'Space Mono', monospace;
+  padding: 2px 7px; border-radius: 100px; background: var(--border); color: var(--text-muted);
 }
-.admin-player-row.linked { border-color: rgba(34,197,94,0.3); }
-.admin-info { flex: 1; }
-.admin-name { font-size: 14px; font-weight: 600; }
-.admin-code {
+.tag.coppia { background: rgba(168,85,247,0.15); color: var(--accent-siria); }
+.tag.affetto { background: rgba(255,107,43,0.15); color: var(--accent-cody); }
+.tag.remoto { background: rgba(34,197,94,0.15); color: var(--green); }
+.tag.bonus { background: rgba(245,158,11,0.15); color: var(--gold); }
+
+.player-right { text-align: right; flex-shrink: 0; }
+.player-cost { font-family: 'Space Mono', monospace; font-size: 15px; font-weight: 700; color: var(--accent-cody); }
+.player-cost-label { font-size: 10px; color: var(--text-muted); }
+
+.cap-badge {
+  display: inline-block; font-size: 10px; font-family: 'Space Mono', monospace;
+  background: rgba(245,158,11,0.2); color: var(--gold); border: 1px solid rgba(245,158,11,0.4);
+  padding: 2px 8px; border-radius: 100px; margin-top: 4px;
+}
+
+/* ── LA MIA SQUADRA ── */
+.squad-header { margin-bottom: 16px; }
+.section-label {
   font-family: 'Space Mono', monospace; font-size: 11px;
-  color: var(--green); margin-top: 2px;
+  color: var(--text-muted); letter-spacing: .12em; text-transform: uppercase; margin-bottom: 8px;
 }
-.admin-code.none { color: var(--text-muted); }
-.btn-unlink {
-  background: rgba(239,68,68,0.1); border: 1.5px solid rgba(239,68,68,0.3);
-  color: var(--red); padding: 6px 12px; border-radius: 8px;
-  font-family: 'Space Mono', monospace; font-size: 11px; cursor: pointer;
-  transition: all .2s; white-space: nowrap;
-}
-.btn-unlink:hover { background: rgba(239,68,68,0.2); }
-.admin-search {
+
+.team-name-input {
   width: 100%; background: var(--surface); border: 1.5px solid var(--border);
   border-radius: 10px; padding: 12px 14px;
   color: var(--text); font-family: 'Space Grotesk', sans-serif;
-  font-size: 14px; outline: none; margin-bottom: 12px;
-  transition: border-color .2s;
+  font-size: 15px; font-weight: 700; outline: none; transition: border-color .2s;
+  margin-bottom: 16px;
 }
-.admin-search:focus { border-color: var(--accent-cody); }
-.admin-stats {
-  display: flex; gap: 10px; margin-bottom: 16px;
-}
-.stat-chip {
-  background: var(--surface); border: 1.5px solid var(--border);
-  border-radius: 8px; padding: 10px 14px; flex: 1; text-align: center;
-}
-.stat-num { font-family: 'Space Mono', monospace; font-size: 20px; font-weight: 700; }
-.stat-label { font-size: 11px; color: var(--text-muted); }
-.stat-chip.ok .stat-num { color: var(--green); }
-.stat-chip.wait .stat-num { color: var(--accent-cody); }
+.team-name-input:focus { border-color: var(--accent-cody); }
+.team-name-input::placeholder { color: var(--text-muted); font-weight: 400; }
 
-/* ── FEEDBACK ── */
+.squad-slot {
+  background: var(--surface); border: 1.5px dashed var(--border);
+  border-radius: 12px; padding: 14px 16px; margin-bottom: 8px;
+  display: flex; align-items: center; gap: 12px; transition: all .2s;
+}
+.squad-slot.filled { border-style: solid; border-color: var(--border); }
+.squad-slot.captain-slot { border-color: var(--gold); background: #150d00; }
+.slot-num {
+  width: 28px; height: 28px; border-radius: 8px;
+  background: var(--border); display: flex; align-items: center; justify-content: center;
+  font-family: 'Space Mono', monospace; font-size: 12px; color: var(--text-muted); flex-shrink: 0;
+}
+.squad-slot.captain-slot .slot-num { background: rgba(245,158,11,0.2); color: var(--gold); }
+.slot-info { flex: 1; }
+.slot-name { font-size: 14px; font-weight: 700; }
+.slot-empty { font-size: 13px; color: var(--text-muted); }
+.slot-cost { font-family: 'Space Mono', monospace; font-size: 13px; color: var(--accent-cody); }
+
+.btn-set-cap {
+  font-size: 10px; font-family: 'Space Mono', monospace;
+  background: rgba(245,158,11,0.15); color: var(--gold);
+  border: 1px solid rgba(245,158,11,0.3); padding: 4px 10px; border-radius: 100px;
+  cursor: pointer; transition: all .2s; white-space: nowrap;
+}
+.btn-set-cap:hover { background: rgba(245,158,11,0.3); }
+.btn-set-cap.is-cap { background: rgba(245,158,11,0.3); }
+.btn-remove {
+  font-size: 16px; color: var(--text-muted); cursor: pointer;
+  padding: 4px; transition: color .2s; background: none; border: none;
+}
+.btn-remove:hover { color: var(--red); }
+
+/* ── SAVE BTN ── */
+.save-bar {
+  position: fixed; bottom: 72px; left: 0; right: 0;
+  background: rgba(10,10,15,0.97); border-top: 1px solid var(--border);
+  padding: 12px 20px; z-index: 60;
+}
+.btn-save {
+  width: 100%; background: linear-gradient(135deg, var(--accent-cody), var(--accent-siria));
+  color: white; padding: 16px; border-radius: 12px; border: none;
+  font-family: 'Space Grotesk', sans-serif; font-size: 16px; font-weight: 700;
+  cursor: pointer; transition: opacity .2s;
+}
+.btn-save:hover { opacity: .85; }
+.btn-save:disabled { opacity: .4; cursor: not-allowed; }
+
+/* ── ALTRE SQUADRE ── */
+.other-team-card {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 12px; padding: 16px; margin-bottom: 10px;
+}
+.other-team-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.other-team-name { font-size: 15px; font-weight: 800; }
+.other-team-owner { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.other-team-count { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--text-muted); }
+.other-player-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 13px;
+}
+.other-player-row:last-child { border-bottom: none; }
+.other-player-cap { color: var(--gold); font-size: 10px; font-family: 'Space Mono', monospace; }
+
+/* ── EMPTY STATE ── */
+.empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); }
+.empty-emoji { font-size: 48px; display: block; margin-bottom: 12px; }
+
+/* ── TOAST ── */
 .toast {
-  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
   background: var(--surface); border: 1.5px solid var(--green);
   color: var(--green); font-family: 'Space Mono', monospace;
   font-size: 13px; padding: 12px 20px; border-radius: 100px;
-  opacity: 0; transition: opacity .3s; pointer-events: none; white-space: nowrap;
-  z-index: 200;
+  opacity: 0; transition: opacity .3s; pointer-events: none; white-space: nowrap; z-index: 200;
 }
 .toast.show { opacity: 1; }
 .toast.error { border-color: var(--red); color: var(--red); }
+.toast.warn { border-color: var(--gold); color: var(--gold); }
+
+/* ── STATUS CHIP ── */
+.status-row { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+.status-chip {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 8px; padding: 8px 12px; font-size: 12px; text-align: center;
+}
+.status-chip .snum { font-family: 'Space Mono', monospace; font-size: 18px; font-weight: 700; display: block; }
+.status-chip.ok .snum { color: var(--green); }
+.status-chip.warn .snum { color: var(--gold); }
+.status-chip.info .snum { color: var(--accent-siria); }
+/* ── BOTTOM NAV BAR ── */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
+  background: rgba(13,13,20,0.97); backdrop-filter: blur(16px);
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-around;
+  padding: 8px 4px calc(8px + env(safe-area-inset-bottom, 0px));
+}
+.nav-item {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  text-decoration: none; color: var(--text-muted);
+  padding: 6px 10px; border-radius: 12px; transition: all .2s;
+  flex: 1; min-width: 0;
+}
+.nav-item.active { color: var(--accent-cody); }
+.nav-icon { font-size: 20px; line-height: 1; }
+.nav-label { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: .05em; white-space: nowrap; }
+.nav-item-center {
+  position: relative; top: -10px;
+}
+.nav-item-center .nav-icon {
+  width: 46px; height: 46px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-cody), var(--accent-siria));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; box-shadow: 0 4px 16px rgba(255,107,43,0.35);
+}
+.nav-item-center.active .nav-icon { box-shadow: 0 4px 20px rgba(255,107,43,0.6); }
+.nav-item-center .nav-label { color: var(--text-muted); }
+.nav-item-center.active .nav-label { color: var(--text); }
+
+/* Spazio extra in fondo alla pagina per non sovrapporsi alla nav */
+body { padding-bottom: 170px !important; }
+
+/* ── FAB REGOLAMENTO ── */
+.fab-regolamento {
+  position: fixed; right: 16px; z-index: 199;
+  bottom: 96px;
+  width: 52px; height: 52px; border-radius: 50%;
+  background: var(--surface); border: 1.5px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; text-decoration: none; cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  transition: all .2s;
+}
+.fab-regolamento:hover { border-color: var(--accent-cody); transform: scale(1.05); }
+
 </style>
 <link rel="stylesheet" href="theme.css">
 </head>
 <body>
 
-<!-- ══════════════════════════════════════════
-     SCREEN 1 — WELCOME / CODICE ASSEGNATO
-══════════════════════════════════════════ -->
-<div class="screen active" id="screen-welcome">
-  <div style="padding: 40px 20px 20px;">
-    <p class="label">// Operazione completata //</p>
-    <span class="welcome-emoji">🎯</span>
-    <h1 class="headline">Missione compiuta.<br>Ora entra nel gioco.</h1>
-    <p class="subline">Hai risolto il quiz. Adesso abbina il tuo nome per partecipare al FantaCompleanno.</p>
+<!-- NAV -->
+<div class="nav">
+  <div>
+    <div class="nav-title">// DRAFT SQUADRA //</div>
+    <div class="nav-name" id="nav-player-name">Caricamento...</div>
+  </div>
+  <div style="font-size:24px;">✂️</div>
+</div>
 
-    <div class="code-badge">
-      <div>
-        <div class="code-label">Il tuo codice univoco</div>
-        <div class="code-value" id="welcome-code">——</div>
-      </div>
-      <div style="font-size:28px;">🔑</div>
-    </div>
-
-    <div class="info-row">
-      <div class="info-chip">
-        <span class="chip-icon">📱</span>
-        <div style="font-weight:600; font-size:13px;">Questo telefono</div>
-        <div class="chip-label">ti ricorderà sempre</div>
-      </div>
-      <div class="info-chip">
-        <span class="chip-icon">🔒</span>
-        <div style="font-weight:600; font-size:13px;">Un nome</div>
-        <div class="chip-label">per codice</div>
-      </div>
-      <div class="info-chip">
-        <span class="chip-icon">⚡</span>
-        <div style="font-weight:600; font-size:13px;">30 secondi</div>
-        <div class="chip-label">per registrarsi</div>
-      </div>
-    </div>
-
-    <button class="btn-primary" onclick="showScreen('screen-register')" style="margin-top:16px;">
-      Abbina il tuo nome →
-    </button>
+<!-- BUDGET BAR -->
+<div class="budget-bar">
+  <div class="budget-row">
+    <span class="budget-label">Capelli rimasti</span>
+    <span class="budget-amount ok" id="budget-display">500 ✂️</span>
+  </div>
+  <div class="bar-track">
+    <div class="bar-fill" id="budget-bar-fill" style="width:100%; background: var(--green);"></div>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════
-     SCREEN 2 — CERCA E SELEZIONA NOME
-══════════════════════════════════════════ -->
-<div class="screen" id="screen-register">
-  <div style="padding: 32px 20px 20px;">
-    <p class="label">// Chi sei? //</p>
-    <h2 class="headline">Trovati nella lista</h2>
-    <p class="subline">Cerca il tuo nome e selezionalo. Verrai abbinato a questo dispositivo.</p>
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('mia-squadra')" id="tab-mia-squadra">🏆 Mia Squadra</div>
+  <div class="tab" onclick="switchTab('giocatori')" id="tab-giocatori">👥 Giocatori</div>
+  <div class="tab" onclick="switchTab('altre-squadre')" id="tab-altre-squadre">👀 Altre Squadre</div>
+</div>
 
-    <div class="search-wrap">
-      <span class="search-icon">🔍</span>
-      <input
-        class="search-input"
-        id="search-input"
-        type="text"
-        placeholder="Scrivi il tuo nome..."
-        oninput="filterPlayers()"
-        autocomplete="off"
-      >
-    </div>
+<!-- TAB: MIA SQUADRA -->
+<div class="tab-content active" id="content-mia-squadra">
+  <div class="squad-header" style="margin-top:8px;">
+    <div class="section-label">Nome Squadra</div>
+    <input class="team-name-input" id="team-name-input" type="text" placeholder="Dai un nome alla tua squadra..." maxlength="40">
+    <div class="section-label">Rosa (0/5) — tocca un giocatore per rimuoverlo · tocca la ⭐ per nominarlo capitano</div>
+  </div>
 
-    <div class="player-list" id="player-list"></div>
+  <div id="squad-slots"></div>
+
+  <div style="margin-top:16px;">
+    <div class="section-label">Riepilogo Budget</div>
+    <div class="status-row" id="budget-status-row"></div>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════
-     SCREEN 3 — GIÀ REGISTRATO
-══════════════════════════════════════════ -->
-<div class="screen" id="screen-already">
-  <div style="padding: 40px 20px 20px; text-align: center;">
-    <span style="font-size:72px; display:block; margin-bottom:20px;">👋</span>
-    <p class="label">// Bentornato //</p>
-    <h2 class="headline" id="already-name" style="margin-bottom:8px;"></h2>
-    <p class="subline">Questo dispositivo è già abbinato al tuo nome. Sei pronto per il FantaCompleanno!</p>
-
-    <div class="code-badge" style="margin-bottom:24px;">
-      <div>
-        <div class="code-label">Il tuo codice</div>
-        <div class="code-value" id="already-code">——</div>
-      </div>
-      <div style="font-size:28px;">✅</div>
-    </div>
-
-    <button class="btn-primary" onclick="window.location.href='home.html'">Vai al gioco →</button>
-    <button class="btn-ghost" onclick="showScreen('screen-register')" style="margin-top:10px;">
-      Non sono io — cambia nome
-    </button>
+<!-- TAB: GIOCATORI -->
+<div class="tab-content" id="content-giocatori">
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input class="search-input" id="player-search" type="text" placeholder="Cerca giocatore..." oninput="renderPlayerList()" autocomplete="off">
   </div>
+  <div class="player-grid" id="player-grid"></div>
 </div>
 
-<!-- ══════════════════════════════════════════
-     SCREEN 4 — ADMIN
-══════════════════════════════════════════ -->
-<div class="screen" id="screen-admin">
-  <div style="padding: 20px;">
-    <div class="admin-header">
-      <div>
-        <p class="label" style="margin-bottom:4px;">Pannello Admin</p>
-        <h2 style="font-size:20px; font-weight:800;">Gestione Ospiti</h2>
-      </div>
-      <div class="admin-badge">30CODY30SYRIA</div>
-    </div>
-
-    <div class="admin-stats">
-      <div class="stat-chip ok">
-        <div class="stat-num" id="stat-linked">0</div>
-        <div class="stat-label">Abbinati</div>
-      </div>
-      <div class="stat-chip wait">
-        <div class="stat-num" id="stat-waiting">0</div>
-        <div class="stat-label">In attesa</div>
-      </div>
-      <div class="stat-chip">
-        <div class="stat-num" id="stat-total">0</div>
-        <div class="stat-label">Totale</div>
-      </div>
-    </div>
-
-    <input
-      class="admin-search"
-      type="text"
-      placeholder="Cerca ospite..."
-      oninput="filterAdmin()"
-      id="admin-search-input"
-    >
-
-    <div class="admin-list" id="admin-list"></div>
-  </div>
+<!-- TAB: ALTRE SQUADRE -->
+<div class="tab-content" id="content-altre-squadre">
+  <div id="other-teams-list"></div>
 </div>
 
-<!-- ══════════════════════════════════════════
-     MODAL CONFERMA SELEZIONE
-══════════════════════════════════════════ -->
-<div class="modal-overlay" id="confirm-modal">
-  <div class="modal-box">
-    <p class="label">Conferma selezione</p>
-    <div class="modal-name" id="modal-name"></div>
-    <p class="modal-sub">
-      Sei sicuro? Questo dispositivo verrà abbinato permanentemente a questo nome.<br>
-      <span style="color:var(--accent-cody);">Non potrai cambiarlo senza chiedere a Pietro.</span>
-    </p>
-    <button class="btn-primary" id="modal-confirm-btn">✓ Sì, sono io!</button>
-    <button class="btn-ghost" onclick="closeModal()">← Torna indietro</button>
-  </div>
+<!-- SAVE BAR -->
+<div class="save-bar">
+  <button class="btn-save" id="save-btn" onclick="saveTeam()">Salva Squadra</button>
 </div>
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
-<!-- ══════════════════════════════════════════
-     FIREBASE + LOGICA
-══════════════════════════════════════════ -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, get, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getDatabase, ref, get, set, remove, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-// ── CONFIG FIREBASE ──
 const firebaseConfig = {
   apiKey: "AIzaSyCqLFQW8XQioObmxG0oDPc_MFpdFXJxmac",
   authDomain: "fantacompleanno-c64c3.firebaseapp.com",
@@ -384,7 +359,6 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
 // ── AUTOMATISMI PRE-FESTA ──
-// Assegna un punto automatico una sola volta per ospite (controlla autoEvents/{key}/{eventId})
 async function assegnaAutomatico(key, eventId, pts, desc) {
   const flagRef = ref(db, `autoEvents/${key}/${eventId}`);
   const snap = await get(flagRef);
@@ -394,303 +368,504 @@ async function assegnaAutomatico(key, eventId, pts, desc) {
   return true;
 }
 
-// ── LISTA OSPITI (da game design doc) ──
+// ── LISTA GIOCATORI ──
 const PLAYERS = [
-  { name: "Alessia Ala", cost: 175 },
-  { name: "Anna Maria Caione (madre)", cost: 150 },
-  { name: "Eleonora Tauro", cost: 90 },
-  { name: "Paolo Bello", cost: 110 },
-  { name: "Mattia Caione", cost: 70 },
-  { name: "Mirco Caione", cost: 85 },
-  { name: "Gloria Rinaldi", cost: 85 },
-  { name: "Dario Caione", cost: 95 },
-  { name: "Gabriele Mangione", cost: 100 },
-  { name: "Federica Ala", cost: 85 },
-  { name: "Simone Baldassarre", cost: 85 },
-  { name: "Desi Ala", cost: 85 },
-  { name: "Michele Nervo", cost: 65 },
-  { name: "Zia Anna", cost: 105 },
-  { name: "Francesca Terlizzi", cost: 140 },
-  { name: "Nicolas Costa", cost: 115 },
-  { name: "Giulia Trevisi", cost: 55 },
-  { name: "Andrea Sozzani", cost: 55 },
-  { name: "Emilio Pulli", cost: 110 },
-  { name: "Eleonora Bello", cost: 110 },
-  { name: "Marta Mignone", cost: 160 },
-  { name: "Giuseppe Susca", cost: 160 },
-  { name: "Annachiara Maci", cost: 85 },
-  { name: "Davide Secci", cost: 50 },
-  { name: "Antonio Borelli", cost: 130 },
-  { name: "Marika Giagnotti", cost: 90 },
-  { name: "Danilo Schiavone", cost: 175 },
-  { name: "Ilaria Tenore", cost: 90 },
-  { name: "Donato Stragapede", cost: 115 },
-  { name: "Emily Giancane", cost: 80 },
-  { name: "Martina Poso", cost: 115 },
-  { name: "Maycols Sirsi", cost: 125 },
-  { name: "Laura Capodieci", cost: 95 },
-  { name: "Davide Attanasio", cost: 135 },
-  { name: "Manuel Palma", cost: 180 },
-  { name: "Carlotta D'aversa", cost: 95 },
-  { name: "Nicolò Spada", cost: 120 },
-  { name: "Antonella Lo vecchio", cost: 50 },
-  { name: "Beatrice Gloria", cost: 80 },
-  { name: "Mariacarla Spagnolo", cost: 45 },
-  { name: "Mattia Martina", cost: 80 },
-  { name: "Andrea Scozzi", cost: 90 },
-  { name: "Annalisa Ancora", cost: 105 },
-  { name: "Roberto Sciurti", cost: 100 },
-  { name: "Nicolò Maci", cost: 85 },
-  { name: "Silvia Lamusta", cost: 50 },
-  { name: "Alessio Maci", cost: 85 },
-  { name: "Rachele Ponzetta", cost: 50 },
-  { name: "Erminio Foti", cost: 165 },
-  { name: "Sara Colletta", cost: 50 },
-  { name: "Luca Grasso", cost: 85 },
-  { name: "Annalisa Maci", cost: 50 },
-  { name: "Alessio Caretto", cost: 85 },
-  { name: "Silvia Maci", cost: 50 },
-  { name: "Errico Del monte", cost: 85 },
-  { name: "Chiara Del Vecchio", cost: 50 },
-  { name: "Daniele Padula", cost: 80 },
-  { name: "Davide Mogavero", cost: 160 },
-  { name: "Marialuce Serra", cost: 85 },
-  { name: "Francesco Romano", cost: 85 },
-  { name: "Mariachiara Longo", cost: 50 },
-  { name: "Alberto Bianco", cost: 100 },
-  { name: "Martina Schiavone", cost: 85 },
-  { name: "Luca Invidia", cost: 80 },
-  { name: "Marika Piconese", cost: 50 },
-  { name: "Stefanuccio", cost: 130 },
-  { name: "Andrea De Matteis", cost: 70 },
-  { name: "Lorenzo Taffone", cost: 70 },
+  { name: "Alessia Ala", cost: 175, tags: ["affetto", "first-lady"] },
+  { name: "Anna Maria Caione (madre)", cost: 150, tags: ["affetto", "over55", "maternita"] },
+  { name: "Eleonora Tauro", cost: 90, tags: ["affetto", "coppia"] },
+  { name: "Paolo Bello", cost: 110, tags: ["affetto", "coppia"] },
+  { name: "Mattia Caione", cost: 70, tags: ["affetto", "remoto"] },
+  { name: "Mirco Caione", cost: 85, tags: ["affetto", "coppia"] },
+  { name: "Gloria Rinaldi", cost: 85, tags: ["affetto", "coppia"] },
+  { name: "Dario Caione", cost: 95, tags: ["affetto", "coppia"] },
+  { name: "Gabriele Mangione", cost: 100, tags: ["affetto", "coppia"] },
+  { name: "Federica Ala", cost: 85, tags: ["affetto", "maternita"] },
+  { name: "Simone Baldassarre", cost: 85, tags: ["affetto", "paternita"] },
+  { name: "Desi Ala", cost: 85, tags: ["affetto", "maternita", "coppia"] },
+  { name: "Michele Nervo", cost: 65, tags: ["affetto", "paternita", "coppia"] },
+  { name: "Zia Anna", cost: 105, tags: ["affetto", "maternita"] },
+  { name: "Francesca Terlizzi", cost: 140, tags: ["coppia", "bonus"] },
+  { name: "Nicolas Costa", cost: 115, tags: ["coppia", "bonus"] },
+  { name: "Giulia Trevisi", cost: 55, tags: ["remoto", "coppia"] },
+  { name: "Andrea Sozzani", cost: 55, tags: ["remoto", "coppia"] },
+  { name: "Emilio Pulli", cost: 110, tags: ["coppia"] },
+  { name: "Eleonora Bello", cost: 110, tags: ["coppia"] },
+  { name: "Marta Mignone", cost: 160, tags: ["coppia", "bonus"] },
+  { name: "Giuseppe Susca", cost: 160, tags: ["coppia", "bonus"] },
+  { name: "Annachiara Maci", cost: 85, tags: ["coppia"] },
+  { name: "Davide Secci", cost: 50, tags: ["coppia"] },
+  { name: "Antonio Borelli", cost: 130, tags: ["coppia", "bonus"] },
+  { name: "Marika Giagnotti", cost: 90, tags: ["coppia"] },
+  { name: "Danilo Schiavone", cost: 175, tags: ["coppia", "bonus"] },
+  { name: "Ilaria Tenore", cost: 90, tags: ["coppia"] },
+  { name: "Donato Stragapede", cost: 115, tags: ["coppia"] },
+  { name: "Emily Giancane", cost: 80, tags: ["coppia"] },
+  { name: "Martina Poso", cost: 115, tags: ["coppia", "bonus"] },
+  { name: "Maycols Sirsi", cost: 125, tags: ["coppia", "bonus"] },
+  { name: "Laura Capodieci", cost: 95, tags: ["coppia"] },
+  { name: "Davide Attanasio", cost: 135, tags: ["coppia", "bonus"] },
+  { name: "Manuel Palma", cost: 180, tags: ["coppia", "bonus"] },
+  { name: "Carlotta D'aversa", cost: 95, tags: ["coppia"] },
+  { name: "Nicolò Spada", cost: 120, tags: ["coppia", "bonus"] },
+  { name: "Antonella Lo vecchio", cost: 50, tags: ["coppia"] },
+  { name: "Beatrice Gloria", cost: 80, tags: ["maternita"] },
+  { name: "Mariacarla Spagnolo", cost: 45, tags: ["remoto","coppia"] },
+  { name: "Mattia Martina", cost: 80, tags: [] },
+  { name: "Andrea Scozzi", cost: 90, tags: ["coppia"] },
+  { name: "Annalisa Ancora", cost: 105, tags: ["coppia"] },
+  { name: "Roberto Sciurti", cost: 100, tags: [] },
+  { name: "Nicolò Maci", cost: 85, tags: ["coppia"] },
+  { name: "Silvia Lamusta", cost: 50, tags: ["coppia"] },
+  { name: "Alessio Maci", cost: 85, tags: ["coppia"] },
+  { name: "Rachele Ponzetta", cost: 50, tags: ["coppia"] },
+  { name: "Erminio Foti", cost: 165, tags: ["coppia", "bonus"] },
+  { name: "Sara Colletta", cost: 50, tags: ["coppia"] },
+  { name: "Luca Grasso", cost: 85, tags: ["coppia"] },
+  { name: "Annalisa Maci", cost: 50, tags: ["coppia"] },
+  { name: "Alessio Caretto", cost: 85, tags: ["coppia"] },
+  { name: "Silvia Maci", cost: 50, tags: ["coppia"] },
+  { name: "Errico Del monte", cost: 85, tags: ["coppia"] },
+  { name: "Chiara Del Vecchio", cost: 50, tags: ["coppia"] },
+  { name: "Daniele Padula", cost: 80, tags: [] },
+  { name: "Davide Mogavero", cost: 160, tags: ["coppia", "bonus"] },
+  { name: "Marialuce Serra", cost: 85, tags: ["coppia"] },
+  { name: "Francesco Romano", cost: 85, tags: ["coppia"] },
+  { name: "Mariachiara Longo", cost: 50, tags: ["coppia"] },
+  { name: "Alberto Bianco", cost: 100, tags: ["coppia"] },
+  { name: "Martina Schiavone", cost: 85, tags: ["coppia"] },
+  { name: "Luca Invidia", cost: 80, tags: ["coppia"] },
+  { name: "Marika Piconese", cost: 50, tags: ["coppia"] },
+  { name: "Stefanuccio", cost: 130, tags: ["bonus"] },
+  { name: "Andrea De Matteis", cost: 70, tags: [] },
+  { name: "Lorenzo Taffone", cost: 70, tags: ["coppia"] },
 ];
 
-// ── ADMIN KEY ──
-const ADMIN_KEY = "30cody30syria";
+const BUDGET = 500;
+const MAX_PLAYERS = 5;
 
 // ── STATO ──
-let myCode = null;
-let myName = null;
-let linkedPlayers = {}; // { playerName: deviceCode }
-let selectedPlayer = null;
-
-// ── GENERA / RECUPERA CODICE ──
-function getOrCreateCode() {
-  let code = localStorage.getItem("fc_device_code");
-  if (!code) {
-    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-    code = Array.from({length: 6}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
-    localStorage.setItem("fc_device_code", code);
-  }
-  return code;
-}
+let myName = localStorage.getItem("fc_player_name");
+let myTeam = []; // array di { name, cost, tags }
+let myCaptain = null; // nome del capitano
+let myTeamName = "";
+let allTeams = {}; // { playerName: { teamName, roster, captain } }
 
 // ── INIT ──
 async function init() {
-  myCode = getOrCreateCode();
-
-  // Controlla se admin
-  const params = new URLSearchParams(window.location.search);
-  if (params.get("key") === ADMIN_KEY) {
-    showScreen('screen-admin');
-    initAdmin();
+  if (!myName) {
+    window.location.href = "register.html";
     return;
   }
 
-  // Carica tutti gli abbinamenti da Firebase
-  const snap = await get(ref(db, "registrations"));
+  document.getElementById("nav-player-name").textContent = myName;
+
+  // Carica team salvato
+  const snap = await get(ref(db, `teams/${sanitize(myName)}`));
   if (snap.exists()) {
-    linkedPlayers = snap.val();
+    const saved = snap.val();
+    myTeamName = saved.teamName || "";
+    myCaptain = saved.captain || null;
+    myTeam = (saved.roster || []).map(n => PLAYERS.find(p => p.name === n)).filter(Boolean);
+    document.getElementById("team-name-input").value = myTeamName;
   }
 
-  // 1. Controlla se questo CODICE DISPOSITIVO è abbinato su Firebase
-  const alreadyLinked = Object.entries(linkedPlayers).find(([name, code]) => code === myCode);
-  if (alreadyLinked) {
-    // Dispositivo riconosciuto → aggiorna localStorage e vai a home
-    myName = alreadyLinked[0];
-    localStorage.setItem("fc_player_name", myName);
-    if (localStorage.getItem("fc_tutorial_done") === "1") {
-      window.location.replace("home.html");
-    } else {
-      window.location.replace("tutorial.html");
-    }
-    return;
-  }
+  renderSquad();
+  renderPlayerList();
+  updateBudget();
 
-  // 2. Controlla se c'è un nome in localStorage ma NON corrisponde più a Firebase
-  const savedName = localStorage.getItem("fc_player_name");
-  if (savedName) {
-    // Pulisci localStorage — era stato scollegato dall'admin
-    localStorage.removeItem("fc_player_name");
-  }
+  // Ascolta tutte le squadre in tempo reale
+  onValue(ref(db, "teams"), (snap) => {
+    allTeams = snap.exists() ? snap.val() : {};
+    renderOtherTeams();
+  });
 
-  // 3. Nessun abbinamento → mostra welcome, scegli nome
-  document.getElementById("welcome-code").textContent = myCode;
-  showScreen('screen-welcome');
+  // Aggiorna nome squadra live
+  document.getElementById("team-name-input").addEventListener("input", (e) => {
+    myTeamName = e.target.value;
+  });
 }
 
-// ── FILTRA LISTA GIOCATORI ──
-window.filterPlayers = function() {
-  const q = document.getElementById("search-input").value.toLowerCase();
-  renderPlayerList(q);
-};
+// ── BUDGET ──
+function getSpent() { return myTeam.reduce((s, p) => s + p.cost, 0); }
+function getRemaining() { return BUDGET - getSpent(); }
 
-function renderPlayerList(filter = "") {
-  const list = document.getElementById("player-list");
-  list.innerHTML = "";
+// ── CAT.2: COPPIE (per "Love is in the Air") ──
+const COPPIE = [
+  ["Eleonora Tauro", "Paolo Bello"],
+  ["Mirco Caione", "Gloria Rinaldi"],
+  ["Dario Caione", "Gabriele Mangione"],
+  ["Desi Ala", "Michele Nervo"],
+  ["Francesca Terlizzi", "Nicolas Costa"],
+  ["Giulia Trevisi", "Andrea Sozzani"],
+  ["Emilio Pulli", "Eleonora Bello"],
+  ["Marta Mignone", "Giuseppe Susca"],
+  ["Annachiara Maci", "Davide Secci"],
+  ["Antonio Borelli", "Marika Giagnotti"],
+  ["Danilo Schiavone", "Ilaria Tenore"],
+  ["Donato Stragapede", "Emily Giancane"],
+  ["Martina Poso", "Maycols Sirsi"],
+  ["Laura Capodieci", "Davide Attanasio"],
+  ["Manuel Palma", "Carlotta D'aversa"],
+  ["Nicolò Spada", "Antonella Lo vecchio"],
+  ["Andrea Scozzi", "Annalisa Ancora"],
+  ["Nicolò Maci", "Silvia Lamusta"],
+  ["Alessio Maci", "Rachele Ponzetta"],
+  ["Erminio Foti", "Sara Colletta"],
+  ["Luca Grasso", "Annalisa Maci"],
+  ["Alessio Caretto", "Silvia Maci"],
+  ["Errico Del monte", "Chiara Del Vecchio"],
+  ["Davide Mogavero", "Marialuce Serra"],
+  ["Francesco Romano", "Mariachiara Longo"],
+  ["Alberto Bianco", "Martina Schiavone"],
+  ["Luca Invidia", "Marika Piconese"],
+  ["Mariacarla Spagnolo", "Lorenzo Taffone"],
+];
 
-  const filtered = PLAYERS.filter(p => p.name.toLowerCase().includes(filter));
+// ── CAT.2: CALCOLO BONUS DRAFT ──
+// Ritorna un array di { id, pts, desc } per i bonus applicabili al roster attuale.
+// Tutti gli id NON applicabili vengono rimossi da Firebase (vedi saveTeam) per
+// gestire correttamente le modifiche di squadra dopo un salvataggio precedente.
+function calcolaCat2(roster, captainName) {
+  const results = [];
+  const spent = roster.reduce((s, p) => s + p.cost, 0);
+  const names = roster.map(p => p.name);
+  const hasTag = (tag) => roster.find(p => (p.tags || []).includes(tag));
 
-  if (filtered.length === 0) {
-    list.innerHTML = '<div class="no-results">Nessun ospite trovato 🤔</div>';
-    return;
+  // +10 Divisione del budget perfetta — spende esattamente 500
+  if (spent === BUDGET) {
+    results.push({ id: "b_cat2_budget_perfetto", pts: 10, desc: "Divisione del budget perfetta (500/500 Capelli)" });
   }
 
-  filtered.forEach(player => {
-    const isTaken = linkedPlayers[player.name] && linkedPlayers[player.name] !== myCode;
+  // +10 Pupilli — tutti i capelli spesi, squadra incompleta (<5)
+  if (spent === BUDGET && roster.length < MAX_PLAYERS) {
+    results.push({ id: "b_cat2_pupilli", pts: 10, desc: "Pupilli — 500 Capelli spesi con squadra incompleta" });
+  }
+
+  // +20 (x2 cap) Bonus Maternità
+  { const p = hasTag("maternita");
+    if (p) results.push({ id: "b_cat2_maternita", pts: p.name === captainName ? 40 : 20, desc: `Bonus Maternità — ${p.name} in squadra${p.name === captainName ? " (capitano, x2)" : ""}` });
+  }
+
+  // +20 (x2 cap) Bonus Paternità
+  { const p = hasTag("paternita");
+    if (p) results.push({ id: "b_cat2_paternita", pts: p.name === captainName ? 40 : 20, desc: `Bonus Paternità — ${p.name} in squadra${p.name === captainName ? " (capitano, x2)" : ""}` });
+  }
+
+  // +25 (x2 cap) Bonus Affetto Stabile
+  { const p = hasTag("affetto");
+    if (p) results.push({ id: "b_cat2_affetto", pts: p.name === captainName ? 50 : 25, desc: `Bonus Affetto Stabile — ${p.name} in squadra${p.name === captainName ? " (capitano, x2)" : ""}` });
+  }
+
+  // +50 (x2 cap) Smartworking
+  { const p = hasTag("remoto");
+    if (p) results.push({ id: "b_cat2_smartworking", pts: p.name === captainName ? 100 : 50, desc: `Smartworking — ${p.name} (gioca da remoto)${p.name === captainName ? " (capitano, x2)" : ""}` });
+  }
+
+  // +30 (x2 cap) Love is in the Air — entrambi i partner di una coppia, per ogni coppia completa
+  COPPIE.forEach(([a, b], i) => {
+    if (names.includes(a) && names.includes(b)) {
+      const isCapInCoppia = captainName === a || captainName === b;
+      results.push({ id: `b_cat2_love_${i}`, pts: isCapInCoppia ? 60 : 30, desc: `Love is in the Air — ${a} & ${b} insieme in squadra${isCapInCoppia ? " (capitano, x2)" : ""}` });
+    }
+  });
+
+  // +30 Capellone Underdog — meno della metà del budget, squadra da 5
+  if (spent < BUDGET / 2 && roster.length === MAX_PLAYERS) {
+    results.push({ id: "b_cat2_underdog", pts: 30, desc: `Capellone Underdog — squadra da 5 con solo ${spent}/${BUDGET} Capelli spesi` });
+  }
+
+  // +30 Bonus Stefanuccio
+  if (hasTag("bonus")) {
+    results.push({ id: "b_cat2_stefanuccio", pts: 30, desc: "Bonus Stefanuccio — Stefanuccio in squadra" });
+  }
+
+  // +50 First Lady — Alessia Ala capitana
+  if (captainName === "Alessia Ala") {
+    results.push({ id: "b_cat2_firstlady", pts: 50, desc: "First Lady — Alessia Ala è capitana" });
+  }
+
+  return results;
+}
+
+// Tutti i possibili id Cat.2 (per sapere quali rimuovere se non più applicabili)
+const CAT2_ALL_IDS = [
+  "b_cat2_budget_perfetto", "b_cat2_pupilli", "b_cat2_maternita", "b_cat2_paternita",
+  "b_cat2_affetto", "b_cat2_smartworking", "b_cat2_underdog", "b_cat2_stefanuccio", "b_cat2_firstlady",
+  ...COPPIE.map((_, i) => `b_cat2_love_${i}`)
+];
+
+// Ricalcola e riscrive i bonus Cat.2 su Firebase, rimuovendo quelli non più validi
+async function aggiornaCat2(roster, captainName) {
+  const key = sanitize(myName);
+  const applicabili = calcolaCat2(roster, captainName);
+  const idsApplicabili = new Set(applicabili.map(r => r.id));
+
+  for (const r of applicabili) {
+    await set(ref(db, `punti/${key}/${r.id}`), { pts: r.pts, desc: r.desc, ts: Date.now() });
+  }
+  for (const id of CAT2_ALL_IDS) {
+    if (!idsApplicabili.has(id)) {
+      await remove(ref(db, `punti/${key}/${id}`)).catch(() => {});
+    }
+  }
+}
+
+function updateBudget() {
+  const rem = getRemaining();
+  const pct = Math.max(0, Math.min(100, (rem / BUDGET) * 100));
+  const el = document.getElementById("budget-display");
+  const bar = document.getElementById("budget-bar-fill");
+
+  el.textContent = rem + " ✂️";
+  el.className = "budget-amount " + (rem < 0 ? "over" : rem < 100 ? "warn" : "ok");
+  bar.style.width = pct + "%";
+  bar.style.background = rem < 0 ? "var(--red)" : rem < 100 ? "var(--gold)" : "var(--green)";
+
+  // Status chips
+  const row = document.getElementById("budget-status-row");
+  row.innerHTML = `
+    <div class="status-chip ${rem >= 0 ? 'ok' : 'warn'}">
+      <span class="snum">${getSpent()}</span>
+      <span>Spesi</span>
+    </div>
+    <div class="status-chip info">
+      <span class="snum">${myTeam.length}/${MAX_PLAYERS}</span>
+      <span>Giocatori</span>
+    </div>
+    <div class="status-chip ${myCaptain ? 'ok' : 'warn'}">
+      <span class="snum">${myCaptain ? '⭐' : '—'}</span>
+      <span>Capitano</span>
+    </div>
+  `;
+
+  // Bottone salva
+  const canSave = myTeam.length >= 1;
+  document.getElementById("save-btn").disabled = !canSave;
+  document.getElementById("save-btn").textContent = canSave
+    ? "✓ Salva Squadra (" + myTeam.length + "/5)"
+    : "Aggiungi almeno 1 giocatore";
+}
+
+// ── ROSA (TAB MIA SQUADRA) ──
+function renderSquad() {
+  const container = document.getElementById("squad-slots");
+  container.innerHTML = "";
+
+  // Label aggiornata
+  document.querySelector("#content-mia-squadra .section-label:last-of-type").textContent =
+    `Rosa (${myTeam.length}/${MAX_PLAYERS}) — tocca un giocatore per rimuoverlo · tocca ⭐ per il capitano`;
+
+  for (let i = 0; i < MAX_PLAYERS; i++) {
+    const player = myTeam[i];
     const div = document.createElement("div");
-    div.className = "player-item" + (isTaken ? " taken" : "");
-    div.innerHTML = `
-      <div>
-        <div class="player-name">${player.name}</div>
-        <div class="player-meta">✂️ ${player.cost} Capelli</div>
-      </div>
-      ${isTaken
-        ? '<span class="taken-badge">già abbinato</span>'
-        : '<span class="player-cost">Seleziona →</span>'
-      }
-    `;
-    if (!isTaken) {
-      div.onclick = () => openModal(player.name);
+    const isCap = player && player.name === myCaptain;
+    div.className = "squad-slot " + (player ? (isCap ? "captain-slot" : "filled") : "");
+
+    if (player) {
+      div.innerHTML = `
+        <div class="slot-num">${isCap ? "⭐" : (i + 1)}</div>
+        <div class="slot-info">
+          <div class="slot-name">${player.name}</div>
+          <div class="slot-cost">${player.cost} ✂️ ${isCap ? '<span style="color:var(--gold);font-size:11px;">CAPITANO x2</span>' : ''}</div>
+        </div>
+        <button class="btn-set-cap ${isCap ? 'is-cap' : ''}" onclick="toggleCaptain('${player.name}')">
+          ${isCap ? "⭐ Cap" : "⭐ Cap?"}
+        </button>
+        <button class="btn-remove" onclick="removePlayer('${player.name}')">✕</button>
+      `;
+    } else {
+      div.innerHTML = `
+        <div class="slot-num">${i + 1}</div>
+        <div class="slot-info"><div class="slot-empty">Slot libero — vai su Giocatori</div></div>
+      `;
     }
-    list.appendChild(div);
-  });
-}
-
-// ── MODAL CONFERMA ──
-window.openModal = function(name) {
-  selectedPlayer = name;
-  document.getElementById("modal-name").textContent = name;
-  document.getElementById("modal-confirm-btn").onclick = () => confirmSelection(name);
-  document.getElementById("confirm-modal").classList.add("open");
-};
-
-window.closeModal = function() {
-  document.getElementById("confirm-modal").classList.remove("open");
-  selectedPlayer = null;
-};
-
-async function confirmSelection(name) {
-  closeModal();
-
-  // Salva su Firebase
-  await set(ref(db, `registrations/${name.replace(/[.#$[\]]/g, '_')}`), myCode);
-
-  // Salva su localStorage
-  localStorage.setItem("fc_player_name", name);
-  myName = name;
-
-  // ── AUTOMATISMI CAT.1 ──
-  const key = name.replace(/[.#$[\]]/g, '_');
-  await assegnaAutomatico(key, "b_registrazione", 5, "Accede al sito e si abbina al nome");
-
-  // Quiz mistero location: legge l'esito salvato da quiz.html prima della registrazione
-  const quizSolved = localStorage.getItem("fc_quiz_solved");
-  if (quizSolved === "true") {
-    await assegnaAutomatico(key, "b_quiz_location", 30, "Risolve il mistero location");
-  } else if (quizSolved === "false") {
-    await assegnaAutomatico(key, "m_quiz_location", -30, "Non risolve il mistero location");
+    container.appendChild(div);
   }
-  // Se quizSolved è null (quiz.html non ha ancora salvato nulla), non si assegna né bonus né malus qui:
-  // ci penserà il batch admin "Applica malus pre-festa" a fine draft.
-
-  showToast(`✓ Benvenuto/a, ${name}!`);
-
-  setTimeout(() => {
-    window.location.replace("tutorial.html");
-  }, 1200);
+  updateBudget();
 }
 
-// ── ADMIN ──
-function initAdmin() {
-  const dbRef = ref(db, "registrations");
-  onValue(dbRef, (snap) => {
-    linkedPlayers = snap.exists() ? snap.val() : {};
-    renderAdminList();
-    updateStats();
-  });
-}
+// ── LISTA GIOCATORI (TAB GIOCATORI) ──
+window.renderPlayerList = function() {
+  const q = (document.getElementById("player-search").value || "").toLowerCase();
+  const grid = document.getElementById("player-grid");
+  grid.innerHTML = "";
 
-function renderAdminList(filter = "") {
-  const list = document.getElementById("admin-list");
-  list.innerHTML = "";
+  const isFull = myTeam.length >= MAX_PLAYERS;
 
-  const filtered = PLAYERS.filter(p => p.name.toLowerCase().includes(filter.toLowerCase()));
+  [...PLAYERS].sort((a,b) => b.cost - a.cost)
+    .filter(p => p.name.toLowerCase().includes(q))
+    .forEach(player => {
+      const isSelected = myTeam.some(t => t.name === player.name);
+      const isCap = player.name === myCaptain;
+      const cantAfford = !isSelected && getRemaining() < player.cost;
+      const isDisabled = cantAfford;
 
-  filtered.forEach(player => {
-    const key = player.name.replace(/[.#$[\]]/g, '_');
-    const code = linkedPlayers[key] || null;
-    const isLinked = !!code;
+      const div = document.createElement("div");
+      div.className = "player-card " +
+        (isCap ? "captain" : isSelected ? "selected" : "") +
+        (isDisabled ? " full" : "");
 
-    const row = document.createElement("div");
-    row.className = "admin-player-row" + (isLinked ? " linked" : "");
-    row.innerHTML = `
-      <div class="admin-info">
-        <div class="admin-name">${player.name}</div>
-        <div class="admin-code ${code ? '' : 'none'}">${code ? `🔑 ${code}` : '— non abbinato'}</div>
-      </div>
-      ${isLinked
-        ? `<button class="btn-unlink" onclick="unlinkPlayer('${player.name}')">Scollega</button>`
-        : ''
+      const initials = player.name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
+
+      const tagHtml = "";
+
+      div.innerHTML = `
+        <div class="player-avatar">${isSelected ? (isCap ? "⭐" : "✓") : initials}</div>
+        <div class="player-info">
+          <div class="player-name">${player.name}</div>
+        </div>
+        <div class="player-right">
+          <div class="player-cost">${player.cost}</div>
+          <div class="player-cost-label">✂️ Capelli</div>
+          ${isCap ? '<div class="cap-badge">⭐ Capitano</div>' : ""}
+        </div>
+      `;
+
+      if (!isDisabled) {
+        div.onclick = () => togglePlayer(player);
       }
+      grid.appendChild(div);
+    });
+};
+
+// ── ALTRE SQUADRE ──
+function renderOtherTeams() {
+  const container = document.getElementById("other-teams-list");
+  container.innerHTML = "";
+
+  const entries = Object.entries(allTeams).filter(([owner]) => owner !== sanitize(myName));
+
+  if (entries.length === 0) {
+    container.innerHTML = `<div class="empty-state"><span class="empty-emoji">👀</span>Nessuna squadra ancora.<br>Sii il primo!</div>`;
+    return;
+  }
+
+  entries.forEach(([ownerKey, team]) => {
+    const div = document.createElement("div");
+    div.className = "other-team-card";
+    const rosterHtml = (team.roster || []).map(name => `
+      <div class="other-player-row">
+        <span>${name === team.captain ? "⭐ " : ""}${name}</span>
+        ${name === team.captain ? '<span class="other-player-cap">CAPITANO</span>' : ""}
+      </div>
+    `).join("");
+
+    div.innerHTML = `
+      <div class="other-team-header">
+        <div>
+          <div class="other-team-name">${team.teamName || "Squadra senza nome"}</div>
+          <div class="other-team-owner">di ${ownerKey.replace(/_/g, " ")}</div>
+        </div>
+        <div class="other-team-count">${(team.roster || []).length}/${MAX_PLAYERS}</div>
+      </div>
+      ${rosterHtml}
     `;
-    list.appendChild(row);
+    container.appendChild(div);
   });
 }
 
-window.filterAdmin = function() {
-  const q = document.getElementById("admin-search-input").value;
-  renderAdminList(q);
+// ── AZIONI ──
+window.togglePlayer = function(player) {
+  const idx = myTeam.findIndex(t => t.name === player.name);
+  if (idx >= 0) {
+    removePlayer(player.name);
+  } else {
+    if (myTeam.length >= MAX_PLAYERS) { showToast("Hai già 5 giocatori — rimuovine uno per cambiare.", "warn"); return; }
+    if (getRemaining() < player.cost) { showToast("Budget insufficiente! ✂️", "error"); return; }
+    myTeam.push(player);
+    showToast(`+ ${player.name} aggiunto`);
+    renderSquad();
+    renderPlayerList();
+  }
 };
 
-window.unlinkPlayer = async function(name) {
-  if (!confirm(`Scollegare ${name}? Il giocatore dovrà riselezionare il nome.`)) return;
-  const key = name.replace(/[.#$[\]]/g, '_');
-  await remove(ref(db, `registrations/${key}`));
-  showToast(`✓ ${name} scollegato`);
+window.removePlayer = function(name) {
+  myTeam = myTeam.filter(p => p.name !== name);
+  if (myCaptain === name) myCaptain = null;
+  renderSquad();
+  renderPlayerList();
 };
 
-function updateStats() {
-  const linked = Object.keys(linkedPlayers).length;
-  const total = PLAYERS.length;
-  document.getElementById("stat-linked").textContent = linked;
-  document.getElementById("stat-waiting").textContent = total - linked;
-  document.getElementById("stat-total").textContent = total;
-}
+window.toggleCaptain = function(name) {
+  myCaptain = (myCaptain === name) ? null : name;
+  renderSquad();
+  renderPlayerList();
+  showToast(myCaptain === name ? `⭐ ${name} è il capitano!` : "Capitano rimosso");
+};
+
+window.saveTeam = async function() {
+  if (myTeam.length === 0) { showToast("Aggiungi almeno 1 giocatore!", "error"); return; }
+  const btn = document.getElementById("save-btn");
+  btn.textContent = "Salvataggio...";
+  btn.disabled = true;
+
+  await set(ref(db, `teams/${sanitize(myName)}`), {
+    teamName: myTeamName || "Squadra di " + myName,
+    roster: myTeam.map(p => p.name),
+    captain: myCaptain || myTeam[0].name,
+    owner: myName,
+    savedAt: Date.now()
+  });
+
+  // ── AUTOMATISMO CAT.1: +10 prima volta che si crea la squadra ──
+  await assegnaAutomatico(sanitize(myName), "b_squadra_creata", 10, "Crea la sua squadra (draft)");
+
+  // ── AUTOMATISMI CAT.2: ricalcola tutti i bonus draft in base al roster attuale ──
+  await aggiornaCat2(myTeam, myCaptain || myTeam[0].name);
+
+  showToast("✓ Squadra salvata!");
+  btn.disabled = false;
+  updateBudget();
+};
+
+// ── TABS ──
+window.switchTab = function(tab) {
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  document.querySelectorAll(".tab-content").forEach(t => t.classList.remove("active"));
+  document.getElementById("tab-" + tab).classList.add("active");
+  document.getElementById("content-" + tab).classList.add("active");
+  if (tab === "giocatori") renderPlayerList();
+  if (tab === "altre-squadre") renderOtherTeams();
+};
 
 // ── UTILS ──
-window.showScreen = function(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  window.scrollTo(0, 0);
-  if (id === 'screen-register') renderPlayerList();
-};
+function sanitize(str) { return str.replace(/[.#$[\]]/g, "_"); }
 
-window.goToGame = function() {
-  // In futuro: redirect a dashboard.html
-  showToast("🚧 Il gioco completo è in arrivo!");
-};
-
-function showToast(msg, isError = false) {
+function showToast(msg, type = "ok") {
   const t = document.getElementById("toast");
   t.textContent = msg;
-  t.className = "toast show" + (isError ? " error" : "");
-  setTimeout(() => { t.className = "toast"; }, 3000);
+  t.className = "toast show" + (type === "error" ? " error" : type === "warn" ? " warn" : "");
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(() => { t.className = "toast"; }, 2500);
 }
 
-// ── START ──
 init();
 </script>
+<a href="regolamento.html" class="fab-regolamento" title="Regolamento">📖</a>
+
+<!-- BOTTOM NAV BAR -->
+<div class="bottom-nav">
+  <a href="classifica.html" class="nav-item" data-page="classifica">
+    <span class="nav-icon">📊</span>
+    <span class="nav-label">Classifica</span>
+  </a>
+  <a href="alleanze.html" class="nav-item" data-page="alleanze">
+    <span class="nav-icon">🤝</span>
+    <span class="nav-label">Alleanze</span>
+  </a>
+  <a href="home.html" class="nav-item nav-item-center" data-page="home">
+    <span class="nav-icon">🏠</span>
+    <span class="nav-label">Home</span>
+  </a>
+  <a href="squadra.html" class="nav-item active" data-page="squadra">
+    <span class="nav-icon">✂️</span>
+    <span class="nav-label">Squadra</span>
+  </a>
+  <a href="profilo.html" class="nav-item" data-page="profilo">
+    <span class="nav-icon">👤</span>
+    <span class="nav-label">Profilo</span>
+  </a>
+</div>
+
 </body>
 </html>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FantaCompleanno — Il Mio Profilo</title>
+<title>FantaCompleanno — Accedi al Gioco</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700;800&family=Space+Mono:wght@400;700&display=swap');
 
@@ -11,329 +11,365 @@
   --bg: #0a0a0f; --surface: #13131a; --border: #1e1e2e;
   --accent-cody: #ff6b2b; --accent-siria: #a855f7;
   --text: #f0f0f5; --text-muted: #6b6b8a;
-  --green: #22c55e; --red: #ef4444; --gold: #f59e0b;
+  --green: #22c55e; --red: #ef4444;
 }
+
 * { margin: 0; padding: 0; box-sizing: border-box; }
+
 body {
   font-family: 'Space Grotesk', sans-serif;
   background: var(--bg); color: var(--text);
-  min-height: 100vh; padding-bottom: 40px;
+  min-height: 100vh; display: flex; align-items: center;
+  justify-content: center; padding: 20px; overflow-x: hidden;
 }
 
-/* ── NAV ── */
-.nav {
-  position: sticky; top: 0; z-index: 50;
-  background: rgba(10,10,15,0.97); backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border);
-  padding: 12px 20px; display: flex; align-items: center; justify-content: space-between;
+.screen { display: none; width: 100%; max-width: 480px; animation: fadeIn .4s ease; }
+.screen.active { display: block; }
+
+@keyframes fadeIn { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+
+/* ── TYPOGRAPHY ── */
+.label {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px; color: var(--text-muted);
+  letter-spacing: .15em; text-transform: uppercase; margin-bottom: 8px;
 }
-.nav-label { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--text-muted); letter-spacing:.1em; }
-.nav-name { font-size: 16px; font-weight: 800; }
-.btn-home {
+.headline { font-size: 22px; font-weight: 800; line-height: 1.25; margin-bottom: 8px; }
+.subline { font-size: 14px; color: var(--text-muted); line-height: 1.5; margin-bottom: 28px; }
+.cody { color: var(--accent-cody); }
+.siria { color: var(--accent-siria); }
+
+/* ── CARD ── */
+.card {
   background: var(--surface); border: 1.5px solid var(--border);
-  color: var(--text-muted); padding: 8px 14px; border-radius: 10px;
-  font-family: 'Space Grotesk', sans-serif; font-size: 13px; cursor: pointer;
+  border-radius: 14px; padding: 20px; margin-bottom: 14px;
 }
 
-/* ── HERO ── */
-.hero {
-  padding: 24px 20px 0;
+/* ── CODE BADGE ── */
+.code-badge {
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(168,85,247,0.08); border: 1.5px solid rgba(168,85,247,0.3);
+  border-radius: 10px; padding: 14px 16px; margin-bottom: 20px;
 }
-.hero-top {
-  display: flex; align-items: center; gap: 16px; margin-bottom: 20px;
-}
-.avatar {
-  width: 64px; height: 64px; border-radius: 16px;
-  background: linear-gradient(135deg, var(--accent-cody), var(--accent-siria));
-  display: flex; align-items: center; justify-content: center;
-  font-size: 26px; font-weight: 800; font-family: 'Space Mono', monospace;
-  color: white; flex-shrink: 0;
-}
-.hero-info { flex: 1; }
-.hero-name { font-size: 22px; font-weight: 800; line-height: 1.1; }
-.hero-team { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+.code-badge .code-label { font-size: 11px; color: var(--text-muted); font-family: 'Space Mono', monospace; letter-spacing: .1em; }
+.code-badge .code-value { font-family: 'Space Mono', monospace; font-size: 22px; font-weight: 700; color: var(--accent-siria); letter-spacing: .15em; }
 
-/* ── PUNTI HERO ── */
-.punti-hero {
-  background: linear-gradient(135deg, #150800, #2d1200);
-  border: 1.5px solid rgba(255,107,43,0.4);
-  border-radius: 16px; padding: 20px; margin-bottom: 16px;
+/* ── SEARCH ── */
+.search-wrap { position: relative; margin-bottom: 12px; }
+.search-input {
+  width: 100%; background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 10px; padding: 14px 14px 14px 42px;
+  color: var(--text); font-family: 'Space Grotesk', sans-serif;
+  font-size: 15px; outline: none; transition: border-color .2s;
+}
+.search-input:focus { border-color: var(--accent-siria); }
+.search-input::placeholder { color: var(--text-muted); }
+.search-icon {
+  position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+  font-size: 16px; pointer-events: none;
+}
+
+/* ── PLAYER LIST ── */
+.player-list { max-height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
+.player-list::-webkit-scrollbar { width: 4px; }
+.player-list::-webkit-scrollbar-track { background: transparent; }
+.player-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+.player-item {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 10px; padding: 14px 16px;
+  cursor: pointer; transition: all .2s;
   display: flex; align-items: center; justify-content: space-between;
 }
-.punti-num {
-  font-family: 'Space Mono', monospace; font-size: 48px; font-weight: 700;
-  line-height: 1;
+.player-item:hover { border-color: var(--accent-cody); background: #1a1000; }
+.player-item.taken {
+  opacity: 0.4; cursor: not-allowed; pointer-events: none;
 }
-.punti-num.pos { color: var(--accent-cody); }
-.punti-num.neg { color: var(--red); }
-.punti-num.zero { color: var(--text-muted); }
-.punti-label { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--text-muted); letter-spacing: .1em; margin-bottom: 4px; }
-.punti-sub { font-size: 12px; color: var(--text-muted); }
-.punti-breakdown { text-align: right; }
-.punti-breakdown-row { font-family: 'Space Mono', monospace; font-size: 14px; margin-bottom: 4px; }
+.player-name { font-size: 15px; font-weight: 600; }
+.player-meta { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.player-cost {
+  font-family: 'Space Mono', monospace; font-size: 13px;
+  color: var(--accent-cody); white-space: nowrap;
+}
+.taken-badge {
+  font-family: 'Space Mono', monospace; font-size: 10px;
+  color: var(--text-muted); background: var(--border);
+  padding: 3px 8px; border-radius: 100px;
+}
+.no-results { text-align: center; padding: 24px; color: var(--text-muted); font-size: 14px; }
 
-/* ── STATS GRID ── */
-.stats-grid {
-  display: grid; grid-template-columns: 1fr 1fr 1fr;
-  gap: 8px; margin-bottom: 16px; padding: 0 20px;
+/* ── CONFIRM MODAL ── */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.8); z-index: 100;
+  align-items: flex-end; justify-content: center;
+  padding: 20px;
 }
-.stat-card {
+.modal-overlay.open { display: flex; }
+.modal-box {
   background: var(--surface); border: 1.5px solid var(--border);
-  border-radius: 12px; padding: 12px; text-align: center;
+  border-radius: 20px 20px 20px 20px; padding: 28px 24px;
+  width: 100%; max-width: 480px; animation: slideUp .3s ease;
 }
-.stat-card-num {
-  font-family: 'Space Mono', monospace; font-size: 20px; font-weight: 700;
-  display: block; margin-bottom: 3px;
-}
-.stat-card-num.gold { color: var(--gold); }
-.stat-card-num.green { color: var(--green); }
-.stat-card-num.siria { color: var(--accent-siria); }
-.stat-card-label { font-size: 10px; color: var(--text-muted); }
+@keyframes slideUp { from { transform: translateY(40px); opacity:0; } to { transform:translateY(0); opacity:1; } }
+.modal-name { font-size: 28px; font-weight: 800; margin-bottom: 6px; }
+.modal-sub { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; line-height: 1.5; }
 
-/* ── SEZIONI ── */
-.section { padding: 0 20px; margin-bottom: 20px; }
-.section-title {
+/* ── BUTTONS ── */
+.btn-primary {
+  width: 100%; background: linear-gradient(135deg, var(--accent-cody), var(--accent-siria));
+  color: white; padding: 16px; border-radius: 12px; border: none;
+  font-family: 'Space Grotesk', sans-serif; font-size: 16px; font-weight: 700;
+  cursor: pointer; transition: opacity .2s; margin-bottom: 10px;
+}
+.btn-primary:hover { opacity: .85; }
+.btn-ghost {
+  width: 100%; background: transparent; border: 1.5px solid var(--border);
+  color: var(--text-muted); padding: 14px; border-radius: 12px;
+  font-family: 'Space Grotesk', sans-serif; font-size: 14px;
+  cursor: pointer; transition: all .2s;
+}
+.btn-ghost:hover { border-color: var(--text-muted); color: var(--text); }
+
+/* ── WELCOME SCREEN ── */
+.welcome-emoji { font-size: 72px; text-align: center; display: block; margin-bottom: 20px; }
+.info-row {
+  display: flex; gap: 10px; margin-bottom: 10px;
+}
+.info-chip {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 8px; padding: 10px 14px; flex: 1;
+  font-size: 12px; text-align: center;
+}
+.info-chip .chip-icon { font-size: 20px; display: block; margin-bottom: 4px; }
+.info-chip .chip-label { color: var(--text-muted); font-size: 11px; }
+
+/* ── ADMIN SCREEN ── */
+.admin-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 32px 0 20px;
+}
+.admin-badge {
+  background: rgba(255,107,43,0.15); border: 1.5px solid var(--accent-cody);
+  color: var(--accent-cody); font-family: 'Space Mono', monospace;
+  font-size: 11px; padding: 4px 10px; border-radius: 100px;
+}
+.admin-list { display: flex; flex-direction: column; gap: 6px; max-height: 65vh; overflow-y: auto; }
+.admin-player-row {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 10px; padding: 14px 16px;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+.admin-player-row.linked { border-color: rgba(34,197,94,0.3); }
+.admin-info { flex: 1; }
+.admin-name { font-size: 14px; font-weight: 600; }
+.admin-code {
   font-family: 'Space Mono', monospace; font-size: 11px;
-  color: var(--text-muted); letter-spacing: .12em; text-transform: uppercase;
-  margin-bottom: 10px;
+  color: var(--green); margin-top: 2px;
 }
-
-/* ── SQUADRA ── */
-.squadra-header {
+.admin-code.none { color: var(--text-muted); }
+.btn-unlink {
+  background: rgba(239,68,68,0.1); border: 1.5px solid rgba(239,68,68,0.3);
+  color: var(--red); padding: 6px 12px; border-radius: 8px;
+  font-family: 'Space Mono', monospace; font-size: 11px; cursor: pointer;
+  transition: all .2s; white-space: nowrap;
+}
+.btn-unlink:hover { background: rgba(239,68,68,0.2); }
+.admin-search {
+  width: 100%; background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 10px; padding: 12px 14px;
+  color: var(--text); font-family: 'Space Grotesk', sans-serif;
+  font-size: 14px; outline: none; margin-bottom: 12px;
+  transition: border-color .2s;
+}
+.admin-search:focus { border-color: var(--accent-cody); }
+.admin-stats {
+  display: flex; gap: 10px; margin-bottom: 16px;
+}
+.stat-chip {
   background: var(--surface); border: 1.5px solid var(--border);
-  border-radius: 14px; padding: 14px 16px; margin-bottom: 8px;
+  border-radius: 8px; padding: 10px 14px; flex: 1; text-align: center;
 }
-.squadra-nome { font-size: 16px; font-weight: 800; margin-bottom: 4px; }
-.squadra-budget { font-size: 12px; color: var(--text-muted); }
+.stat-num { font-family: 'Space Mono', monospace; font-size: 20px; font-weight: 700; }
+.stat-label { font-size: 11px; color: var(--text-muted); }
+.stat-chip.ok .stat-num { color: var(--green); }
+.stat-chip.wait .stat-num { color: var(--accent-cody); }
 
-.giocatore-row {
-  background: var(--surface); border: 1.5px solid var(--border);
-  border-radius: 10px; padding: 12px 14px; margin-bottom: 6px;
-  display: flex; align-items: center; gap: 12px;
+/* ── FEEDBACK ── */
+.toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  background: var(--surface); border: 1.5px solid var(--green);
+  color: var(--green); font-family: 'Space Mono', monospace;
+  font-size: 13px; padding: 12px 20px; border-radius: 100px;
+  opacity: 0; transition: opacity .3s; pointer-events: none; white-space: nowrap;
+  z-index: 200;
 }
-.giocatore-row.capitano { border-color: var(--gold); background: rgba(245,158,11,0.05); }
-.giocatore-avatar {
-  width: 36px; height: 36px; border-radius: 8px;
-  background: var(--border); display: flex; align-items: center; justify-content: center;
-  font-size: 13px; font-weight: 800; font-family: 'Space Mono', monospace;
-  color: var(--text-muted); flex-shrink: 0;
-}
-.giocatore-row.capitano .giocatore-avatar { background: rgba(245,158,11,0.2); color: var(--gold); }
-.giocatore-info { flex: 1; }
-.giocatore-nome { font-size: 14px; font-weight: 700; }
-.giocatore-ruolo { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
-.giocatore-pts {
-  font-family: 'Space Mono', monospace; font-size: 15px; font-weight: 700; text-align: right;
-}
-.giocatore-pts.pos { color: var(--green); }
-.giocatore-pts.neg { color: var(--red); }
-.giocatore-pts.zero { color: var(--text-muted); }
-.cap-x2 { font-size: 10px; color: var(--gold); text-align: right; margin-top: 2px; font-family: 'Space Mono', monospace; }
-
-/* ── POSIZIONE ── */
-.posizione-row {
-  display: flex; gap: 8px;
-}
-.pos-card {
-  flex: 1; background: var(--surface); border: 1.5px solid var(--border);
-  border-radius: 12px; padding: 14px; text-align: center;
-}
-.pos-card.highlight { border-color: var(--accent-cody); background: rgba(255,107,43,0.05); }
-.pos-num {
-  font-family: 'Space Mono', monospace; font-size: 28px; font-weight: 700;
-  color: var(--accent-cody); display: block; margin-bottom: 4px;
-}
-.pos-label { font-size: 11px; color: var(--text-muted); }
-.pos-sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
-
-/* ── ALLEANZA ── */
-.alleanza-mini {
-  background: linear-gradient(135deg, #0d0020, #1a0035);
-  border: 1.5px solid rgba(168,85,247,0.35);
-  border-radius: 14px; padding: 16px; cursor: pointer; transition: all .2s;
-}
-.alleanza-mini:hover { border-color: var(--accent-siria); }
-.alleanza-mini-name { font-size: 16px; font-weight: 800; margin-bottom: 6px; }
-.alleanza-mini-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-.alleanza-mini-coeff { font-family: 'Space Mono', monospace; font-size: 18px; font-weight: 700; color: var(--accent-siria); }
-.alleanza-mini-pos { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--text-muted); }
-.alleanza-mini-track { width: 100%; height: 4px; background: var(--border); border-radius: 2px; }
-.alleanza-mini-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--accent-cody), var(--accent-siria)); transition: width .5s; }
-
-/* ── STORICO ── */
-.storico-item {
-  background: var(--surface); border: 1.5px solid var(--border);
-  border-radius: 10px; padding: 12px 14px; margin-bottom: 6px;
-  display: flex; align-items: center; gap: 12px;
-}
-.storico-pts {
-  font-family: 'Space Mono', monospace; font-size: 16px; font-weight: 700;
-  min-width: 52px; flex-shrink: 0;
-}
-.storico-pts.pos { color: var(--green); }
-.storico-pts.neg { color: var(--red); }
-.storico-info { flex: 1; }
-.storico-desc { font-size: 13px; font-weight: 600; }
-.storico-time { font-size: 10px; color: var(--text-muted); margin-top: 2px; font-family: 'Space Mono', monospace; }
-
-/* ── EMPTY ── */
-.empty-state { text-align: center; padding: 24px; color: var(--text-muted); font-size: 13px; }
-
-/* ── LIVE ── */
-.live-dot {
-  display: flex; align-items: center; gap: 6px;
-  font-family: 'Space Mono', monospace; font-size: 11px; color: var(--green);
-}
-.live-dot::before {
-  content:''; width:8px; height:8px; border-radius:50%;
-  background:var(--green); animation:pulse 1.5s infinite;
-}
-@keyframes pulse { 0%,100%{opacity:1}50%{opacity:.3} }
-/* ── BOTTOM NAV BAR ── */
-.bottom-nav {
-  position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
-  background: rgba(13,13,20,0.97); backdrop-filter: blur(16px);
-  border-top: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: space-around;
-  padding: 8px 4px calc(8px + env(safe-area-inset-bottom, 0px));
-}
-.nav-item {
-  display: flex; flex-direction: column; align-items: center; gap: 3px;
-  text-decoration: none; color: var(--text-muted);
-  padding: 6px 10px; border-radius: 12px; transition: all .2s;
-  flex: 1; min-width: 0;
-}
-.nav-item.active { color: var(--accent-cody); }
-.nav-icon { font-size: 20px; line-height: 1; }
-.nav-label { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: .05em; white-space: nowrap; }
-.nav-item-center {
-  position: relative; top: -10px;
-}
-.nav-item-center .nav-icon {
-  width: 46px; height: 46px; border-radius: 50%;
-  background: linear-gradient(135deg, var(--accent-cody), var(--accent-siria));
-  display: flex; align-items: center; justify-content: center;
-  font-size: 22px; box-shadow: 0 4px 16px rgba(255,107,43,0.35);
-}
-.nav-item-center.active .nav-icon { box-shadow: 0 4px 20px rgba(255,107,43,0.6); }
-.nav-item-center .nav-label { color: var(--text-muted); }
-.nav-item-center.active .nav-label { color: var(--text); }
-
-/* Spazio extra in fondo alla pagina per non sovrapporsi alla nav */
-body { padding-bottom: 90px !important; }
-
-/* ── FAB REGOLAMENTO ── */
-.fab-regolamento {
-  position: fixed; right: 16px; z-index: 199;
-  bottom: 96px;
-  width: 52px; height: 52px; border-radius: 50%;
-  background: var(--surface); border: 1.5px solid var(--border);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 22px; text-decoration: none; cursor: pointer;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
-  transition: all .2s;
-}
-.fab-regolamento:hover { border-color: var(--accent-cody); transform: scale(1.05); }
-
+.toast.show { opacity: 1; }
+.toast.error { border-color: var(--red); color: var(--red); }
 </style>
 <link rel="stylesheet" href="theme.css">
 </head>
 <body>
 
-<!-- NAV -->
-<div class="nav">
-  <div>
-    <div class="nav-label">// IL MIO PROFILO //</div>
-    <div class="nav-name" id="nav-name">...</div>
-  </div>
-  <div style="display:flex;align-items:center;gap:10px;">
-    <div class="live-dot">LIVE</div>
-  </div>
-</div>
+<!-- ══════════════════════════════════════════
+     SCREEN 1 — WELCOME / CODICE ASSEGNATO
+══════════════════════════════════════════ -->
+<div class="screen active" id="screen-welcome">
+  <div style="padding: 40px 20px 20px;">
+    <p class="label">// Operazione completata //</p>
+    <span class="welcome-emoji">🎯</span>
+    <h1 class="headline">Missione compiuta.<br>Ora entra nel gioco.</h1>
+    <p class="subline">Hai risolto il quiz. Adesso abbina il tuo nome per partecipare al FantaCompleanno.</p>
 
-<!-- HERO -->
-<div class="hero">
-  <div class="hero-top">
-    <div class="avatar" id="avatar">?</div>
-    <div class="hero-info">
-      <div class="hero-name" id="hero-name">...</div>
-      <div class="hero-team" id="hero-team">Caricamento...</div>
+    <div class="code-badge">
+      <div>
+        <div class="code-label">Il tuo codice univoco</div>
+        <div class="code-value" id="welcome-code">——</div>
+      </div>
+      <div style="font-size:28px;">🔑</div>
     </div>
-  </div>
 
-  <!-- PUNTI PERSONALI -->
-  <div class="punti-hero" style="margin: 0 0 16px;">
-    <div>
-      <div class="punti-label">PUNTI PERSONALI</div>
-      <div class="punti-num zero" id="punti-num">0</div>
-      <div class="punti-sub">assegnati durante la festa</div>
+    <div class="info-row">
+      <div class="info-chip">
+        <span class="chip-icon">📱</span>
+        <div style="font-weight:600; font-size:13px;">Questo telefono</div>
+        <div class="chip-label">ti ricorderà sempre</div>
+      </div>
+      <div class="info-chip">
+        <span class="chip-icon">🔒</span>
+        <div style="font-weight:600; font-size:13px;">Un nome</div>
+        <div class="chip-label">per codice</div>
+      </div>
+      <div class="info-chip">
+        <span class="chip-icon">⚡</span>
+        <div style="font-weight:600; font-size:13px;">30 secondi</div>
+        <div class="chip-label">per registrarsi</div>
+      </div>
     </div>
-    <div class="punti-breakdown">
-      <div class="punti-breakdown-row" style="color:var(--green)" id="punti-bonus">+0 bonus</div>
-      <div class="punti-breakdown-row" style="color:var(--red)" id="punti-malus">-0 malus</div>
-      <div class="punti-breakdown-row" style="color:var(--text-muted)" id="punti-eventi">0 eventi</div>
-    </div>
-  </div>
-</div>
 
-<!-- STATS GRID -->
-<div class="stats-grid" style="grid-template-columns: 1.3fr 1fr;">
-  <div class="stat-card" style="text-align:left;padding:14px 16px;">
-    <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:2px;">
-      <span class="stat-card-num gold" id="pos-camp" style="font-size:24px;">—</span>
-      <span class="stat-card-label">posizione Classifica</span>
-    </div>
-    <div style="font-size:11px;color:var(--text-muted);">
-      <span id="pts-squadra" class="green" style="color:var(--green);font-family:'Space Mono',monospace;font-weight:700;">0</span> pt squadra — determina la tua posizione
-    </div>
-  </div>
-  <div class="stat-card">
-    <span class="stat-card-num siria" id="pos-alleanza">—</span>
-    <span class="stat-card-label">Alleanza</span>
+    <button class="btn-primary" onclick="showScreen('screen-register')" style="margin-top:16px;">
+      Abbina il tuo nome →
+    </button>
   </div>
 </div>
 
-<!-- AZIONI RAPIDE -->
-<div class="section" style="padding-top:0;padding-bottom:0;">
-  <button onclick="window.location.href='tutorial.html'" style="width:100%;background:var(--surface);border:1.5px solid var(--border);color:var(--text-muted);padding:12px;border-radius:10px;font-family:'Space Grotesk',sans-serif;font-size:13px;cursor:pointer;">
-    🎬 Rivedi il tutorial
-  </button>
+<!-- ══════════════════════════════════════════
+     SCREEN 2 — CERCA E SELEZIONA NOME
+══════════════════════════════════════════ -->
+<div class="screen" id="screen-register">
+  <div style="padding: 32px 20px 20px;">
+    <p class="label">// Chi sei? //</p>
+    <h2 class="headline">Trovati nella lista</h2>
+    <p class="subline">Cerca il tuo nome e selezionalo. Verrai abbinato a questo dispositivo.</p>
+
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input
+        class="search-input"
+        id="search-input"
+        type="text"
+        placeholder="Scrivi il tuo nome..."
+        oninput="filterPlayers()"
+        autocomplete="off"
+      >
+    </div>
+
+    <div class="player-list" id="player-list"></div>
+  </div>
 </div>
 
-<!-- FAZIONE -->
-<div class="section">
-  <div class="section-title">La mia fazione</div>
-  <div id="fazione-content"></div>
+<!-- ══════════════════════════════════════════
+     SCREEN 3 — GIÀ REGISTRATO
+══════════════════════════════════════════ -->
+<div class="screen" id="screen-already">
+  <div style="padding: 40px 20px 20px; text-align: center;">
+    <span style="font-size:72px; display:block; margin-bottom:20px;">👋</span>
+    <p class="label">// Bentornato //</p>
+    <h2 class="headline" id="already-name" style="margin-bottom:8px;"></h2>
+    <p class="subline">Questo dispositivo è già abbinato al tuo nome. Sei pronto per il FantaCompleanno!</p>
+
+    <div class="code-badge" style="margin-bottom:24px;">
+      <div>
+        <div class="code-label">Il tuo codice</div>
+        <div class="code-value" id="already-code">——</div>
+      </div>
+      <div style="font-size:28px;">✅</div>
+    </div>
+
+    <button class="btn-primary" onclick="window.location.href='home.html'">Vai al gioco →</button>
+    <button class="btn-ghost" onclick="showScreen('screen-register')" style="margin-top:10px;">
+      Non sono io — cambia nome
+    </button>
+  </div>
 </div>
 
-<!-- SQUADRA -->
-<div class="section">
-  <div class="section-title">La mia squadra</div>
-  <div id="squadra-content"></div>
+<!-- ══════════════════════════════════════════
+     SCREEN 4 — ADMIN
+══════════════════════════════════════════ -->
+<div class="screen" id="screen-admin">
+  <div style="padding: 20px;">
+    <div class="admin-header">
+      <div>
+        <p class="label" style="margin-bottom:4px;">Pannello Admin</p>
+        <h2 style="font-size:20px; font-weight:800;">Gestione Ospiti</h2>
+      </div>
+      <div class="admin-badge">30CODY30SYRIA</div>
+    </div>
+
+    <div class="admin-stats">
+      <div class="stat-chip ok">
+        <div class="stat-num" id="stat-linked">0</div>
+        <div class="stat-label">Abbinati</div>
+      </div>
+      <div class="stat-chip wait">
+        <div class="stat-num" id="stat-waiting">0</div>
+        <div class="stat-label">In attesa</div>
+      </div>
+      <div class="stat-chip">
+        <div class="stat-num" id="stat-total">0</div>
+        <div class="stat-label">Totale</div>
+      </div>
+    </div>
+
+    <input
+      class="admin-search"
+      type="text"
+      placeholder="Cerca ospite..."
+      oninput="filterAdmin()"
+      id="admin-search-input"
+    >
+
+    <div class="admin-list" id="admin-list"></div>
+  </div>
 </div>
 
-<!-- POSIZIONE IN CLASSIFICA -->
-<div class="section">
-  <div class="section-title">Posizione</div>
-  <div class="posizione-row" id="posizione-row"></div>
+<!-- ══════════════════════════════════════════
+     MODAL CONFERMA SELEZIONE
+══════════════════════════════════════════ -->
+<div class="modal-overlay" id="confirm-modal">
+  <div class="modal-box">
+    <p class="label">Conferma selezione</p>
+    <div class="modal-name" id="modal-name"></div>
+    <p class="modal-sub">
+      Sei sicuro? Questo dispositivo verrà abbinato permanentemente a questo nome.<br>
+      <span style="color:var(--accent-cody);">Non potrai cambiarlo senza chiedere a Pietro.</span>
+    </p>
+    <button class="btn-primary" id="modal-confirm-btn">✓ Sì, sono io!</button>
+    <button class="btn-ghost" onclick="closeModal()">← Torna indietro</button>
+  </div>
 </div>
 
-<!-- ALLEANZA -->
-<div class="section">
-  <div class="section-title">La mia alleanza</div>
-  <div id="alleanza-content"></div>
-</div>
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
 
-<!-- STORICO EVENTI -->
-<div class="section">
-  <div class="section-title">Storico eventi personali</div>
-  <div id="storico-content"></div>
-</div>
-
+<!-- ══════════════════════════════════════════
+     FIREBASE + LOGICA
+══════════════════════════════════════════ -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getDatabase, ref, get, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
+// ── CONFIG FIREBASE ──
 const firebaseConfig = {
   apiKey: "AIzaSyCqLFQW8XQioObmxG0oDPc_MFpdFXJxmac",
   authDomain: "fantacompleanno-c64c3.firebaseapp.com",
@@ -347,9 +383,18 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-const myName = localStorage.getItem("fc_player_name");
-if (!myName) { window.location.replace("register.html"); }
+// ── AUTOMATISMI PRE-FESTA ──
+// Assegna un punto automatico una sola volta per ospite (controlla autoEvents/{key}/{eventId})
+async function assegnaAutomatico(key, eventId, pts, desc) {
+  const flagRef = ref(db, `autoEvents/${key}/${eventId}`);
+  const snap = await get(flagRef);
+  if (snap.exists()) return false;
+  await set(ref(db, `punti/${key}/${eventId}`), { pts, desc, ts: Date.now() });
+  await set(flagRef, true);
+  return true;
+}
 
+// ── LISTA OSPITI (da game design doc) ──
 const PLAYERS = [
   { name: "Alessia Ala", cost: 175 },
   { name: "Anna Maria Caione (madre)", cost: 150 },
@@ -421,308 +466,231 @@ const PLAYERS = [
   { name: "Lorenzo Taffone", cost: 70 },
 ];
 
-const ALLEANZE = {
-  "💰 ISEE Allargato": ["Alessia Ala","Anna Maria Caione (madre)","Eleonora Tauro","Paolo Bello","Mattia Caione","Mirco Caione","Gloria Rinaldi","Dario Caione","Gabriele Mangione","Federica Ala","Simone Baldassarre","Desi Ala","Michele Nervo","Zia Anna"],
-  "💥 Bombette di Cisternino ASAP": ["Francesca Terlizzi","Nicolas Costa","Giulia Trevisi","Andrea Sozzani","Emilio Pulli","Eleonora Bello","Marta Mignone","Giuseppe Susca","Annachiara Maci","Davide Secci"],
-  "😈 Il Buono Il Bello e il Danilo": ["Antonio Borelli","Marika Giagnotti","Danilo Schiavone","Ilaria Tenore","Donato Stragapede","Emily Giancane"],
-  "💸 Cuoricini Broke": ["Martina Poso","Maycols Sirsi","Laura Capodieci","Davide Attanasio","Manuel Palma","Carlotta D'aversa","Nicolò Spada","Antonella Lo vecchio","Beatrice Gloria","Mariacarla Spagnolo","Mattia Martina","Lorenzo Taffone"],
-  "⚽ FantaSanPio 08:00 AM": ["Andrea Scozzi","Annalisa Ancora","Roberto Sciurti","Nicolò Maci","Silvia Lamusta","Alessio Maci","Rachele Ponzetta","Erminio Foti","Sara Colletta","Luca Grasso","Annalisa Maci","Alessio Caretto","Silvia Maci","Errico Del monte","Chiara Del Vecchio","Daniele Padula","Davide Mogavero","Marialuce Serra","Andrea De Matteis"],
-  "🏆 Guinness World Record Partecipazione": ["Francesco Romano","Mariachiara Longo","Alberto Bianco","Martina Schiavone","Luca Invidia","Marika Piconese","Stefanuccio"],
-};
+// ── ADMIN KEY ──
+const ADMIN_KEY = "30cody30syria";
 
-let punti = {};
-let teams = {};
-let fazioni = {};
+// ── STATO ──
+let myCode = null;
+let myName = null;
+let linkedPlayers = {}; // { playerName: deviceCode }
+let selectedPlayer = null;
 
-const RUOLI = {
-  cody: {
-    soldato: { id:"soldato_cody", nome:"🍖 Dispenser di Croccantini", regola:"Ruolo comune — i tuoi punti contribuiscono normalmente (x1) al totale della fazione Cody.", effetto:"x1" },
-    moltiplicatore: { id:"moltiplicatore_cody", nome:"👨‍🍳 Cuoco di Corte", regola:"Ruolo speciale — i tuoi punti raddoppiano per la tua fazione.", effetto:"x2" },
-    spia: { id:"spia_cody", nome:"✨ Glitter di Beagle", regola:"Ruolo speciale — sei una spia di Siria. I tuoi punti vanno a Siria.", effetto:"spia" }
-  },
-  siria: {
-    soldato: { id:"soldato_siria", nome:"🚽 Pulitore di Lettiera", regola:"Ruolo comune — i tuoi punti contribuiscono normalmente (x1) al totale della fazione Siria.", effetto:"x1" },
-    moltiplicatore: { id:"moltiplicatore_siria", nome:"❤️ Umano Preferito", regola:"Ruolo speciale — i tuoi punti raddoppiano per la tua fazione.", effetto:"x2" },
-    spia: { id:"spia_siria", nome:"🌸 Fioriera come Lettiera", regola:"Ruolo speciale — sei una spia di Cody. I tuoi punti vanno a Cody.", effetto:"spia" }
+// ── GENERA / RECUPERA CODICE ──
+function getOrCreateCode() {
+  let code = localStorage.getItem("fc_device_code");
+  if (!code) {
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    code = Array.from({length: 6}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+    localStorage.setItem("fc_device_code", code);
   }
-};
-
-function getRuolo(fazione, ruoloId) {
-  for (const tipo of ['soldato','moltiplicatore','spia']) {
-    if (RUOLI[fazione][tipo].id === ruoloId) return RUOLI[fazione][tipo];
-  }
-  return RUOLI[fazione].soldato;
-}
-
-function sanitize(s) { return s.replace(/[.#$[\]]/g, "_"); }
-
-// ── CALCOLI ──
-function getPuntiPersonali(name) {
-  const key = sanitize(name);
-  if (!punti[key]) return { bonus: 0, malus: 0, tot: 0, eventi: [] };
-  let bonus = 0, malus = 0, eventi = [];
-  Object.entries(punti[key]).forEach(([id, e]) => {
-    if (e.pts > 0) bonus += e.pts; else malus += Math.abs(e.pts);
-    eventi.push({ id, ...e });
-  });
-  return { bonus, malus, tot: bonus - malus, eventi: eventi.sort((a,b) => (b.ts||0)-(a.ts||0)) };
-}
-
-function getPuntiSquadra(ownerName) {
-  const key = sanitize(ownerName);
-  const team = teams[key];
-  if (!team || !team.roster) return 0;
-  let tot = 0;
-  team.roster.forEach(p => {
-    const isCap = team.captain === p;
-    const pp = getPuntiPersonali(p);
-    tot += (pp.bonus - pp.malus) * (isCap ? 2 : 1);
-  });
-  return tot;
-}
-
-function getMiaAlleanza() {
-  for (const [nome, membri] of Object.entries(ALLEANZE)) {
-    if (membri.includes(myName)) return { nome, membri };
-  }
-  return null;
-}
-
-function getCoeffAlleanza(membri) {
-  const conSq = membri.filter(m => teams[sanitize(m)]);
-  if (!conSq.length) return 0;
-  const totB = conSq.reduce((s,m) => s + getPuntiPersonali(m).bonus, 0);
-  const totM = conSq.reduce((s,m) => s + getPuntiPersonali(m).malus, 0);
-  return (totB / conSq.length) - (totM / conSq.length);
-}
-
-// ── RENDER ──
-function render() {
-  const pp = getPuntiPersonali(myName);
-  const myKey = sanitize(myName);
-  const myTeam = teams[myKey];
-  const ptsSq = getPuntiSquadra(myName);
-  const initials = myName.split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase();
-
-  // Nav + avatar
-  document.getElementById("nav-name").textContent = myName;
-  document.getElementById("avatar").textContent = initials;
-  document.getElementById("hero-name").textContent = myName;
-  document.getElementById("hero-team").textContent = myTeam ? `✂️ ${myTeam.teamName || "Squadra senza nome"}` : "Nessuna squadra ancora";
-
-  // ── FAZIONE ──
-  const myKeyFaz = sanitize(myName);
-  const fazContainer = document.getElementById("fazione-content");
-  const mioFaz = fazioni[myKeyFaz];
-  if (!mioFaz) {
-    fazContainer.innerHTML = `
-      <div style="background:var(--surface);border:1.5px dashed var(--border);border-radius:14px;padding:16px;text-align:center;cursor:pointer;" onclick="window.location.href='fazione.html'">
-        <div style="font-size:32px;margin-bottom:8px;">✉️</div>
-        <div style="font-size:13px;color:var(--text-muted);">Non hai ancora aperto la tua busta fazione.</div>
-        <div style="font-size:12px;color:var(--accent-siria);margin-top:6px;">Tocca per scoprirla →</div>
-      </div>
-    `;
-  } else {
-    const isCody = mioFaz.fazione === "cody";
-    const ruolo = getRuolo(mioFaz.fazione, mioFaz.ruoloId);
-    const isSpeciale = ruolo.effetto !== "x1";
-    const gradient = isCody ? "linear-gradient(135deg, #1a0800, #2d1200)" : "linear-gradient(135deg, #0d0020, #1a0035)";
-    const borderColor = isCody ? "rgba(255,107,43,0.4)" : "rgba(168,85,247,0.4)";
-    const accentColor = isCody ? "var(--accent-cody)" : "var(--accent-siria)";
-    fazContainer.innerHTML = `
-      <div style="background:${gradient};border:1.5px solid ${borderColor};border-radius:14px;padding:16px;cursor:pointer;" onclick="window.location.href='fazione.html'">
-        <div style="display:flex;align-items:center;gap:14px;">
-          <div style="font-size:40px;flex-shrink:0;">${isCody ? "🐕" : "🐱"}</div>
-          <div style="flex:1;">
-            <div style="font-size:15px;font-weight:800;color:${accentColor};">${isCody ? "Team Cody" : "Team Siria"}</div>
-            <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">${ruolo.nome}</div>
-          </div>
-          <div style="color:var(--text-muted);font-size:16px;">→</div>
-        </div>
-        ${isSpeciale ? `<div style="margin-top:10px;font-family:'Space Mono',monospace;font-size:10px;color:var(--red);background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:100px;padding:4px 10px;display:inline-block;">🔒 Ruolo Speciale</div>` : ''}
-      </div>
-    `;
-  }
-
-  // Punti personali
-  const pEl = document.getElementById("punti-num");
-  pEl.textContent = (pp.tot > 0 ? "+" : "") + pp.tot;
-  pEl.className = "punti-num " + (pp.tot > 0 ? "pos" : pp.tot < 0 ? "neg" : "zero");
-  document.getElementById("punti-bonus").textContent = `+${pp.bonus} bonus`;
-  document.getElementById("punti-malus").textContent = `-${pp.malus} malus`;
-  document.getElementById("punti-eventi").textContent = `${pp.eventi.length} eventi`;
-
-  // Posizione campionato (basata su punti squadra)
-  const classifica = PLAYERS.map(p => ({ name: p.name, pts: getPuntiSquadra(p.name) }))
-    .sort((a,b) => b.pts - a.pts);
-  const myPos = classifica.findIndex(p => p.name === myName) + 1;
-
-  // Posizione alleanza
-  const miaAll = getMiaAlleanza();
-  const allanzeRanked = Object.entries(ALLEANZE)
-    .map(([n,m]) => ({ nome: n, coeff: getCoeffAlleanza(m) }))
-    .sort((a,b) => b.coeff - a.coeff);
-  const myAllPos = miaAll ? allanzeRanked.findIndex(a => a.nome === miaAll.nome) + 1 : null;
-
-  // Stats grid
-  document.getElementById("pos-camp").textContent = myPos + "°";
-  document.getElementById("pts-squadra").textContent = (ptsSq > 0 ? "+" : "") + ptsSq;
-  document.getElementById("pos-alleanza").textContent = myAllPos ? myAllPos + "°" : "—";
-
-  // ── SQUADRA ──
-  const sqContainer = document.getElementById("squadra-content");
-  sqContainer.innerHTML = "";
-  if (!myTeam || !myTeam.roster) {
-    sqContainer.innerHTML = '<div class="empty-state">Non hai ancora creato la squadra.<br><br><button onclick="window.location.href=\'squadra.html\'" style="background:linear-gradient(135deg,var(--accent-cody),var(--accent-siria));color:white;padding:12px 24px;border-radius:10px;border:none;font-family:\'Space Grotesk\',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">Crea squadra →</button></div>';
-  } else {
-    const header = document.createElement("div");
-    header.className = "squadra-header";
-    const spesi = myTeam.roster.reduce((s,n) => s + (PLAYERS.find(p=>p.name===n)?.cost||0), 0);
-    header.innerHTML = `<div class="squadra-nome">${myTeam.teamName || "Squadra senza nome"}</div><div class="squadra-budget">✂️ ${spesi}/500 Capelli spesi · ${myTeam.roster.length}/5 giocatori</div>`;
-    sqContainer.appendChild(header);
-
-    myTeam.roster.forEach(pName => {
-      const isCap = myTeam.captain === pName;
-      const pPts = getPuntiPersonali(pName);
-      const pData = PLAYERS.find(p => p.name === pName);
-      const initials2 = pName.split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase();
-      const ptsConMolt = isCap ? (pPts.bonus - pPts.malus) * 2 : pPts.tot;
-
-      const div = document.createElement("div");
-      div.className = "giocatore-row" + (isCap ? " capitano" : "");
-      div.innerHTML = `
-        <div class="giocatore-avatar">${isCap ? "⭐" : initials2}</div>
-        <div class="giocatore-info">
-          <div class="giocatore-nome">${pName}</div>
-          <div class="giocatore-ruolo">${pData?.cost || 0} ✂️${isCap ? " · CAPITANO x2" : ""}</div>
-        </div>
-        <div>
-          <div class="giocatore-pts ${ptsConMolt > 0 ? 'pos' : ptsConMolt < 0 ? 'neg' : 'zero'}">${ptsConMolt > 0 ? '+' : ''}${ptsConMolt}</div>
-          ${isCap ? '<div class="cap-x2">x2 applicato</div>' : ''}
-        </div>
-      `;
-      sqContainer.appendChild(div);
-    });
-
-    // Tasto modifica
-    const editBtn = document.createElement("button");
-    editBtn.onclick = () => window.location.href = "squadra.html";
-    editBtn.style.cssText = "width:100%;background:var(--surface);border:1.5px solid var(--border);color:var(--text-muted);padding:12px;border-radius:10px;font-family:'Space Grotesk',sans-serif;font-size:13px;cursor:pointer;margin-top:8px;";
-    editBtn.textContent = "✏️ Modifica squadra";
-    sqContainer.appendChild(editBtn);
-  }
-
-  // ── POSIZIONE IN CLASSIFICA ──
-  const posRow = document.getElementById("posizione-row");
-  posRow.innerHTML = "";
-  const prevName = myPos > 1 ? classifica[myPos-2].name : null;
-  const nextName = myPos < classifica.length ? classifica[myPos].name : null;
-  const prevPts = prevName ? getPuntiSquadra(prevName) : null;
-  const nextPts = nextName ? getPuntiSquadra(nextName) : null;
-
-  if (prevName) {
-    const div = document.createElement("div");
-    div.className = "pos-card";
-    div.innerHTML = `<span class="pos-num" style="font-size:14px;color:var(--text-muted)">${prevName.split(" ")[0]}</span><span class="pos-label">Sopra di te</span><span class="pos-sub">+${prevPts} pt</span>`;
-    posRow.appendChild(div);
-  }
-
-  const myCard = document.createElement("div");
-  myCard.className = "pos-card highlight";
-  myCard.innerHTML = `<span class="pos-num">${myPos}°</span><span class="pos-label">su ${PLAYERS.length}</span><span class="pos-sub">${ptsSq > 0 ? '+' : ''}${ptsSq} pt squadra</span>`;
-  posRow.appendChild(myCard);
-
-  if (nextName) {
-    const div = document.createElement("div");
-    div.className = "pos-card";
-    div.innerHTML = `<span class="pos-num" style="font-size:14px;color:var(--text-muted)">${nextName.split(" ")[0]}</span><span class="pos-label">Sotto di te</span><span class="pos-sub">${nextPts > 0 ? '+' : ''}${nextPts} pt</span>`;
-    posRow.appendChild(div);
-  }
-
-  // ── ALLEANZA ──
-  const allContainer = document.getElementById("alleanza-content");
-  if (!miaAll) {
-    allContainer.innerHTML = '<div class="empty-state">Non sei in nessuna alleanza.</div>';
-  } else {
-    const coeff = getCoeffAlleanza(miaAll.membri);
-    const sqFormate = miaAll.membri.filter(m => teams[sanitize(m)]).length;
-    allContainer.innerHTML = `
-      <div class="alleanza-mini" onclick="window.location.href='alleanze.html'">
-        <div class="alleanza-mini-name">${miaAll.nome}</div>
-        <div class="alleanza-mini-row">
-          <div class="alleanza-mini-coeff">${coeff > 0 ? '+' : ''}${coeff.toFixed(1)}</div>
-          <div class="alleanza-mini-pos">${myAllPos}° su 6 · ${sqFormate}/${miaAll.membri.length} squadre</div>
-        </div>
-        <div class="alleanza-mini-track">
-          <div class="alleanza-mini-fill" style="width:${Math.min(100, Math.max(5, 50 + coeff))}%"></div>
-        </div>
-        <div style="font-size:11px;color:var(--text-muted);margin-top:8px;">Tocca per vedere il dettaglio →</div>
-      </div>
-    `;
-  }
-
-  // ── STORICO PERSONALE ──
-  const storContainer = document.getElementById("storico-content");
-  storContainer.innerHTML = "";
-  if (pp.eventi.length === 0) {
-    storContainer.innerHTML = '<div class="empty-state">Nessun evento ancora assegnato.</div>';
-  } else {
-    pp.eventi.forEach(ev => {
-      const div = document.createElement("div");
-      div.className = "storico-item";
-      const d = new Date(ev.ts);
-      const timeStr = d.toLocaleTimeString('it-IT', { hour:'2-digit', minute:'2-digit' });
-      div.innerHTML = `
-        <div class="storico-pts ${ev.pts > 0 ? 'pos' : 'neg'}">${ev.pts > 0 ? '+' : ''}${ev.pts}</div>
-        <div class="storico-info">
-          <div class="storico-desc">${ev.desc}</div>
-          <div class="storico-time">${timeStr}</div>
-        </div>
-      `;
-      storContainer.appendChild(div);
-    });
-  }
+  return code;
 }
 
 // ── INIT ──
-onValue(ref(db, "punti"), snap => {
-  punti = snap.exists() ? snap.val() : {};
-  render();
-});
-onValue(ref(db, "teams"), snap => {
-  teams = snap.exists() ? snap.val() : {};
-  render();
-});
-onValue(ref(db, "fazioni"), snap => {
-  fazioni = snap.exists() ? snap.val() : {};
-  render();
-});
+async function init() {
+  myCode = getOrCreateCode();
+
+  // Controlla se admin
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("key") === ADMIN_KEY) {
+    showScreen('screen-admin');
+    initAdmin();
+    return;
+  }
+
+  // Carica tutti gli abbinamenti da Firebase
+  const snap = await get(ref(db, "registrations"));
+  if (snap.exists()) {
+    linkedPlayers = snap.val();
+  }
+
+  // 1. Controlla se questo CODICE DISPOSITIVO è abbinato su Firebase
+  const alreadyLinked = Object.entries(linkedPlayers).find(([name, code]) => code === myCode);
+  if (alreadyLinked) {
+    // Dispositivo riconosciuto → aggiorna localStorage e vai a home
+    myName = alreadyLinked[0];
+    localStorage.setItem("fc_player_name", myName);
+    if (localStorage.getItem("fc_tutorial_done") === "1") {
+      window.location.replace("home.html");
+    } else {
+      window.location.replace("tutorial.html");
+    }
+    return;
+  }
+
+  // 2. Controlla se c'è un nome in localStorage ma NON corrisponde più a Firebase
+  const savedName = localStorage.getItem("fc_player_name");
+  if (savedName) {
+    // Pulisci localStorage — era stato scollegato dall'admin
+    localStorage.removeItem("fc_player_name");
+  }
+
+  // 3. Nessun abbinamento → mostra welcome, scegli nome
+  document.getElementById("welcome-code").textContent = myCode;
+  showScreen('screen-welcome');
+}
+
+// ── FILTRA LISTA GIOCATORI ──
+window.filterPlayers = function() {
+  const q = document.getElementById("search-input").value.toLowerCase();
+  renderPlayerList(q);
+};
+
+function renderPlayerList(filter = "") {
+  const list = document.getElementById("player-list");
+  list.innerHTML = "";
+
+  const filtered = PLAYERS.filter(p => p.name.toLowerCase().includes(filter));
+
+  if (filtered.length === 0) {
+    list.innerHTML = '<div class="no-results">Nessun ospite trovato 🤔</div>';
+    return;
+  }
+
+  filtered.forEach(player => {
+    const isTaken = linkedPlayers[player.name] && linkedPlayers[player.name] !== myCode;
+    const div = document.createElement("div");
+    div.className = "player-item" + (isTaken ? " taken" : "");
+    div.innerHTML = `
+      <div>
+        <div class="player-name">${player.name}</div>
+        <div class="player-meta">✂️ ${player.cost} Capelli</div>
+      </div>
+      ${isTaken
+        ? '<span class="taken-badge">già abbinato</span>'
+        : '<span class="player-cost">Seleziona →</span>'
+      }
+    `;
+    if (!isTaken) {
+      div.onclick = () => openModal(player.name);
+    }
+    list.appendChild(div);
+  });
+}
+
+// ── MODAL CONFERMA ──
+window.openModal = function(name) {
+  selectedPlayer = name;
+  document.getElementById("modal-name").textContent = name;
+  document.getElementById("modal-confirm-btn").onclick = () => confirmSelection(name);
+  document.getElementById("confirm-modal").classList.add("open");
+};
+
+window.closeModal = function() {
+  document.getElementById("confirm-modal").classList.remove("open");
+  selectedPlayer = null;
+};
+
+async function confirmSelection(name) {
+  closeModal();
+
+  // Salva su Firebase
+  await set(ref(db, `registrations/${name.replace(/[.#$[\]]/g, '_')}`), myCode);
+
+  // Salva su localStorage
+  localStorage.setItem("fc_player_name", name);
+  myName = name;
+
+  // ── AUTOMATISMI CAT.1 ──
+  const key = name.replace(/[.#$[\]]/g, '_');
+  await assegnaAutomatico(key, "b_registrazione", 5, "Accede al sito e si abbina al nome");
+
+  // Quiz mistero location: legge l'esito salvato da quiz.html prima della registrazione
+  const quizSolved = localStorage.getItem("fc_quiz_solved");
+  if (quizSolved === "true") {
+    await assegnaAutomatico(key, "b_quiz_location", 30, "Risolve il mistero location");
+  } else if (quizSolved === "false") {
+    await assegnaAutomatico(key, "m_quiz_location", -30, "Non risolve il mistero location");
+  }
+  // Se quizSolved è null (quiz.html non ha ancora salvato nulla), non si assegna né bonus né malus qui:
+  // ci penserà il batch admin "Applica malus pre-festa" a fine draft.
+
+  showToast(`✓ Benvenuto/a, ${name}!`);
+
+  setTimeout(() => {
+    window.location.replace("tutorial.html");
+  }, 1200);
+}
+
+// ── ADMIN ──
+function initAdmin() {
+  const dbRef = ref(db, "registrations");
+  onValue(dbRef, (snap) => {
+    linkedPlayers = snap.exists() ? snap.val() : {};
+    renderAdminList();
+    updateStats();
+  });
+}
+
+function renderAdminList(filter = "") {
+  const list = document.getElementById("admin-list");
+  list.innerHTML = "";
+
+  const filtered = PLAYERS.filter(p => p.name.toLowerCase().includes(filter.toLowerCase()));
+
+  filtered.forEach(player => {
+    const key = player.name.replace(/[.#$[\]]/g, '_');
+    const code = linkedPlayers[key] || null;
+    const isLinked = !!code;
+
+    const row = document.createElement("div");
+    row.className = "admin-player-row" + (isLinked ? " linked" : "");
+    row.innerHTML = `
+      <div class="admin-info">
+        <div class="admin-name">${player.name}</div>
+        <div class="admin-code ${code ? '' : 'none'}">${code ? `🔑 ${code}` : '— non abbinato'}</div>
+      </div>
+      ${isLinked
+        ? `<button class="btn-unlink" onclick="unlinkPlayer('${player.name}')">Scollega</button>`
+        : ''
+      }
+    `;
+    list.appendChild(row);
+  });
+}
+
+window.filterAdmin = function() {
+  const q = document.getElementById("admin-search-input").value;
+  renderAdminList(q);
+};
+
+window.unlinkPlayer = async function(name) {
+  if (!confirm(`Scollegare ${name}? Il giocatore dovrà riselezionare il nome.`)) return;
+  const key = name.replace(/[.#$[\]]/g, '_');
+  await remove(ref(db, `registrations/${key}`));
+  showToast(`✓ ${name} scollegato`);
+};
+
+function updateStats() {
+  const linked = Object.keys(linkedPlayers).length;
+  const total = PLAYERS.length;
+  document.getElementById("stat-linked").textContent = linked;
+  document.getElementById("stat-waiting").textContent = total - linked;
+  document.getElementById("stat-total").textContent = total;
+}
+
+// ── UTILS ──
+window.showScreen = function(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+  if (id === 'screen-register') renderPlayerList();
+};
+
+window.goToGame = function() {
+  // In futuro: redirect a dashboard.html
+  showToast("🚧 Il gioco completo è in arrivo!");
+};
+
+function showToast(msg, isError = false) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.className = "toast show" + (isError ? " error" : "");
+  setTimeout(() => { t.className = "toast"; }, 3000);
+}
+
+// ── START ──
+init();
 </script>
-<a href="regolamento.html" class="fab-regolamento" title="Regolamento">📖</a>
-
-<!-- BOTTOM NAV BAR -->
-<div class="bottom-nav">
-  <a href="classifica.html" class="nav-item" data-page="classifica">
-    <span class="nav-icon">📊</span>
-    <span class="nav-label">Classifica</span>
-  </a>
-  <a href="alleanze.html" class="nav-item" data-page="alleanze">
-    <span class="nav-icon">🤝</span>
-    <span class="nav-label">Alleanze</span>
-  </a>
-  <a href="home.html" class="nav-item nav-item-center" data-page="home">
-    <span class="nav-icon">🏠</span>
-    <span class="nav-label">Home</span>
-  </a>
-  <a href="squadra.html" class="nav-item" data-page="squadra">
-    <span class="nav-icon">✂️</span>
-    <span class="nav-label">Squadra</span>
-  </a>
-  <a href="profilo.html" class="nav-item active" data-page="profilo">
-    <span class="nav-icon">👤</span>
-    <span class="nav-label">Profilo</span>
-  </a>
-</div>
-
 </body>
 </html>
