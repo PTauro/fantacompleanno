@@ -480,7 +480,7 @@ window.apriBusta = async function() {
   // 3. Anteprima carta che esce
   const preview = document.getElementById("carta-preview");
   preview.className = `carta-preview ${fazione}-preview esce`;
-  preview.textContent = fazione === "cody" ? "🐕" : "🐱";
+  preview.innerHTML = `<img src="badge_team_${fazione}.jpg" alt="" style="width:90px;height:90px;border-radius:10px;object-fit:cover;">`;
 
   await sleep(800);
 
@@ -518,7 +518,7 @@ function renderCarta(fazione, ruoloId) {
   if (!ruolo) ruolo = RUOLI[fazione].soldato;
 
   const isCody = fazione === "cody";
-  const fazioneNome = isCody ? "🐕 Team Cody" : "🐱 Team Siria";
+  const fazioneNome = isCody ? "Team Cody" : "Team Siria";
   const fazione_class = isCody ? "carta-cody" : "carta-siria";
   const isSpeciale = ruolo.effetto !== "x1";
 
