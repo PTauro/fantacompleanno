@@ -540,20 +540,20 @@ function calcolaCat2(roster, captainName) {
     results.push({ id: "b_cat2_pupilli", pts: 10, desc: "Pupilli — 500 Capelli spesi con squadra incompleta" });
   }
 
-  // +20 Bonus Maternità
-  { const p = hasTag("maternita");
-    if (p) results.push({ id: "b_cat2_maternita", pts: 20, desc: `Bonus Maternità — ${p.name} in squadra` });
-  }
+  // +20 Bonus Maternità — cumulabile per ogni giocatrice taggata
+  roster.filter(p => (p.tags || []).includes("maternita")).forEach(p => {
+    results.push({ id: `b_cat2_maternita_${sanitize(p.name)}`, pts: 20, desc: `Bonus Maternità — ${p.name} in squadra` });
+  });
 
-  // +20 Bonus Paternità
-  { const p = hasTag("paternita");
-    if (p) results.push({ id: "b_cat2_paternita", pts: 20, desc: `Bonus Paternità — ${p.name} in squadra` });
-  }
+  // +20 Bonus Paternità — cumulabile per ogni giocatore taggato
+  roster.filter(p => (p.tags || []).includes("paternita")).forEach(p => {
+    results.push({ id: `b_cat2_paternita_${sanitize(p.name)}`, pts: 20, desc: `Bonus Paternità — ${p.name} in squadra` });
+  });
 
-  // +25 Bonus Affetto Stabile
-  { const p = hasTag("affetto");
-    if (p) results.push({ id: "b_cat2_affetto", pts: 25, desc: `Bonus Affetto Stabile — ${p.name} in squadra` });
-  }
+  // +25 Bonus Affetto Stabile — cumulabile per ogni giocatore taggato
+  roster.filter(p => (p.tags || []).includes("affetto")).forEach(p => {
+    results.push({ id: `b_cat2_affetto_${sanitize(p.name)}`, pts: 25, desc: `Bonus Affetto Stabile — ${p.name} in squadra` });
+  });
 
   // +50 Smartworking — cumulabile: un bonus per ogni giocatore "remoto" in squadra
   roster.filter(p => (p.tags || []).includes("remoto")).forEach(p => {
@@ -587,10 +587,12 @@ function calcolaCat2(roster, captainName) {
 
 // Tutti i possibili id Cat.2 (per sapere quali rimuovere se non più applicabili)
 const CAT2_ALL_IDS = [
-  "b_cat2_budget_perfetto", "b_cat2_pupilli", "b_cat2_maternita", "b_cat2_paternita",
-  "b_cat2_affetto", "b_cat2_underdog", "b_cat2_stefanuccio", "b_cat2_firstlady",
+  "b_cat2_budget_perfetto", "b_cat2_pupilli", "b_cat2_underdog", "b_cat2_stefanuccio", "b_cat2_firstlady",
   ...COPPIE.map((_, i) => `b_cat2_love_${i}`),
-  ...PLAYERS.filter(p => (p.tags || []).includes("remoto")).map(p => `b_cat2_smartworking_${sanitize(p.name)}`)
+  ...PLAYERS.filter(p => (p.tags || []).includes("remoto")).map(p => `b_cat2_smartworking_${sanitize(p.name)}`),
+  ...PLAYERS.filter(p => (p.tags || []).includes("maternita")).map(p => `b_cat2_maternita_${sanitize(p.name)}`),
+  ...PLAYERS.filter(p => (p.tags || []).includes("paternita")).map(p => `b_cat2_paternita_${sanitize(p.name)}`),
+  ...PLAYERS.filter(p => (p.tags || []).includes("affetto")).map(p => `b_cat2_affetto_${sanitize(p.name)}`),
 ];
 
 // Ricalcola e riscrive i bonus Cat.2 su Firebase, rimuovendo quelli non più validi
