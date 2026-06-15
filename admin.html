@@ -377,11 +377,15 @@ body {
     <button class="btn-annulla" style="width:100%;margin-bottom:14px;justify-content:center;" id="btn-reset-ospite">🗑 Reset Punti — questa persona</button>
 
     <div class="section-label">✏️ Punti Personalizzati (Cash or Trash, premi fine serata, ecc.)</div>
-    <div style="display:flex;gap:8px;margin-bottom:14px;">
+    <div style="display:flex;gap:8px;margin-bottom:6px;">
       <input type="number" id="custom-pts" placeholder="pt (es. 150 o -50)" style="width:120px;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;color:var(--text);font-family:'Space Mono',monospace;font-size:14px;outline:none;">
       <input type="text" id="custom-desc" placeholder="Descrizione (es. Cash or Trash — vince)" style="flex:1;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:13px;outline:none;">
       <button id="btn-custom-assegna" style="background:var(--gold);border:none;color:#1a1500;font-weight:800;border-radius:10px;padding:10px 16px;cursor:pointer;font-family:'Space Grotesk',sans-serif;font-size:13px;">Assegna</button>
     </div>
+    <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-muted);margin-bottom:14px;cursor:pointer;">
+      <input type="checkbox" id="custom-nocap" style="accent-color:var(--gold);">
+      Non raddoppiare se è capitano altrove (es. bonus +150 fazione/alleanza vincente a fine serata)
+    </label>
 
     <div class="section-label">Assegna Bonus</div>
     <div class="eventi-grid" id="modal-bonus-grid"></div>
@@ -469,15 +473,33 @@ const ALLEANZE = {
 
 // Versioni "raw" — usate SOLO per calcolare il podio alleanze al momento dell'assegnazione,
 // quindi NON includono alleanzaBonusFinale (eviterebbe un circolo: il bonus che determina se stesso)
+const CAT12_IDS = new Set([
+  "b_quiz_location","m_quiz_location","b_registrazione","b_squadra_creata",
+  "b_alleanza_vista","b_agente_missione",
+  "m_non_registrato","m_squadra_non_creata","m_fazione_non_pescata","m_alleanza_non_vista"
+]);
+function isMoltiplicabile(id, entry) {
+  if (id.startsWith("b_cat2_")) return false;
+  if (CAT12_IDS.has(id)) return false;
+  if (id.startsWith("custom_") && entry && entry.noCap) return false;
+  return true;
+}
 function getPuntiPersonaliRaw(name) {
   const key = sanitize(name);
-  if (!punti[key]) return { bonus: 0, malus: 0 };
-  let bonus = 0, malus = 0;
-  Object.values(punti[key]).forEach(e => {
-    if (e.pts > 0) bonus += e.pts;
-    else malus += Math.abs(e.pts);
+  if (!punti[key]) return { bonus: 0, malus: 0, bonusFisso: 0, malusFisso: 0, bonusMolt: 0, malusMolt: 0 };
+  let bonus = 0, malus = 0, bonusFisso = 0, malusFisso = 0, bonusMolt = 0, malusMolt = 0;
+  Object.entries(punti[key]).forEach(([id, e]) => {
+    const molt = isMoltiplicabile(id, e);
+    if (e.pts > 0) {
+      bonus += e.pts;
+      if (molt) bonusMolt += e.pts; else bonusFisso += e.pts;
+    } else {
+      const v = Math.abs(e.pts);
+      malus += v;
+      if (molt) malusMolt += v; else malusFisso += v;
+    }
   });
-  return { bonus, malus };
+  return { bonus, malus, bonusFisso, malusFisso, bonusMolt, malusMolt };
 }
 function getPuntiSquadraRaw(ownerName) {
   const team = allTeams[sanitize(ownerName)];
@@ -487,8 +509,8 @@ function getPuntiSquadraRaw(ownerName) {
     const isCap = team.captain === playerName;
     const pp = getPuntiPersonaliRaw(playerName);
     const mult = isCap ? 2 : 1;
-    bonus += pp.bonus * mult;
-    malus += pp.malus * mult;
+    bonus += pp.bonusFisso + pp.bonusMolt * mult;
+    malus += pp.malusFisso + pp.malusMolt * mult;
   });
   return { bonus, malus };
 }
@@ -832,17 +854,22 @@ window.resetPuntiOspite = async function(name) {
 async function assegnaPersonalizzato(name) {
   const ptsInput = document.getElementById("custom-pts");
   const descInput = document.getElementById("custom-desc");
+  const noCapInput = document.getElementById("custom-nocap");
   const pts = parseInt(ptsInput.value, 10);
   const desc = (descInput.value || "").trim();
+  const noCap = !!noCapInput.checked;
   if (!Number.isFinite(pts) || pts === 0) { showToast("Inserisci un valore di punti valido", "warn"); return; }
   if (!desc) { showToast("Inserisci una descrizione", "warn"); return; }
 
   const key = sanitize(name);
   const eventId = `custom_${Date.now()}`;
-  await set(ref(db, `punti/${key}/${eventId}`), { pts, desc, ts: Date.now() });
+  const entry = { pts, desc, ts: Date.now() };
+  if (noCap) entry.noCap = true;
+  await set(ref(db, `punti/${key}/${eventId}`), entry);
   showToast(`${pts > 0 ? '+' : ''}${pts} → ${name}`);
   ptsInput.value = "";
   descInput.value = "";
+  noCapInput.checked = false;
   aggiornaModalOspite(name);
 }
 

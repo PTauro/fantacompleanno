@@ -457,15 +457,35 @@ function getRuolo(fazione, ruoloId) {
 function sanitize(s) { return s.replace(/[.#$[\]]/g, "_"); }
 
 // ── CALCOLI ──
+const CAT12_IDS = new Set([
+  "b_quiz_location","m_quiz_location","b_registrazione","b_squadra_creata",
+  "b_alleanza_vista","b_agente_missione",
+  "m_non_registrato","m_squadra_non_creata","m_fazione_non_pescata","m_alleanza_non_vista"
+]);
+function isMoltiplicabile(id, entry) {
+  if (id.startsWith("b_cat2_")) return false;
+  if (CAT12_IDS.has(id)) return false;
+  if (id.startsWith("custom_") && entry && entry.noCap) return false;
+  return true;
+}
+
 function getPuntiPersonali(name) {
   const key = sanitize(name);
-  if (!punti[key]) return { bonus: 0, malus: 0, tot: 0, eventi: [] };
-  let bonus = 0, malus = 0, eventi = [];
+  if (!punti[key]) return { bonus: 0, malus: 0, tot: 0, bonusFisso: 0, malusFisso: 0, bonusMolt: 0, malusMolt: 0, eventi: [] };
+  let bonus = 0, malus = 0, bonusFisso = 0, malusFisso = 0, bonusMolt = 0, malusMolt = 0, eventi = [];
   Object.entries(punti[key]).forEach(([id, e]) => {
-    if (e.pts > 0) bonus += e.pts; else malus += Math.abs(e.pts);
+    const molt = isMoltiplicabile(id, e);
+    if (e.pts > 0) {
+      bonus += e.pts;
+      if (molt) bonusMolt += e.pts; else bonusFisso += e.pts;
+    } else {
+      const v = Math.abs(e.pts);
+      malus += v;
+      if (molt) malusMolt += v; else malusFisso += v;
+    }
     eventi.push({ id, ...e });
   });
-  return { bonus, malus, tot: bonus - malus, eventi: eventi.sort((a,b) => (b.ts||0)-(a.ts||0)) };
+  return { bonus, malus, tot: bonus - malus, bonusFisso, malusFisso, bonusMolt, malusMolt, eventi: eventi.sort((a,b) => (b.ts||0)-(a.ts||0)) };
 }
 
 function getPuntiSquadra(ownerName) {
@@ -479,8 +499,8 @@ function getPuntiSquadra(ownerName) {
     const isCap = team.captain === p;
     const pp = getPuntiPersonali(p);
     const mult = isCap ? 2 : 1;
-    bonus += pp.bonus * mult;
-    malus += pp.malus * mult;
+    bonus += pp.bonusFisso + pp.bonusMolt * mult;
+    malus += pp.malusFisso + pp.malusMolt * mult;
   });
 
   // Bonus Alleanza Finale (+150/+100/+50) — non moltiplicato dal capitano
@@ -597,7 +617,9 @@ function render() {
       const pPts = getPuntiPersonali(pName);
       const pData = PLAYERS.find(p => p.name === pName);
       const initials2 = pName.split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase();
-      const ptsConMolt = isCap ? (pPts.bonus - pPts.malus) * 2 : pPts.tot;
+      const ptsConMolt = isCap
+        ? (pPts.bonusFisso + pPts.bonusMolt * 2) - (pPts.malusFisso + pPts.malusMolt * 2)
+        : pPts.tot;
 
       const div = document.createElement("div");
       div.className = "giocatore-row" + (isCap ? " capitano" : "");

@@ -378,7 +378,6 @@ const PLAYERS = [
   { name: "Luca Invidia", cost: 80 },
   { name: "Marika Piconese", cost: 50 },
   { name: "Stefanuccio", cost: 130 },
-  { name: "Andrea De Matteis", cost: 70 },
   { name: "Lorenzo Taffone", cost: 70 },
 ];
 
@@ -387,7 +386,7 @@ const ALLEANZE = {
   "💥 Bombette di Cisternino ASAP": ["Francesca Terlizzi","Nicolas Costa","Giulia Trevisi","Andrea Sozzani","Emilio Pulli","Eleonora Bello","Marta Mignone","Giuseppe Susca","Annachiara Maci","Davide Secci"],
   "😈 Il Buono Il Bello e il Danilo": ["Antonio Borelli","Marika Giagnotti","Danilo Schiavone","Ilaria Tenore","Donato Stragapede","Emily Giancane"],
   "💸 Cuoricini Broke": ["Martina Poso","Maycols Sirsi","Laura Capodieci","Davide Attanasio","Manuel Palma","Carlotta D'aversa","Nicolò Spada","Antonella Lo vecchio","Beatrice Gloria","Mariacarla Spagnolo","Mattia Martina","Lorenzo Taffone"],
-  "⚽ FantaSanPio 08:00 AM": ["Andrea Scozzi","Annalisa Ancora","Roberto Sciurti","Nicolò Maci","Silvia Lamusta","Alessio Maci","Rachele Ponzetta","Erminio Foti","Sara Colletta","Luca Grasso","Annalisa Maci","Alessio Caretto","Silvia Maci","Errico Del monte","Chiara Del Vecchio","Daniele Padula","Davide Mogavero","Marialuce Serra","Andrea De Matteis"],
+  "⚽ FantaSanPio 08:00 AM": ["Andrea Scozzi","Annalisa Ancora","Roberto Sciurti","Nicolò Maci","Silvia Lamusta","Alessio Maci","Rachele Ponzetta","Erminio Foti","Sara Colletta","Luca Grasso","Annalisa Maci","Alessio Caretto","Silvia Maci","Errico Del monte","Chiara Del Vecchio","Daniele Padula","Davide Mogavero","Marialuce Serra"],
   "🏆 Guinness World Record Partecipazione": ["Francesco Romano","Mariachiara Longo","Alberto Bianco","Martina Schiavone","Luca Invidia","Marika Piconese","Stefanuccio"],
 };
 
@@ -423,15 +422,37 @@ function renderLockedTab(listId, podioId) {
 // ── CALCOLI ──
 
 // Punti personali di un singolo ospite (per fazioni e punti personali)
+// Eventi di Cat.1 (automatismi pre-festa) e Cat.2 (composizione squadra/draft):
+// il moltiplicatore capitano (x2) NON si applica mai a questi — solo ai bonus/malus
+// di Cat.3-5/Ad Personam/Punti Personalizzati assegnati durante la festa.
+const CAT12_IDS = new Set([
+  "b_quiz_location","m_quiz_location","b_registrazione","b_squadra_creata",
+  "b_alleanza_vista","b_agente_missione",
+  "m_non_registrato","m_squadra_non_creata","m_fazione_non_pescata","m_alleanza_non_vista"
+]);
+function isMoltiplicabile(id, entry) {
+  if (id.startsWith("b_cat2_")) return false;
+  if (CAT12_IDS.has(id)) return false;
+  if (id.startsWith("custom_") && entry && entry.noCap) return false;
+  return true;
+}
+
 function getPuntiPersonali(name) {
   const key = sanitize(name);
-  if (!punti[key]) return { bonus: 0, malus: 0, tot: 0 };
-  let bonus = 0, malus = 0;
-  Object.values(punti[key]).forEach(e => {
-    if (e.pts > 0) bonus += e.pts;
-    else malus += Math.abs(e.pts);
+  if (!punti[key]) return { bonus: 0, malus: 0, tot: 0, bonusFisso: 0, malusFisso: 0, bonusMolt: 0, malusMolt: 0 };
+  let bonus = 0, malus = 0, bonusFisso = 0, malusFisso = 0, bonusMolt = 0, malusMolt = 0;
+  Object.entries(punti[key]).forEach(([id, e]) => {
+    const molt = isMoltiplicabile(id, e);
+    if (e.pts > 0) {
+      bonus += e.pts;
+      if (molt) bonusMolt += e.pts; else bonusFisso += e.pts;
+    } else {
+      const v = Math.abs(e.pts);
+      malus += v;
+      if (molt) malusMolt += v; else malusFisso += v;
+    }
   });
-  return { bonus, malus, tot: bonus - malus };
+  return { bonus, malus, tot: bonus - malus, bonusFisso, malusFisso, bonusMolt, malusMolt };
 }
 
 // Punti squadra di un ospite (somma punti personali delle persone che ha draftato)
@@ -450,8 +471,9 @@ function getPuntiSquadra(ownerName) {
     const isCap = team.captain === playerName;
     const pp = getPuntiPersonali(playerName);
     const mult = isCap ? 2 : 1;
-    bonus += pp.bonus * mult;
-    malus += pp.malus * mult;
+    // Solo la parte "moltiplicabile" (Cat.3-5/Ad Personam/custom) viene raddoppiata dal capitano
+    bonus += pp.bonusFisso + pp.bonusMolt * mult;
+    malus += pp.malusFisso + pp.malusMolt * mult;
   });
 
   // ── BONUS ALLEANZA FINALE (+150/+100/+50) ──
