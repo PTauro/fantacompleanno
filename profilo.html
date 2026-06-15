@@ -417,7 +417,6 @@ const PLAYERS = [
   { name: "Luca Invidia", cost: 80 },
   { name: "Marika Piconese", cost: 50 },
   { name: "Stefanuccio", cost: 130 },
-  { name: "Andrea De Matteis", cost: 70 },
   { name: "Lorenzo Taffone", cost: 70 },
 ];
 
@@ -426,13 +425,14 @@ const ALLEANZE = {
   "💥 Bombette di Cisternino ASAP": ["Francesca Terlizzi","Nicolas Costa","Giulia Trevisi","Andrea Sozzani","Emilio Pulli","Eleonora Bello","Marta Mignone","Giuseppe Susca","Annachiara Maci","Davide Secci"],
   "😈 Il Buono Il Bello e il Danilo": ["Antonio Borelli","Marika Giagnotti","Danilo Schiavone","Ilaria Tenore","Donato Stragapede","Emily Giancane"],
   "💸 Cuoricini Broke": ["Martina Poso","Maycols Sirsi","Laura Capodieci","Davide Attanasio","Manuel Palma","Carlotta D'aversa","Nicolò Spada","Antonella Lo vecchio","Beatrice Gloria","Mariacarla Spagnolo","Mattia Martina","Lorenzo Taffone"],
-  "⚽ FantaSanPio 08:00 AM": ["Andrea Scozzi","Annalisa Ancora","Roberto Sciurti","Nicolò Maci","Silvia Lamusta","Alessio Maci","Rachele Ponzetta","Erminio Foti","Sara Colletta","Luca Grasso","Annalisa Maci","Alessio Caretto","Silvia Maci","Errico Del monte","Chiara Del Vecchio","Daniele Padula","Davide Mogavero","Marialuce Serra","Andrea De Matteis"],
+  "⚽ FantaSanPio 08:00 AM": ["Andrea Scozzi","Annalisa Ancora","Roberto Sciurti","Nicolò Maci","Silvia Lamusta","Alessio Maci","Rachele Ponzetta","Erminio Foti","Sara Colletta","Luca Grasso","Annalisa Maci","Alessio Caretto","Silvia Maci","Errico Del monte","Chiara Del Vecchio","Daniele Padula","Davide Mogavero","Marialuce Serra"],
   "🏆 Guinness World Record Partecipazione": ["Francesco Romano","Mariachiara Longo","Alberto Bianco","Martina Schiavone","Luca Invidia","Marika Piconese","Stefanuccio"],
 };
 
 let punti = {};
 let teams = {};
 let fazioni = {};
+let alleanzaBonusFinale = {};
 
 const RUOLI = {
   cody: {
@@ -471,14 +471,22 @@ function getPuntiPersonali(name) {
 function getPuntiSquadra(ownerName) {
   const key = sanitize(ownerName);
   const team = teams[key];
-  if (!team || !team.roster) return 0;
-  let tot = 0;
+  const extra = (alleanzaBonusFinale[key] && alleanzaBonusFinale[key].pts) || 0;
+  if (!team || !team.roster) return { bonus: extra, malus: 0, tot: extra };
+
+  let bonus = 0, malus = 0;
   team.roster.forEach(p => {
     const isCap = team.captain === p;
     const pp = getPuntiPersonali(p);
-    tot += (pp.bonus - pp.malus) * (isCap ? 2 : 1);
+    const mult = isCap ? 2 : 1;
+    bonus += pp.bonus * mult;
+    malus += pp.malus * mult;
   });
-  return tot;
+
+  // Bonus Alleanza Finale (+150/+100/+50) — non moltiplicato dal capitano
+  bonus += extra;
+
+  return { bonus, malus, tot: bonus - malus };
 }
 
 function getMiaAlleanza() {
@@ -491,8 +499,8 @@ function getMiaAlleanza() {
 function getCoeffAlleanza(membri) {
   const conSq = membri.filter(m => teams[sanitize(m)]);
   if (!conSq.length) return 0;
-  const totB = conSq.reduce((s,m) => s + getPuntiPersonali(m).bonus, 0);
-  const totM = conSq.reduce((s,m) => s + getPuntiPersonali(m).malus, 0);
+  const totB = conSq.reduce((s,m) => s + getPuntiSquadra(m).bonus, 0);
+  const totM = conSq.reduce((s,m) => s + getPuntiSquadra(m).malus, 0);
   return (totB / conSq.length) - (totM / conSq.length);
 }
 
@@ -501,7 +509,8 @@ function render() {
   const pp = getPuntiPersonali(myName);
   const myKey = sanitize(myName);
   const myTeam = teams[myKey];
-  const ptsSq = getPuntiSquadra(myName);
+  const ptsSqObj = getPuntiSquadra(myName);
+  const ptsSq = ptsSqObj.tot;
   const initials = myName.split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase();
 
   // Nav + avatar
@@ -553,7 +562,7 @@ function render() {
   document.getElementById("punti-eventi").textContent = `${pp.eventi.length} eventi`;
 
   // Posizione campionato (basata su punti squadra)
-  const classifica = PLAYERS.map(p => ({ name: p.name, pts: getPuntiSquadra(p.name) }))
+  const classifica = PLAYERS.map(p => ({ name: p.name, pts: getPuntiSquadra(p.name).tot }))
     .sort((a,b) => b.pts - a.pts);
   const myPos = classifica.findIndex(p => p.name === myName) + 1;
 
@@ -578,7 +587,9 @@ function render() {
     const header = document.createElement("div");
     header.className = "squadra-header";
     const spesi = myTeam.roster.reduce((s,n) => s + (PLAYERS.find(p=>p.name===n)?.cost||0), 0);
-    header.innerHTML = `<div class="squadra-nome">${myTeam.teamName || "Squadra senza nome"}</div><div class="squadra-budget">✂️ ${spesi}/500 Capelli spesi · ${myTeam.roster.length}/5 giocatori</div>`;
+    const ab = alleanzaBonusFinale[myKey];
+    const abRow = ab ? `<div class="squadra-budget" style="color:var(--gold);margin-top:4px;">🏆 +${ab.pts} Bonus Alleanza Finale — ${ab.alleanza}</div>` : '';
+    header.innerHTML = `<div class="squadra-nome">${myTeam.teamName || "Squadra senza nome"}</div><div class="squadra-budget">✂️ ${spesi}/500 Capelli spesi · ${myTeam.roster.length}/5 giocatori</div>${abRow}`;
     sqContainer.appendChild(header);
 
     myTeam.roster.forEach(pName => {
@@ -617,8 +628,8 @@ function render() {
   posRow.innerHTML = "";
   const prevName = myPos > 1 ? classifica[myPos-2].name : null;
   const nextName = myPos < classifica.length ? classifica[myPos].name : null;
-  const prevPts = prevName ? getPuntiSquadra(prevName) : null;
-  const nextPts = nextName ? getPuntiSquadra(nextName) : null;
+  const prevPts = prevName ? getPuntiSquadra(prevName).tot : null;
+  const nextPts = nextName ? getPuntiSquadra(nextName).tot : null;
 
   if (prevName) {
     const div = document.createElement("div");
@@ -695,6 +706,10 @@ onValue(ref(db, "teams"), snap => {
 });
 onValue(ref(db, "fazioni"), snap => {
   fazioni = snap.exists() ? snap.val() : {};
+  render();
+});
+onValue(ref(db, "alleanzaBonusFinale"), snap => {
+  alleanzaBonusFinale = snap.exists() ? snap.val() : {};
   render();
 });
 </script>
