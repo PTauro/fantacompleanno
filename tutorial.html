@@ -270,7 +270,7 @@ const PLAYER_COSTS = {
   "Luca Grasso":85,"Annalisa Maci":50,"Alessio Caretto":85,"Silvia Maci":50,"Errico Del monte":85,
   "Chiara Del Vecchio":50,"Daniele Padula":80,"Davide Mogavero":160,"Marialuce Serra":85,"Francesco Romano":85,
   "Mariachiara Longo":50,"Alberto Bianco":100,"Martina Schiavone":85,"Luca Invidia":80,"Marika Piconese":50,
-  "Stefanuccio":130,"Andrea De Matteis":70,"Lorenzo Taffone":70
+  "Stefanuccio":130,"Lorenzo Taffone":70
 };
 
 const RUOLI = {
@@ -525,6 +525,7 @@ function renderCartaRivelata(fazione, ruolo) {
 
   const btn = document.getElementById("btn-next");
   btn.disabled = false;
+  btn.style.display = "block";
   btn.textContent = "🏠 Vai alla Home →";
   btn.onclick = () => {
     localStorage.setItem("fc_tutorial_done", "1");
