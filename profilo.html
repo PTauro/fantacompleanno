@@ -181,12 +181,14 @@ body {
   100% { transform: scale(1) rotateY(0deg); opacity: 1; }
 }
 .carta-cody {
-  background: linear-gradient(135deg, #1a0800, #2d1200, #1a0800);
+  background-image: linear-gradient(135deg, rgba(26,8,0,0.78), rgba(45,18,0,0.78), rgba(26,8,0,0.78)), url('assets/cornice_cody.jpg');
+  background-size: 100% 100%; background-repeat: no-repeat;
   border: 2px solid var(--accent-cody);
   box-shadow: 0 0 40px rgba(255,107,43,0.3);
 }
 .carta-siria {
-  background: linear-gradient(135deg, #0d0020, #1a0035, #0d0020);
+  background-image: linear-gradient(135deg, rgba(13,0,32,0.78), rgba(26,0,53,0.78), rgba(13,0,32,0.78)), url('assets/cornice_siria.jpg');
+  background-size: 100% 100%; background-repeat: no-repeat;
   border: 2px solid var(--accent-siria);
   box-shadow: 0 0 40px rgba(168,85,247,0.3);
 }
@@ -197,6 +199,10 @@ body {
 }
 .carta-cody .carta-ruolo-icon { box-shadow: 0 0 24px rgba(255,107,43,0.35); border: 1.5px solid rgba(255,107,43,0.4); }
 .carta-siria .carta-ruolo-icon { box-shadow: 0 0 24px rgba(168,85,247,0.35); border: 1.5px solid rgba(168,85,247,0.4); }
+.carta-fazione-row { display: flex; align-items: center; justify-content: center; gap: 8px; }
+.carta-team-badge { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+.carta-cody .carta-team-badge { box-shadow: 0 0 12px rgba(255,107,43,0.5); }
+.carta-siria .carta-team-badge { box-shadow: 0 0 12px rgba(168,85,247,0.5); }
 .carta-fazione-label {
   font-family: 'Space Mono', monospace; font-size: 11px;
   letter-spacing: .2em; text-transform: uppercase; margin-bottom: 6px;
@@ -523,7 +529,10 @@ function renderCarta(fazione, ruoloId) {
     <div class="carta-revealed ${fazione_class}">
       <img class="carta-ruolo-icon" src="${ruolo.img}" alt="${ruolo.nome}">
       <div class="carta-fazione-label">Sei nel</div>
-      <div class="carta-fazione-name">${fazioneNome}</div>
+      <div class="carta-fazione-row">
+        <img class="carta-team-badge" src="assets/badge_team_${fazione}.jpg" alt="">
+        <div class="carta-fazione-name">${fazioneNome}</div>
+      </div>
 
       <div class="carta-ruolo-label">Il tuo ruolo</div>
       <div class="carta-ruolo-name">${ruolo.nome}</div>
