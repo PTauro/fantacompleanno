@@ -519,10 +519,15 @@ async function init() {
   }
 
   // 2. Controlla se c'è un nome in localStorage ma NON corrisponde più a Firebase
+  //    (es. l'admin ha fatto un Reset Totale) → pulizia completa, si ricomincia dal quiz
   const savedName = localStorage.getItem("fc_player_name");
   if (savedName) {
-    // Pulisci localStorage — era stato scollegato dall'admin
     localStorage.removeItem("fc_player_name");
+    localStorage.removeItem("fc_tutorial_done");
+    localStorage.removeItem("fc_quiz_solved");
+    localStorage.removeItem("fc_device_code");
+    window.location.replace("quiz.html");
+    return;
   }
 
   // 3. Nessun abbinamento → mostra welcome, scegli nome

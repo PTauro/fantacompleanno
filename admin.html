@@ -324,6 +324,11 @@ body {
     🗑 Reset Totale Punti
   </button>
 
+  <div class="section-label">Reset Totale Gioco — Tutti tornano al Quiz</div>
+  <button onclick="resetTotaleGioco()" style="width:100%;background:rgba(239,68,68,0.18);border:1.5px solid var(--red);color:var(--red);padding:14px 16px;border-radius:12px;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:800;cursor:pointer;margin-bottom:12px;">
+    ☢️ Reset Totale Gioco (registrazioni + squadre + fazioni + punti)
+  </button>
+
   <div class="section-label">Reset Fazioni</div>
   <button onclick="resetFazioniTutte()" style="width:100%;background:rgba(168,85,247,0.1);border:1.5px solid rgba(168,85,247,0.4);color:var(--accent-siria);padding:14px 16px;border-radius:12px;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:8px;">
     ⚔️ Reset Fazioni — Tutti
@@ -352,6 +357,8 @@ body {
         <button class="btn-close" onclick="closeModal()">✕</button>
       </div>
     </div>
+
+    <button class="btn-annulla" style="width:100%;margin-bottom:14px;justify-content:center;" id="btn-reset-ospite">🗑 Reset Punti — questa persona</button>
 
     <div class="section-label">Assegna Bonus</div>
     <div class="eventi-grid" id="modal-bonus-grid"></div>
@@ -663,6 +670,7 @@ function aggiornaModalOspite(name) {
 
   document.getElementById("modal-name").textContent = name;
   document.getElementById("modal-sub").textContent = `${eventi.length} eventi assegnati`;
+  document.getElementById("btn-reset-ospite").onclick = () => resetPuntiOspite(name);
 
   const ptsEl = document.getElementById("modal-pts");
   ptsEl.textContent = (pts > 0 ? '+' : '') + pts + ' pt';
@@ -717,6 +725,16 @@ function aggiornaModalOspite(name) {
 window.closeModal = function() {
   document.getElementById("modal-ospite").classList.remove("open");
   currentGuest = null;
+};
+
+// ── RESET PUNTI SINGOLO OSPITE (manuali + automatici) ──
+window.resetPuntiOspite = async function(name) {
+  if (!confirm(`Reset di TUTTI i punti (manuali e automatici) di ${name}?\n\nGli automatismi potranno riassegnarsi da capo (es. registrazione, squadra, quiz...).`)) return;
+  const key = sanitize(name);
+  await remove(ref(db, `punti/${key}`));
+  await remove(ref(db, `autoEvents/${key}`));
+  showToast(`✓ Punti di ${name} resettati`, "warn");
+  aggiornaModalOspite(name);
 };
 
 // ── ASSEGNA PUNTO A OSPITE ──
@@ -947,9 +965,24 @@ function renderToolsRegistrations() {
 
 window.resetPunti = async function() {
   if (!confirm("RESET TOTALE di tutti i punti assegnati? Azione irreversibile!")) return;
-  if (!confirm("Sei SICURO? Tutti i punti verranno azzerati.")) return;
+  if (!confirm("Sei SICURO? Tutti i punti e gli automatismi verranno azzerati (i bonus/malus automatici potranno essere riassegnati).")) return;
   await remove(ref(db, "punti"));
-  showToast("✓ Tutti i punti resettati", "warn");
+  await remove(ref(db, "autoEvents"));
+  showToast("✓ Punti e automatismi resettati", "warn");
+};
+
+window.resetTotaleGioco = async function() {
+  if (!confirm("RESET TOTALE DEL GIOCO?\n\nVerranno cancellati: registrazioni, squadre, fazioni, punti e automatismi.\nOgni dispositivo, al prossimo accesso, tornerà al QUIZ iniziale.\n\nAzione irreversibile!")) return;
+  if (!confirm("Sei DAVVERO sicuro? Si ricomincia da zero per tutti.")) return;
+  await Promise.all([
+    remove(ref(db, "registrations")),
+    remove(ref(db, "teams")),
+    remove(ref(db, "fazioni")),
+    remove(ref(db, "punti")),
+    remove(ref(db, "autoEvents")),
+    remove(ref(db, "prefesta_sbloccata")),
+  ]);
+  showToast("✓ Reset totale completato — tutti torneranno al quiz", "warn");
 };
 
 window.resetFazioniTutte = async function() {
