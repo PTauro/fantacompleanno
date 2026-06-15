@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FantaCompleanno — Classifica</title>
+<title>FantaCompleanno — Home</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700;800&family=Space+Mono:wght@400;700&display=swap');
 
@@ -20,162 +20,167 @@ body {
   min-height: 100vh; padding-bottom: 40px;
 }
 
-/* ── NAV ── */
-.nav {
-  position: sticky; top: 0; z-index: 50;
-  background: rgba(10,10,15,0.97); backdrop-filter: blur(12px);
+/* ── HEADER ── */
+.hero-banner {
+  width: 100%; display: block; object-fit: cover;
+  border-bottom: 1.5px solid var(--border);
+  max-height: 220px;
+}
+.header {
+  padding: 40px 20px 24px;
   border-bottom: 1px solid var(--border);
-  padding: 12px 20px; display: flex; align-items: center; justify-content: space-between;
 }
-.nav-title { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--text-muted); letter-spacing:.1em; }
-.nav-name { font-size: 16px; font-weight: 800; }
-.live-dot {
+.header-top {
+  display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px;
+}
+.greeting {
+  font-family: 'Space Mono', monospace; font-size: 11px;
+  color: var(--text-muted); letter-spacing: .15em; text-transform: uppercase; margin-bottom: 6px;
+}
+.player-name { font-size: 26px; font-weight: 800; line-height: 1.1; }
+.player-name span { color: var(--accent-cody); }
+.avatar-circle {
+  width: 48px; height: 48px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-cody), var(--accent-siria));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; font-weight: 800; font-family: 'Space Mono', monospace;
+  color: white; flex-shrink: 0;
+}
+
+/* STATUS PILLS */
+.status-pills { display: flex; gap: 8px; flex-wrap: wrap; }
+.pill {
   display: flex; align-items: center; gap: 6px;
-  font-family: 'Space Mono', monospace; font-size: 11px; color: var(--green);
-}
-.live-dot::before {
-  content: ''; width: 8px; height: 8px; border-radius: 50%;
-  background: var(--green); animation: pulse 1.5s infinite;
-}
-@keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
-
-/* ── TABS ── */
-.tabs {
-  display: flex; border-bottom: 1px solid var(--border);
-  background: var(--surface); position: sticky; top: 53px; z-index: 40;
-}
-.tab {
-  flex: 1; padding: 13px 8px; text-align: center;
-  font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700;
-  color: var(--text-muted); cursor: pointer; transition: all .2s;
-  border-bottom: 2px solid transparent;
-}
-.tab.active { color: var(--accent-cody); border-bottom-color: var(--accent-cody); }
-
-.tab-content { display: none; padding: 16px 20px; }
-.tab-content.active { display: block; }
-
-/* ── PODIO TOP 3 ── */
-.podio {
-  display: flex; align-items: flex-end; justify-content: center;
-  gap: 8px; margin-bottom: 24px; padding-top: 8px;
-}
-.podio-slot {
-  flex: 1; text-align: center; max-width: 120px;
-}
-.podio-bar {
-  border-radius: 10px 10px 0 0; margin-bottom: 8px;
-  display: flex; align-items: flex-end; justify-content: center;
-  padding-bottom: 8px; position: relative;
-}
-.podio-pos {
-  font-family: 'Space Mono', monospace; font-size: 20px; font-weight: 700;
-  position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
-}
-.podio-1 .podio-bar { height: 120px; background: linear-gradient(180deg, rgba(245,158,11,0.3), rgba(245,158,11,0.1)); border: 1.5px solid var(--gold); }
-.podio-2 .podio-bar { height: 90px; background: linear-gradient(180deg, rgba(168,85,247,0.3), rgba(168,85,247,0.1)); border: 1.5px solid var(--accent-siria); }
-.podio-3 .podio-bar { height: 70px; background: linear-gradient(180deg, rgba(255,107,43,0.3), rgba(255,107,43,0.1)); border: 1.5px solid var(--accent-cody); }
-.podio-name { font-size: 11px; font-weight: 700; margin-bottom: 2px; line-height: 1.2; }
-.podio-pts { font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 700; color: var(--gold); }
-.podio-team { font-size: 10px; color: var(--text-muted); }
-
-/* ── CLASSIFICA ROWS ── */
-.rank-row {
   background: var(--surface); border: 1.5px solid var(--border);
-  border-radius: 12px; padding: 14px 16px; margin-bottom: 8px;
-  display: flex; align-items: center; gap: 14px; transition: all .2s;
+  border-radius: 100px; padding: 6px 12px; font-size: 12px;
 }
-.rank-row.me { border-color: var(--accent-cody); background: rgba(255,107,43,0.05); }
-.rank-row.top1 { border-color: var(--gold); }
-.rank-pos {
-  font-family: 'Space Mono', monospace; font-size: 18px; font-weight: 700;
-  min-width: 32px; color: var(--text-muted);
-}
-.rank-pos.gold { color: var(--gold); }
-.rank-pos.silver { color: #94a3b8; }
-.rank-pos.bronze { color: var(--accent-cody); }
-.rank-info { flex: 1; min-width: 0; }
-.rank-name { font-size: 14px; font-weight: 700; }
-.rank-team { font-size: 11px; color: var(--text-muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.rank-pts {
-  font-family: 'Space Mono', monospace; font-size: 18px; font-weight: 700;
-  text-align: right;
-}
-.rank-pts.pos { color: var(--green); }
-.rank-pts.neg { color: var(--red); }
-.rank-pts.zero { color: var(--text-muted); }
-.rank-delta { font-size: 10px; text-align: right; margin-top: 2px; font-family: 'Space Mono', monospace; }
+.pill.ok { border-color: rgba(34,197,94,0.4); color: var(--green); }
+.pill.warn { border-color: rgba(245,158,11,0.4); color: var(--gold); }
+.pill.neutral { color: var(--text-muted); }
 
-/* ── ALLEANZE ── */
-.alleanza-card {
-  background: var(--surface); border: 1.5px solid var(--border);
-  border-radius: 14px; padding: 16px; margin-bottom: 10px; transition: all .2s;
+/* ── SEZIONI PRINCIPALI ── */
+.section { padding: 20px; }
+.section-title {
+  font-family: 'Space Mono', monospace; font-size: 11px;
+  color: var(--text-muted); letter-spacing: .15em; text-transform: uppercase;
+  margin-bottom: 12px;
 }
-.alleanza-card.winner { border-color: var(--gold); background: rgba(245,158,11,0.05); }
-.alleanza-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-.alleanza-name { font-size: 16px; font-weight: 800; }
-.alleanza-pos {
-  font-family: 'Space Mono', monospace; font-size: 13px;
-  padding: 4px 12px; border-radius: 100px; background: var(--border); color: var(--text-muted);
-}
-.alleanza-pos.first { background: rgba(245,158,11,0.2); color: var(--gold); border: 1px solid rgba(245,158,11,0.4); }
-.coefficiente-bar { margin-bottom: 12px; }
-.coefficiente-label {
-  font-family: 'Space Mono', monospace; font-size: 10px;
-  color: var(--text-muted); letter-spacing: .1em; margin-bottom: 6px;
-  display: flex; justify-content: space-between;
-}
-.coeff-formula {
-  font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 700;
-  color: var(--accent-siria);
-}
-.coeff-value {
-  font-family: 'Space Mono', monospace; font-size: 22px; font-weight: 700;
-  color: var(--green);
-}
-.coeff-value.neg { color: var(--red); }
-.track { width: 100%; height: 6px; background: var(--border); border-radius: 3px; margin-top: 6px; }
-.track-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--accent-cody), var(--accent-siria)); transition: width .5s ease; }
-.alleanza-membri {
-  display: flex; flex-wrap: wrap; gap: 4px;
-}
-.membro-chip {
-  font-size: 10px; background: var(--border); border-radius: 100px;
-  padding: 3px 8px; color: var(--text-muted);
-}
-.membro-chip.has-team { color: var(--text); background: rgba(255,107,43,0.1); }
 
-/* ── FAZIONI ── */
-.fazione-card {
-  border-radius: 14px; padding: 16px; margin-bottom: 10px;
+/* ── AZIONE CARD GRANDE ── */
+.action-card {
+  border-radius: 16px; padding: 20px; margin-bottom: 12px;
+  cursor: pointer; transition: all .2s; position: relative; overflow: hidden;
+  border: 1.5px solid var(--border);
 }
-.fazione-cody {
+.action-card:active { transform: scale(0.98); }
+.action-card-draft {
   background: linear-gradient(135deg, #1a0800, #2d1200);
-  border: 1.5px solid rgba(255,107,43,0.4);
+  border-color: rgba(255,107,43,0.4);
 }
-.fazione-siria {
-  background: linear-gradient(135deg, #0d0020, #1a0035);
-  border: 1.5px solid rgba(168,85,247,0.4);
+.action-card-draft:hover { border-color: var(--accent-cody); }
+.action-card-regolamento {
+  background: var(--surface);
 }
-.fazione-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-.fazione-name { font-size: 18px; font-weight: 800; }
-.fazione-pts { font-family: 'Space Mono', monospace; font-size: 24px; font-weight: 700; }
-.fazione-cody .fazione-pts { color: var(--accent-cody); }
-.fazione-siria .fazione-pts { color: var(--accent-siria); }
-.fazione-bar-wrap { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; margin-bottom: 8px; }
-.fazione-bar-fill { height: 100%; border-radius: 4px; transition: width .5s ease; }
-.fazione-cody .fazione-bar-fill { background: var(--accent-cody); }
-.fazione-siria .fazione-bar-fill { background: var(--accent-siria); }
-.fazione-label { font-size: 11px; color: var(--text-muted); }
+.action-card-regolamento:hover { border-color: var(--accent-siria); }
+.action-card-alleanze {
+  background: linear-gradient(135deg, #0a0020, #15003a);
+  border-color: rgba(168,85,247,0.3);
+}
+.action-card-alleanze:hover { border-color: var(--accent-siria); }
+.action-card-fazione {
+  background: linear-gradient(135deg, #001a0a, #003018);
+  border-color: rgba(34,197,94,0.3);
+}
+.action-card-fazione:hover { border-color: var(--green); }
 
-/* ── EMPTY ── */
-.empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); }
-.empty-emoji { font-size: 48px; display: block; margin-bottom: 12px; }
-.locked-badge {
-  font-family: 'Space Mono', monospace; font-size: 11px; color: var(--text-muted);
-  background: rgba(255,255,255,0.04); border: 1px dashed var(--border);
-  border-radius: 8px; padding: 6px 10px; display: inline-block;
+.card-icon { font-size: 32px; margin-bottom: 10px; display: block; }
+.card-title { font-size: 18px; font-weight: 800; margin-bottom: 4px; }
+.card-sub { font-size: 13px; color: var(--text-muted); line-height: 1.4; }
+.card-arrow {
+  position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
+  font-size: 20px; color: var(--text-muted);
 }
+.card-badge {
+  display: inline-block; font-family: 'Space Mono', monospace; font-size: 10px;
+  padding: 3px 10px; border-radius: 100px; margin-top: 8px;
+}
+.badge-ok { background: rgba(34,197,94,0.15); color: var(--green); border: 1px solid rgba(34,197,94,0.3); }
+.badge-warn { background: rgba(245,158,11,0.15); color: var(--gold); border: 1px solid rgba(245,158,11,0.3); }
+.badge-info { background: rgba(168,85,247,0.15); color: var(--accent-siria); border: 1px solid rgba(168,85,247,0.3); }
+.badge-lock { background: rgba(107,107,138,0.15); color: var(--text-muted); border: 1px solid var(--border); }
+
+/* GRIGLIA 2 col per card piccole */
+.card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.action-card-small {
+  border-radius: 14px; padding: 16px;
+  cursor: pointer; transition: all .2s;
+  border: 1.5px solid var(--border); background: var(--surface);
+}
+.action-card-small:active { transform: scale(0.97); }
+.action-card-small .card-icon { font-size: 24px; margin-bottom: 8px; }
+.action-card-small .card-title { font-size: 14px; }
+.action-card-small .card-sub { font-size: 12px; }
+
+/* ── MODAL REGOLAMENTO ── */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.9); z-index: 100;
+  overflow-y: auto; padding: 20px;
+}
+.modal-overlay.open { display: block; }
+.modal-box {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 20px; padding: 24px; max-width: 480px; margin: 0 auto;
+  animation: slideUp .3s ease;
+}
+@keyframes slideUp { from { transform: translateY(30px); opacity:0; } to { transform:translateY(0); opacity:1; } }
+.modal-header {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;
+}
+.modal-title { font-size: 18px; font-weight: 800; }
+.btn-close {
+  background: var(--border); border: none; color: var(--text);
+  width: 32px; height: 32px; border-radius: 50%; font-size: 16px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+}
+
+/* REGOLAMENTO CONTENT */
+.reg-section { margin-bottom: 24px; }
+.reg-section-title {
+  font-family: 'Space Mono', monospace; font-size: 12px;
+  color: var(--accent-cody); letter-spacing: .1em; text-transform: uppercase;
+  margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border);
+}
+.reg-row {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 8px 0; border-bottom: 1px solid rgba(30,30,46,0.5); font-size: 13px;
+}
+.reg-row:last-child { border-bottom: none; }
+.reg-pts {
+  font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 700;
+  min-width: 52px; flex-shrink: 0;
+}
+.reg-pts.pos { color: var(--green); }
+.reg-pts.neg { color: var(--red); }
+.reg-desc { color: var(--text); line-height: 1.4; }
+.reg-type {
+  font-size: 10px; color: var(--text-muted); font-family: 'Space Mono', monospace;
+  margin-top: 2px;
+}
+
+/* SUB-MODAL per categoria */
+.cat-tabs {
+  display: flex; gap: 6px; margin-bottom: 16px; overflow-x: auto;
+  padding-bottom: 4px; scrollbar-width: none;
+}
+.cat-tabs::-webkit-scrollbar { display: none; }
+.cat-tab {
+  flex-shrink: 0; padding: 7px 14px; border-radius: 100px;
+  font-family: 'Space Mono', monospace; font-size: 11px; cursor: pointer;
+  background: var(--border); color: var(--text-muted); transition: all .2s;
+  border: 1.5px solid transparent;
+}
+.cat-tab.active { background: rgba(255,107,43,0.15); color: var(--accent-cody); border-color: rgba(255,107,43,0.4); }
 
 /* ── TOAST ── */
 .toast {
@@ -186,7 +191,80 @@ body {
   opacity: 0; transition: opacity .3s; pointer-events: none; white-space: nowrap; z-index: 300;
 }
 .toast.show { opacity: 1; }
-.toast.warn { border-color: var(--gold); color: var(--gold); }
+
+/* ── COUNTDOWN ── */
+.countdown-bar {
+  background: linear-gradient(135deg, #0d0020, #1a0035);
+  border-bottom: 1px solid rgba(168,85,247,0.3);
+  padding: 14px 20px; text-align: center;
+}
+.countdown-label {
+  font-family: 'Space Mono', monospace; font-size: 10px;
+  color: var(--accent-siria); letter-spacing: .15em; text-transform: uppercase; margin-bottom: 6px;
+}
+.countdown-timer {
+  display: flex; justify-content: center; gap: 8px; align-items: center;
+}
+.cd-unit {
+  background: rgba(168,85,247,0.1); border: 1px solid rgba(168,85,247,0.3);
+  border-radius: 8px; padding: 6px 10px; min-width: 52px; text-align: center;
+}
+.cd-num {
+  font-family: 'Space Mono', monospace; font-size: 20px; font-weight: 700;
+  color: var(--accent-siria); display: block; line-height: 1;
+}
+.cd-label { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .1em; }
+.cd-sep { font-family: 'Space Mono', monospace; font-size: 20px; color: rgba(168,85,247,0.5); margin-bottom: 12px; }
+
+.draft-countdown {
+  background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.25);
+  border-radius: 10px; padding: 10px 14px; margin-top: 8px;
+  display: flex; align-items: center; gap: 10px;
+}
+.draft-cd-label { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--gold); letter-spacing: .1em; flex-shrink: 0; }
+.draft-cd-timer { font-family: 'Space Mono', monospace; font-size: 14px; font-weight: 700; color: var(--gold); }
+.draft-cd-closed { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--red); }
+
+/* ── LORE ── */
+.lore-box {
+  margin: 0 20px 4px;
+  background: linear-gradient(135deg, rgba(255,107,43,0.06), rgba(168,85,247,0.06));
+  border: 1.5px solid var(--border);
+  border-radius: 14px; padding: 18px 20px;
+}
+.lore-text {
+  font-size: 14px; line-height: 1.7; color: var(--text-muted);
+  font-style: italic;
+}
+.lore-text strong { color: var(--text); font-style: normal; }
+.lore-text .cody { color: var(--accent-cody); font-style: normal; }
+.lore-text .siria { color: var(--accent-siria); font-style: normal; }
+
+/* ── SEZIONE GENERALE ── */
+.generale-box {
+  margin: 0 20px 4px;
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 14px; padding: 20px;
+}
+.generale-title {
+  font-size: 16px; font-weight: 800; margin-bottom: 14px;
+  display: flex; align-items: center; gap: 8px;
+}
+.generale-block { margin-bottom: 16px; }
+.generale-block:last-child { margin-bottom: 0; }
+.generale-block-title {
+  font-family: 'Space Mono', monospace; font-size: 11px;
+  color: var(--accent-cody); letter-spacing: .1em; text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.generale-block p { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+.generale-block p strong { color: var(--text); }
+.info-chips-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+.info-chip-small {
+  background: var(--border); border-radius: 8px; padding: 6px 12px;
+  font-size: 12px; color: var(--text-muted);
+}
+.info-chip-small strong { color: var(--text); }
 /* ── BOTTOM NAV BAR ── */
 .bottom-nav {
   position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
@@ -238,61 +316,133 @@ body { padding-bottom: 90px !important; }
 </head>
 <body>
 
-<!-- NAV -->
-<div class="nav">
-  <div>
-    <div class="nav-title">// CLASSIFICA LIVE //</div>
-    <div class="nav-name">FantaCompleanno 🎂</div>
+<!-- ══ HERO BANNER ══ -->
+<img src="hero_banner.jpg" alt="Regno di Casa Tauro — La Guerra dei 30 Anni" class="hero-banner">
+
+<!-- ══ HEADER ══ -->
+<!-- ══ COUNTDOWN FESTA ══ -->
+<div class="countdown-bar">
+  <div class="countdown-label">⚔️ La guerra ha inizio tra</div>
+  <div class="countdown-timer" id="festa-countdown">
+    <div class="cd-unit"><span class="cd-num" id="cd-giorni">--</span><span class="cd-label">giorni</span></div>
+    <span class="cd-sep">:</span>
+    <div class="cd-unit"><span class="cd-num" id="cd-ore">--</span><span class="cd-label">ore</span></div>
+    <span class="cd-sep">:</span>
+    <div class="cd-unit"><span class="cd-num" id="cd-min">--</span><span class="cd-label">min</span></div>
+    <span class="cd-sep">:</span>
+    <div class="cd-unit"><span class="cd-num" id="cd-sec">--</span><span class="cd-label">sec</span></div>
   </div>
-  <div style="display:flex;align-items:center;gap:10px;">
-    <div class="live-dot">LIVE</div>
-      </div>
 </div>
 
-<!-- TABS -->
-<div class="tabs">
-  <div class="tab active" onclick="switchTab('invitati')" id="tab-invitati">👤 Invitati</div>
-  <div class="tab" onclick="switchTab('campionato')" id="tab-campionato">🏆 Squadre</div>
-  <div class="tab" onclick="switchTab('alleanze')" id="tab-alleanze">🤝 Alleanze</div>
-  <div class="tab" onclick="switchTab('fazioni')" id="tab-fazioni">⚔️ Fazioni</div>
-</div>
-
-<!-- TAB INVITATI -->
-<div class="tab-content active" id="content-invitati">
-  <div style="background:rgba(255,107,43,0.08);border:1px solid rgba(255,107,43,0.2);border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:12px;color:var(--text-muted);line-height:1.5;">
-    Punti <strong style="color:var(--text)">personali</strong> di ogni invitato — assegnati automaticamente dall'app o da Pietro in base alle azioni durante la serata.
+<div class="header">
+  <div class="header-top">
+    <div>
+      <div class="greeting">// FantaCompleanno — 27 Giugno 2026 //</div>
+      <div class="player-name">Ciao, <span id="player-name-display">...</span> 👋</div>
+    </div>
+    <div class="avatar-circle" id="avatar-circle" onclick="window.location.href='profilo.html'" style="cursor:pointer;" title="Il mio profilo">?</div>
   </div>
-  <div class="podio" id="podio-invitati"></div>
-  <div id="invitati-list"></div>
-</div>
-
-<!-- TAB CAMPIONATO -->
-<div class="tab-content" id="content-campionato">
-  <div class="podio" id="podio"></div>
-  <div id="classifica-list"></div>
-</div>
-
-<!-- TAB ALLEANZE -->
-<div class="tab-content" id="content-alleanze">
-  <div style="background:rgba(168,85,247,0.08);border:1px solid rgba(168,85,247,0.2);border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:12px;color:var(--text-muted);line-height:1.5;">
-    Il coefficiente si calcola sulla <strong style="color:var(--text)">media dei punti squadra</strong> dei membri — non sui punti personali. Conta la qualità media del gruppo.
+  <div class="status-pills">
+    <div class="pill neutral" id="pill-squad">⏳ Squadra non creata</div>
+    <div class="pill neutral">🎂 27 Giugno</div>
   </div>
-  <div id="alleanze-list"></div>
 </div>
 
-<!-- TAB FAZIONI -->
-<div class="tab-content" id="content-fazioni">
-  <div style="background:rgba(255,107,43,0.08);border:1px solid rgba(255,107,43,0.2);border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:12px;color:var(--text-muted);line-height:1.5;">
-    Le fazioni si basano sui <strong style="color:var(--text)">punti personali</strong> di ogni ospite — non sulla squadra draftata. Ogni bonus/malus che ricevi va direttamente alla tua fazione.
+
+<!-- ══ LORE ══ -->
+<div class="lore-box" style="margin-top:16px;">
+  <div class="lore-text">
+    <span class="cody">🐕 Cody il Beagle Vorace</span> contro <span class="siria">🐱 Siria la Bisbetica Gatta</span>.<br><br>
+    <strong>Partecipa attivamente alla guerra del territorio di Casa Tauro.</strong> Crea la tua fanta squadra, scopri chi è la tua alleanza, svela la tua fazione segreta e scopri il tuo ceto sociale. Ogni tua azione durante la serata vale punti — per te, per la tua squadra, per il tuo regno.
   </div>
-  <div id="fazioni-display"></div>
+</div>
+
+<!-- ══ STATO SQUADRA ══ -->
+<div class="alleanza-mini-style" style="margin:12px 20px 0;padding:16px;border-radius:14px;background:linear-gradient(135deg,#150800,#2d1200);border:1.5px solid rgba(255,107,43,0.4);cursor:pointer;" onclick="window.location.href='squadra.html'">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+    <div style="font-size:15px;font-weight:800;">✂️ La tua Squadra</div>
+    <div style="color:var(--text-muted);font-size:18px;">→</div>
+  </div>
+  <div id="squadra-status-text" style="font-size:12px;color:var(--text-muted);margin-bottom:10px;">Caricamento...</div>
+  <div class="draft-countdown" id="draft-countdown-wrap">
+    <span class="draft-cd-label">⏳ DRAFT CHIUDE</span>
+    <span class="draft-cd-timer" id="draft-cd-timer">--:--:--</span>
+  </div>
+</div>
+
+<!-- ══ COME FUNZIONA ══ -->
+<div class="generale-box" style="margin-top:12px;">
+  <div class="generale-title">📖 Come funziona il gioco</div>
+  <p style="font-size:13px;color:var(--text-muted);line-height:1.6;margin-bottom:12px;">
+    Campionato, Alleanze, Fazioni, Bonus e Malus — tutto spiegato passo per passo nel tutorial introduttivo.
+  </p>
+  <div class="info-chips-row" style="margin-bottom:12px;">
+    <div class="info-chip-small">⚡ <strong>Automatico</strong> — app lo assegna da sola</div>
+    <div class="info-chip-small">👑 <strong>Giudizio admin</strong> — Pietro decide</div>
+  </div>
+  <button onclick="window.location.href='tutorial.html'" style="width:100%;background:rgba(168,85,247,0.1);border:1.5px solid rgba(168,85,247,0.3);color:var(--accent-siria);padding:12px;border-radius:10px;font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">
+    🎬 Rivedi il tutorial
+  </button>
 </div>
 
 <div class="toast" id="toast"></div>
 
+<script>
+  // ── COUNTDOWN — script indipendente, parte subito ──
+  const FESTA_DATE = new Date('2026-06-27T20:30:00');
+  const DRAFT_DATE = new Date('2026-06-26T18:00:00');
+
+  function pad(n) { return String(n).padStart(2, '0'); }
+
+  function updateCountdowns() {
+    const now = new Date();
+
+    // FESTA
+    const diffFesta = FESTA_DATE - now;
+    const bar = document.querySelector('.countdown-bar');
+    if (diffFesta > 0) {
+      const g = Math.floor(diffFesta / 86400000);
+      const h = Math.floor((diffFesta % 86400000) / 3600000);
+      const m = Math.floor((diffFesta % 3600000) / 60000);
+      const s = Math.floor((diffFesta % 60000) / 1000);
+      const dEl = document.getElementById('cd-giorni');
+      const hEl = document.getElementById('cd-ore');
+      const mEl = document.getElementById('cd-min');
+      const sEl = document.getElementById('cd-sec');
+      if (dEl) dEl.textContent = pad(g);
+      if (hEl) hEl.textContent = pad(h);
+      if (mEl) mEl.textContent = pad(m);
+      if (sEl) sEl.textContent = pad(s);
+    } else if (bar) {
+      bar.innerHTML = '<div class="countdown-label" style="color:var(--accent-cody);font-size:16px;font-weight:800;padding:4px 0;">⚔️ La guerra ha inizio — BUONA FORTUNA!</div>';
+    }
+
+    // DRAFT
+    const diffDraft = DRAFT_DATE - now;
+    const wrap = document.getElementById('draft-countdown-wrap');
+    if (wrap) {
+      if (diffDraft > 0) {
+        const g2 = Math.floor(diffDraft / 86400000);
+        const h2 = Math.floor((diffDraft % 86400000) / 3600000);
+        const m2 = Math.floor((diffDraft % 3600000) / 60000);
+        const s2 = Math.floor((diffDraft % 60000) / 1000);
+        const timerEl = document.getElementById('draft-cd-timer');
+        if (timerEl) timerEl.textContent = g2 > 0
+          ? g2 + 'g ' + pad(h2) + ':' + pad(m2) + ':' + pad(s2)
+          : pad(h2) + ':' + pad(m2) + ':' + pad(s2);
+      } else {
+        wrap.innerHTML = '<span class="draft-cd-closed">🔒 Draft chiuso</span>';
+      }
+    }
+  }
+
+  updateCountdowns();
+  setInterval(updateCountdowns, 1000);
+</script>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, get, onValue, remove, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCqLFQW8XQioObmxG0oDPc_MFpdFXJxmac",
@@ -303,482 +453,44 @@ const firebaseConfig = {
   messagingSenderId: "1090185599902",
   appId: "1:1090185599902:web:abcc2c0bcfdc2077d2548f"
 };
-
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-const ADMIN_KEY = "30cody30syria";
-const isAdmin = new URLSearchParams(window.location.search).get("key") === ADMIN_KEY;
+async function init() {
+  const myName = localStorage.getItem("fc_player_name");
+  if (!myName) { window.location.href = "register.html"; return; }
 
-// ── DATI GIOCO ──
-const PLAYERS = [
-  { name: "Alessia Ala", cost: 175 },
-  { name: "Anna Maria Caione (madre)", cost: 150 },
-  { name: "Eleonora Tauro", cost: 90 },
-  { name: "Paolo Bello", cost: 110 },
-  { name: "Mattia Caione", cost: 70 },
-  { name: "Mirco Caione", cost: 85 },
-  { name: "Gloria Rinaldi", cost: 85 },
-  { name: "Dario Caione", cost: 95 },
-  { name: "Gabriele Mangione", cost: 100 },
-  { name: "Federica Ala", cost: 85 },
-  { name: "Simone Baldassarre", cost: 85 },
-  { name: "Desi Ala", cost: 85 },
-  { name: "Michele Nervo", cost: 65 },
-  { name: "Zia Anna", cost: 105 },
-  { name: "Francesca Terlizzi", cost: 140 },
-  { name: "Nicolas Costa", cost: 115 },
-  { name: "Giulia Trevisi", cost: 55 },
-  { name: "Andrea Sozzani", cost: 55 },
-  { name: "Emilio Pulli", cost: 110 },
-  { name: "Eleonora Bello", cost: 110 },
-  { name: "Marta Mignone", cost: 160 },
-  { name: "Giuseppe Susca", cost: 160 },
-  { name: "Annachiara Maci", cost: 85 },
-  { name: "Davide Secci", cost: 50 },
-  { name: "Antonio Borelli", cost: 130 },
-  { name: "Marika Giagnotti", cost: 90 },
-  { name: "Danilo Schiavone", cost: 175 },
-  { name: "Ilaria Tenore", cost: 90 },
-  { name: "Donato Stragapede", cost: 115 },
-  { name: "Emily Giancane", cost: 80 },
-  { name: "Martina Poso", cost: 115 },
-  { name: "Maycols Sirsi", cost: 125 },
-  { name: "Laura Capodieci", cost: 95 },
-  { name: "Davide Attanasio", cost: 135 },
-  { name: "Manuel Palma", cost: 180 },
-  { name: "Carlotta D'aversa", cost: 95 },
-  { name: "Nicolò Spada", cost: 120 },
-  { name: "Antonella Lo vecchio", cost: 50 },
-  { name: "Beatrice Gloria", cost: 80 },
-  { name: "Mariacarla Spagnolo", cost: 45 },
-  { name: "Mattia Martina", cost: 80 },
-  { name: "Andrea Scozzi", cost: 90 },
-  { name: "Annalisa Ancora", cost: 105 },
-  { name: "Roberto Sciurti", cost: 100 },
-  { name: "Nicolò Maci", cost: 85 },
-  { name: "Silvia Lamusta", cost: 50 },
-  { name: "Alessio Maci", cost: 85 },
-  { name: "Rachele Ponzetta", cost: 50 },
-  { name: "Erminio Foti", cost: 165 },
-  { name: "Sara Colletta", cost: 50 },
-  { name: "Luca Grasso", cost: 85 },
-  { name: "Annalisa Maci", cost: 50 },
-  { name: "Alessio Caretto", cost: 85 },
-  { name: "Silvia Maci", cost: 50 },
-  { name: "Errico Del monte", cost: 85 },
-  { name: "Chiara Del Vecchio", cost: 50 },
-  { name: "Daniele Padula", cost: 80 },
-  { name: "Davide Mogavero", cost: 160 },
-  { name: "Marialuce Serra", cost: 85 },
-  { name: "Francesco Romano", cost: 85 },
-  { name: "Mariachiara Longo", cost: 50 },
-  { name: "Alberto Bianco", cost: 100 },
-  { name: "Martina Schiavone", cost: 85 },
-  { name: "Luca Invidia", cost: 80 },
-  { name: "Marika Piconese", cost: 50 },
-  { name: "Stefanuccio", cost: 130 },
-  { name: "Andrea De Matteis", cost: 70 },
-  { name: "Lorenzo Taffone", cost: 70 },
-];
+  document.getElementById("player-name-display").textContent = myName;
+  const initials = myName.split(" ").map(w => w[0]).join("").slice(0,2).toUpperCase();
+  document.getElementById("avatar-circle").textContent = initials;
 
-const ALLEANZE = {
-  "💰 ISEE Allargato": ["Alessia Ala","Anna Maria Caione (madre)","Eleonora Tauro","Paolo Bello","Mattia Caione","Mirco Caione","Gloria Rinaldi","Dario Caione","Gabriele Mangione","Federica Ala","Simone Baldassarre","Desi Ala","Michele Nervo","Zia Anna"],
-  "💥 Bombette di Cisternino ASAP": ["Francesca Terlizzi","Nicolas Costa","Giulia Trevisi","Andrea Sozzani","Emilio Pulli","Eleonora Bello","Marta Mignone","Giuseppe Susca","Annachiara Maci","Davide Secci"],
-  "😈 Il Buono Il Bello e il Danilo": ["Antonio Borelli","Marika Giagnotti","Danilo Schiavone","Ilaria Tenore","Donato Stragapede","Emily Giancane"],
-  "💸 Cuoricini Broke": ["Martina Poso","Maycols Sirsi","Laura Capodieci","Davide Attanasio","Manuel Palma","Carlotta D'aversa","Nicolò Spada","Antonella Lo vecchio","Beatrice Gloria","Mariacarla Spagnolo","Mattia Martina","Lorenzo Taffone"],
-  "⚽ FantaSanPio 08:00 AM": ["Andrea Scozzi","Annalisa Ancora","Roberto Sciurti","Nicolò Maci","Silvia Lamusta","Alessio Maci","Rachele Ponzetta","Erminio Foti","Sara Colletta","Luca Grasso","Annalisa Maci","Alessio Caretto","Silvia Maci","Errico Del monte","Chiara Del Vecchio","Daniele Padula","Davide Mogavero","Marialuce Serra","Andrea De Matteis"],
-  "🏆 Guinness World Record Partecipazione": ["Francesco Romano","Mariachiara Longo","Alberto Bianco","Martina Schiavone","Luca Invidia","Marika Piconese","Stefanuccio"],
-};
+  // Controlla se ha già una squadra
+  const key = myName.replace(/[.#$[\]]/g, "_");
+  const snap = await get(ref(db, `teams/${key}`));
+  const pill = document.getElementById("pill-squad");
+  const statusText = document.getElementById("squadra-status-text");
 
-// ── STATO ──
-let punti = {};   // punti personali per ospite
-let teams = {};   // squadre draft
-let fazioni = {}; // fazioni assegnate
-let prefestaSbloccata = false; // diventa true quando Pietro preme "Sblocca Punti Pre-Festa"
-const myName = localStorage.getItem("fc_player_name");
-
-function sanitize(s) { return s.replace(/[.#$[\]]/g, "_"); }
-
-// Mostra un placeholder "in attesa" al posto di podio + lista, per le tab interamente bloccate
-function renderLockedTab(listId, podioId) {
-  const list = document.getElementById(listId);
-  if (list) {
-    list.innerHTML = `
-      <div class="empty-state">
-        <span class="empty-emoji">🔒</span>
-        I punteggi sono nascosti fino alla chiusura del draft.<br>
-        Continua a costruire la tua squadra — si sbloccano tutti insieme!
-      </div>
-    `;
+  if (snap.exists()) {
+    const t = snap.val();
+    const n = (t.roster || []).length;
+    pill.textContent = `✅ ${t.teamName || "Squadra creata"}`;
+    pill.className = "pill ok";
+    statusText.textContent = `${t.teamName || "Squadra creata"} — ${n}/5 giocatori. Tocca per modificare.`;
+  } else {
+    pill.textContent = "⏳ Squadra non creata";
+    pill.className = "pill neutral";
+    statusText.textContent = "Non hai ancora creato la tua squadra. Tocca per iniziare il draft.";
   }
-  if (podioId) {
-    const podio = document.getElementById(podioId);
-    if (podio) podio.innerHTML = "";
-  }
-}
-
-// ── CALCOLI ──
-
-// Punti personali di un singolo ospite (per fazioni e punti personali)
-function getPuntiPersonali(name) {
-  const key = sanitize(name);
-  if (!punti[key]) return { bonus: 0, malus: 0, tot: 0 };
-  let bonus = 0, malus = 0;
-  Object.values(punti[key]).forEach(e => {
-    if (e.pts > 0) bonus += e.pts;
-    else malus += Math.abs(e.pts);
-  });
-  return { bonus, malus, tot: bonus - malus };
-}
-
-// Punti squadra di un ospite (somma punti personali delle persone che ha draftato)
-// Il capitano conta x2
-function getPuntiSquadra(ownerName) {
-  const key = sanitize(ownerName);
-  const team = teams[key];
-  if (!team || !team.roster) return { bonus: 0, malus: 0, tot: 0 };
-
-  let bonus = 0, malus = 0;
-  team.roster.forEach(playerName => {
-    const isCap = team.captain === playerName;
-    const pp = getPuntiPersonali(playerName);
-    const mult = isCap ? 2 : 1;
-    bonus += pp.bonus * mult;
-    malus += pp.malus * mult;
-  });
-  return { bonus, malus, tot: bonus - malus };
-}
-
-// Coefficiente alleanza = media bonus squadra membri - media malus squadra membri
-function getCoeffAlleanza(membri) {
-  if (membri.length === 0) return 0;
-  const conSquadra = membri.filter(m => teams[sanitize(m)]);
-  if (conSquadra.length === 0) return 0;
-  const totBonus = conSquadra.reduce((s, m) => s + getPuntiSquadra(m).bonus, 0);
-  const totMalus = conSquadra.reduce((s, m) => s + getPuntiSquadra(m).malus, 0);
-  return (totBonus / conSquadra.length) - (totMalus / conSquadra.length);
-}
-
-// Effetto del ruolo fazione sul totale: a chi vanno i punti e con che moltiplicatore
-// soldato_*        -> propria fazione, x1
-// moltiplicatore_*  -> propria fazione, x2
-// spia_cody         -> Siria, x1 (le mele marce di Cody lavorano per Siria)
-// spia_siria        -> Cody, x1 (le mele marce di Siria lavorano per Cody)
-function getRuoloEffetto(fazioneBase, ruoloId) {
-  if (ruoloId === "moltiplicatore_cody" || ruoloId === "moltiplicatore_siria") {
-    return { target: fazioneBase, multiplier: 2 };
-  }
-  if (ruoloId === "spia_cody") return { target: "siria", multiplier: 1 };
-  if (ruoloId === "spia_siria") return { target: "cody", multiplier: 1 };
-  // soldato_* o ruoloId mancante/non riconosciuto → comportamento di default
-  return { target: fazioneBase, multiplier: 1 };
-}
-
-// Punti totali fazione
-function getPuntiFazione(faz) {
-  let tot = 0;
-  PLAYERS.forEach(p => {
-    const f = fazioni[sanitize(p.name)];
-    if (!f || !f.fazione) return;
-    const { target, multiplier } = getRuoloEffetto(f.fazione, f.ruoloId);
-    if (target === faz) {
-      tot += getPuntiPersonali(p.name).tot * multiplier;
-    }
-  });
-  return tot;
-}
-
-// ── RENDER INVITATI ──
-function renderInvitati() {
-  if (!prefestaSbloccata) { renderLockedTab("invitati-list", "podio-invitati"); return; }
-
-  const classifica = PLAYERS.map(p => {
-    const pp = getPuntiPersonali(p.name);
-    return { name: p.name, pts: pp.tot, bonus: pp.bonus, malus: pp.malus };
-  }).sort((a, b) => b.pts - a.pts);
-
-  // PODIO
-  const podio = document.getElementById("podio-invitati");
-  podio.innerHTML = "";
-  const top3 = classifica.slice(0, 3);
-  const order = [top3[1], top3[0], top3[2]].filter(Boolean);
-  const posClass = ["podio-2", "podio-1", "podio-3"];
-  const posEmoji = ["🥈", "🥇", "🥉"];
-
-  order.forEach((p, i) => {
-    if (!p) return;
-    const div = document.createElement("div");
-    div.className = "podio-slot " + posClass[i];
-    div.innerHTML = `
-      <div class="podio-bar"><span class="podio-pos">${posEmoji[i]}</span></div>
-      <div class="podio-name">${p.name.split(" ")[0]}</div>
-      <div class="podio-pts">${p.pts > 0 ? '+' : ''}${p.pts}</div>
-    `;
-    podio.appendChild(div);
-  });
-
-  // LISTA
-  const list = document.getElementById("invitati-list");
-  list.innerHTML = "";
-
-  if (classifica.every(p => p.pts === 0)) {
-    list.innerHTML = '<div class="empty-state"><span class="empty-emoji">⏳</span>Nessun punto ancora assegnato</div>';
-    return;
-  }
-
-  classifica.forEach((p, i) => {
-    const posC = i === 0 ? "gold" : i === 1 ? "silver" : i === 2 ? "bronze" : "";
-    const isMe = p.name === myName;
-    const div = document.createElement("div");
-    div.className = "rank-row" + (isMe ? " me" : "") + (i === 0 ? " top1" : "");
-    div.innerHTML = `
-      <div class="rank-pos ${posC}">${i + 1}</div>
-      <div class="rank-info">
-        <div class="rank-name">${p.name}${isMe ? " 👤" : ""}</div>
-        <div class="rank-team" style="color:var(--green)">+${p.bonus} bonus &nbsp;·&nbsp; <span style="color:var(--red)">-${p.malus} malus</span></div>
-      </div>
-      <div>
-        <div class="rank-pts ${p.pts > 0 ? 'pos' : p.pts < 0 ? 'neg' : 'zero'}">${p.pts > 0 ? '+' : ''}${p.pts}</div>
-      </div>
-    `;
-    list.appendChild(div);
-  });
-}
-
-// ── RENDER CAMPIONATO ──
-function renderCampionato() {
-  if (!prefestaSbloccata) { renderLockedTab("classifica-list", "podio"); return; }
-
-  // Per ogni ospite calcola punti squadra
-  const classifica = PLAYERS.map(p => ({
-    name: p.name,
-    pts: getPuntiSquadra(p.name).tot,
-    bonus: getPuntiSquadra(p.name).bonus,
-    malus: getPuntiSquadra(p.name).malus,
-    teamName: teams[sanitize(p.name)]?.teamName || null,
-  })).sort((a, b) => b.pts - a.pts);
-
-  // PODIO
-  const podio = document.getElementById("podio");
-  podio.innerHTML = "";
-  const top3 = classifica.slice(0, 3);
-  const order = [top3[1], top3[0], top3[2]].filter(Boolean);
-  const posClass = ["podio-2", "podio-1", "podio-3"];
-  const posNum = ["2°", "1°", "3°"];
-  const posEmoji = ["🥈", "🥇", "🥉"];
-
-  order.forEach((p, i) => {
-    if (!p) return;
-    const div = document.createElement("div");
-    div.className = "podio-slot " + posClass[i];
-    div.innerHTML = `
-      <div class="podio-bar"><span class="podio-pos">${posEmoji[i]}</span></div>
-      <div class="podio-name">${p.name.split(" ")[0]}</div>
-      <div class="podio-pts">${p.pts > 0 ? '+' : ''}${p.pts}</div>
-      <div class="podio-team">${p.teamName || '—'}</div>
-    `;
-    podio.appendChild(div);
-  });
-
-  // LISTA
-  const list = document.getElementById("classifica-list");
-  list.innerHTML = "";
-
-  if (classifica.every(p => p.pts === 0)) {
-    list.innerHTML = '<div class="empty-state"><span class="empty-emoji">⏳</span>Nessun punto ancora assegnato</div>';
-    return;
-  }
-
-  classifica.forEach((p, i) => {
-    const div = document.createElement("div");
-    const posC = i === 0 ? "gold" : i === 1 ? "silver" : i === 2 ? "bronze" : "";
-    const isMe = p.name === myName;
-    div.className = "rank-row" + (isMe ? " me" : "") + (i === 0 ? " top1" : "");
-    div.innerHTML = `
-      <div class="rank-pos ${posC}">${i + 1}</div>
-      <div class="rank-info">
-        <div class="rank-name">${p.name}${isMe ? " 👤" : ""}</div>
-        <div class="rank-team">${p.teamName || 'Nessuna squadra'}</div>
-      </div>
-      <div>
-        <div class="rank-pts ${p.pts > 0 ? 'pos' : p.pts < 0 ? 'neg' : 'zero'}">${p.pts > 0 ? '+' : ''}${p.pts}</div>
-        <div class="rank-delta" style="color:var(--green)">+${p.bonus}</div>
-        <div class="rank-delta" style="color:var(--red)">-${p.malus}</div>
-      </div>
-    `;
-    list.appendChild(div);
-  });
-}
-
-// ── RENDER ALLEANZE ──
-function renderAlleanze() {
-  const list = document.getElementById("alleanze-list");
-  list.innerHTML = "";
-
-  if (!prefestaSbloccata) {
-    // Pre-festa: mostra le alleanze e chi ha già fatto la squadra, ma non coefficienti/posizioni
-    Object.entries(ALLEANZE).forEach(([nome, membri]) => {
-      const formate = membri.filter(m => teams[sanitize(m)]).length;
-      const div = document.createElement("div");
-      div.className = "alleanza-card";
-      const myAlleanza = membri.includes(myName);
-      div.innerHTML = `
-        <div class="alleanza-header">
-          <div class="alleanza-name">${nome}${myAlleanza ? " 👤" : ""}</div>
-          <div class="locked-badge">🔒 in attesa</div>
-        </div>
-        <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px;">
-          ✂️ ${formate}/${membri.length} squadre formate
-        </div>
-        <div class="alleanza-membri">
-          ${membri.map(m => `<span class="membro-chip ${teams[sanitize(m)] ? 'has-team' : ''}">${m.split(" ")[0]}</span>`).join("")}
-        </div>
-      `;
-      list.appendChild(div);
-    });
-    return;
-  }
-
-  const ranked = Object.entries(ALLEANZE).map(([nome, membri]) => ({
-    nome, membri, coeff: getCoeffAlleanza(membri)
-  })).sort((a, b) => b.coeff - a.coeff);
-
-  const maxCoeff = Math.max(...ranked.map(a => Math.abs(a.coeff)), 1);
-
-  ranked.forEach((a, i) => {
-    const div = document.createElement("div");
-    div.className = "alleanza-card" + (i === 0 ? " winner" : "");
-    const pct = Math.min(100, Math.max(0, ((a.coeff + maxCoeff) / (2 * maxCoeff)) * 100));
-    const myAlleanza = a.membri.includes(myName);
-
-    div.innerHTML = `
-      <div class="alleanza-header">
-        <div class="alleanza-name">${a.nome}${myAlleanza ? " 👤" : ""}</div>
-        <div class="alleanza-pos ${i === 0 ? 'first' : ''}">${i === 0 ? '🥇 1°' : (i + 1) + '°'}</div>
-      </div>
-      <div class="coefficiente-bar">
-        <div class="coefficiente-label">
-          <span>COEFFICIENTE</span>
-          <span class="coeff-formula">media bonus − media malus</span>
-        </div>
-        <div class="coeff-value ${a.coeff < 0 ? 'neg' : ''}">${a.coeff > 0 ? '+' : ''}${a.coeff.toFixed(1)}</div>
-        <div class="track"><div class="track-fill" style="width:${pct}%"></div></div>
-      </div>
-      <div class="alleanza-membri">
-        ${a.membri.map(m => `<span class="membro-chip ${teams[sanitize(m)] ? 'has-team' : ''}">${m.split(" ")[0]}</span>`).join("")}
-      </div>
-    `;
-    list.appendChild(div);
-  });
-}
-
-// ── RENDER FAZIONI ──
-function renderFazioni() {
-  const container = document.getElementById("fazioni-display");
-
-  if (!prefestaSbloccata) {
-    container.innerHTML = `
-      <div class="empty-state">
-        <span class="empty-emoji">🔒</span>
-        I totali Cody vs Siria sono nascosti fino alla chiusura del draft.<br>
-        Le fazioni restano segrete — ci pensiamo a festa iniziata!
-      </div>
-    `;
-    return;
-  }
-
-  const ptsCody = getPuntiFazione("cody");
-  const ptsSiria = getPuntiFazione("siria");
-  const tot = Math.max(ptsCody + ptsSiria, 1);
-  const pctCody = Math.round((ptsCody / tot) * 100);
-  const pctSiria = 100 - pctCody;
-
-  container.innerHTML = `
-    <div class="fazione-card fazione-cody">
-      <div class="fazione-header">
-        <div class="fazione-name">🐕 Team Cody</div>
-        <div class="fazione-pts">${ptsCody > 0 ? '+' : ''}${ptsCody}</div>
-      </div>
-      <div class="fazione-bar-wrap"><div class="fazione-bar-fill" style="width:${pctCody}%"></div></div>
-      <div class="fazione-label">${pctCody}% dei punti totali</div>
-    </div>
-
-    <div class="fazione-card fazione-siria">
-      <div class="fazione-header">
-        <div class="fazione-name">🐱 Team Siria</div>
-        <div class="fazione-pts">${ptsSiria > 0 ? '+' : ''}${ptsSiria}</div>
-      </div>
-      <div class="fazione-bar-wrap"><div class="fazione-bar-fill" style="width:${pctSiria}%"></div></div>
-      <div class="fazione-label">${pctSiria}% dei punti totali</div>
-    </div>
-
-    <div style="margin-top:16px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;font-size:12px;color:var(--text-muted);">
-      ⚠️ Le fazioni sono segrete — i totali mostrano solo il punteggio aggregato senza rivelare chi è in quale fazione.
-    </div>
-  `;
-}
-
-// ── TABS ──
-window.switchTab = function(tab) {
-  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-  document.querySelectorAll(".tab-content").forEach(t => t.classList.remove("active"));
-  document.getElementById("tab-" + tab).classList.add("active");
-  document.getElementById("content-" + tab).classList.add("active");
-};
-
-// ── TOAST ──
-function showToast(msg, type = "ok") {
-  const t = document.getElementById("toast");
-  t.textContent = msg;
-  t.className = "toast show" + (type === "warn" ? " warn" : "");
-  clearTimeout(window._tt);
-  window._tt = setTimeout(() => { t.className = "toast"; }, 2500);
-}
-
-// ── INIT ──
-function init() {
-  // Ascolta punti in tempo reale
-  onValue(ref(db, "punti"), snap => {
-    punti = snap.exists() ? snap.val() : {};
-    renderInvitati();
-    renderCampionato();
-    renderAlleanze();
-    renderFazioni();
-  });
-
-  // Ascolta squadre
-  onValue(ref(db, "teams"), snap => {
-    teams = snap.exists() ? snap.val() : {};
-    renderInvitati();
-    renderCampionato();
-    renderAlleanze();
-  });
-
-  // Ascolta fazioni
-  onValue(ref(db, "fazioni"), snap => {
-    fazioni = snap.exists() ? snap.val() : {};
-    renderFazioni();
-  });
-
-  // Ascolta lo sblocco punti pre-festa
-  onValue(ref(db, "prefesta_sbloccata"), snap => {
-    prefestaSbloccata = snap.exists() && snap.val() === true;
-    renderInvitati();
-    renderCampionato();
-    renderAlleanze();
-    renderFazioni();
-  });
-
 }
 
 init();
 </script>
+
 <a href="regolamento.html" class="fab-regolamento" title="Regolamento">📖</a>
 
 <!-- BOTTOM NAV BAR -->
 <div class="bottom-nav">
-  <a href="classifica.html" class="nav-item active" data-page="classifica">
+  <a href="classifica.html" class="nav-item" data-page="classifica">
     <span class="nav-icon">📊</span>
     <span class="nav-label">Classifica</span>
   </a>
@@ -786,7 +498,7 @@ init();
     <span class="nav-icon">🤝</span>
     <span class="nav-label">Alleanze</span>
   </a>
-  <a href="home.html" class="nav-item nav-item-center" data-page="home">
+  <a href="home.html" class="nav-item nav-item-center active" data-page="home">
     <span class="nav-icon">🏠</span>
     <span class="nav-label">Home</span>
   </a>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin — FantaCompleanno</title>
+<title>FantaCompleanno — Classifica</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700;800&family=Space+Mono:wght@400;700&display=swap');
 
@@ -17,7 +17,7 @@
 body {
   font-family: 'Space Grotesk', sans-serif;
   background: var(--bg); color: var(--text);
-  min-height: 100vh; padding-bottom: 100px;
+  min-height: 100vh; padding-bottom: 40px;
 }
 
 /* ── NAV ── */
@@ -25,15 +25,19 @@ body {
   position: sticky; top: 0; z-index: 50;
   background: rgba(10,10,15,0.97); backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
-  padding: 12px 16px; display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 20px; display: flex; align-items: center; justify-content: space-between;
 }
-.nav-title { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--accent-cody); letter-spacing:.1em; }
+.nav-title { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--text-muted); letter-spacing:.1em; }
 .nav-name { font-size: 16px; font-weight: 800; }
-.admin-badge {
-  background: rgba(255,107,43,0.15); border: 1.5px solid var(--accent-cody);
-  color: var(--accent-cody); font-family: 'Space Mono', monospace;
-  font-size: 10px; padding: 4px 10px; border-radius: 100px;
+.live-dot {
+  display: flex; align-items: center; gap: 6px;
+  font-family: 'Space Mono', monospace; font-size: 11px; color: var(--green);
 }
+.live-dot::before {
+  content: ''; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--green); animation: pulse 1.5s infinite;
+}
+@keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
 
 /* ── TABS ── */
 .tabs {
@@ -48,208 +52,187 @@ body {
 }
 .tab.active { color: var(--accent-cody); border-bottom-color: var(--accent-cody); }
 
-.tab-content { display: none; padding: 14px 16px; }
+.tab-content { display: none; padding: 16px 20px; }
 .tab-content.active { display: block; }
 
-/* ── SEARCH ── */
-.search-wrap { position: relative; margin-bottom: 12px; }
-.search-icon { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); font-size: 15px; pointer-events: none; }
-.search-input {
-  width: 100%; background: var(--surface); border: 1.5px solid var(--border);
-  border-radius: 10px; padding: 12px 12px 12px 38px;
-  color: var(--text); font-family: 'Space Grotesk', sans-serif;
-  font-size: 15px; outline: none; transition: border-color .2s;
+/* ── PODIO TOP 3 ── */
+.podio {
+  display: flex; align-items: flex-end; justify-content: center;
+  gap: 8px; margin-bottom: 24px; padding-top: 8px;
 }
-.search-input:focus { border-color: var(--accent-cody); }
-.search-input::placeholder { color: var(--text-muted); }
-
-/* ── GUEST LIST ── */
-.guest-item {
-  background: var(--surface); border: 1.5px solid var(--border);
-  border-radius: 12px; padding: 14px 16px; margin-bottom: 8px;
-  display: flex; align-items: center; justify-content: space-between;
-  cursor: pointer; transition: all .2s;
+.podio-slot {
+  flex: 1; text-align: center; max-width: 120px;
 }
-.guest-item:hover, .guest-item.selected { border-color: var(--accent-cody); background: #150800; }
-.guest-info { flex: 1; }
-.guest-name { font-size: 15px; font-weight: 700; }
-.guest-pts {
-  font-family: 'Space Mono', monospace; font-size: 13px;
-  margin-top: 3px;
+.podio-bar {
+  border-radius: 10px 10px 0 0; margin-bottom: 8px;
+  display: flex; align-items: flex-end; justify-content: center;
+  padding-bottom: 8px; position: relative;
 }
-.guest-pts.pos { color: var(--green); }
-.guest-pts.neg { color: var(--red); }
-.guest-pts.zero { color: var(--text-muted); }
-.guest-arrow { font-size: 18px; color: var(--text-muted); }
-
-/* ── MODAL OSPITE ── */
-.modal-overlay {
-  display: none; position: fixed; inset: 0;
-  background: rgba(0,0,0,0.85); z-index: 100;
-  overflow-y: auto; padding: 16px;
-}
-.modal-overlay.open { display: block; }
-.modal-box {
-  background: var(--surface); border: 1.5px solid var(--border);
-  border-radius: 20px; padding: 20px; max-width: 480px;
-  margin: 0 auto 20px; animation: slideUp .25s ease;
-}
-@keyframes slideUp { from { transform:translateY(30px); opacity:0; } to { transform:translateY(0); opacity:1; } }
-
-.modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-.modal-guest-name { font-size: 20px; font-weight: 800; }
-.modal-pts {
-  font-family: 'Space Mono', monospace; font-size: 22px; font-weight: 700;
-  padding: 6px 16px; border-radius: 100px;
-}
-.modal-pts.pos { background: rgba(34,197,94,0.15); color: var(--green); border: 1px solid rgba(34,197,94,0.3); }
-.modal-pts.neg { background: rgba(239,68,68,0.15); color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
-.modal-pts.zero { background: var(--border); color: var(--text-muted); }
-
-.btn-close {
-  background: var(--border); border: none; color: var(--text);
-  width: 34px; height: 34px; border-radius: 50%; font-size: 16px;
-  cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-}
-
-.section-label {
-  font-family: 'Space Mono', monospace; font-size: 10px;
-  color: var(--text-muted); letter-spacing: .12em; text-transform: uppercase;
-  margin-bottom: 8px; margin-top: 16px;
-}
-
-/* ── EVENTI RAPIDI ── */
-.eventi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.evento-btn {
-  background: var(--bg); border: 1.5px solid var(--border);
-  border-radius: 10px; padding: 10px 12px; cursor: pointer;
-  transition: all .2s; text-align: left;
-}
-.evento-btn:hover { transform: scale(1.02); }
-.evento-btn.bonus-btn { border-color: rgba(34,197,94,0.3); }
-.evento-btn.bonus-btn:hover { background: rgba(34,197,94,0.08); border-color: var(--green); }
-.evento-btn.malus-btn { border-color: rgba(239,68,68,0.3); }
-.evento-btn.malus-btn:hover { background: rgba(239,68,68,0.08); border-color: var(--red); }
-.evento-pts {
-  font-family: 'Space Mono', monospace; font-size: 16px; font-weight: 700;
-  display: block; margin-bottom: 3px;
-}
-.evento-pts.pos { color: var(--green); }
-.evento-pts.neg { color: var(--red); }
-.evento-desc { font-size: 11px; color: var(--text-muted); line-height: 1.3; }
-
-/* ── STORICO ── */
-.storico-item {
-  background: var(--bg); border: 1.5px solid var(--border);
-  border-radius: 10px; padding: 10px 14px; margin-bottom: 6px;
-  display: flex; align-items: center; gap: 10px;
-}
-.storico-pts {
-  font-family: 'Space Mono', monospace; font-size: 15px; font-weight: 700;
-  min-width: 52px; flex-shrink: 0;
-}
-.storico-pts.pos { color: var(--green); }
-.storico-pts.neg { color: var(--red); }
-.storico-info { flex: 1; }
-.storico-desc { font-size: 12px; font-weight: 600; }
-.storico-time { font-size: 10px; color: var(--text-muted); font-family: 'Space Mono', monospace; margin-top: 2px; }
-.btn-annulla {
-  background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3);
-  color: var(--red); padding: 5px 10px; border-radius: 8px;
-  font-size: 11px; font-family: 'Space Mono', monospace;
-  cursor: pointer; transition: all .2s; white-space: nowrap; flex-shrink: 0;
-}
-.btn-annulla:hover { background: rgba(239,68,68,0.2); }
-
-/* ── VISTA PER EVENTO ── */
-.evento-big {
-  background: var(--surface); border: 1.5px solid var(--border);
-  border-radius: 12px; padding: 14px 16px; margin-bottom: 8px;
-  cursor: pointer; transition: all .2s;
-}
-.evento-big:hover { border-color: var(--accent-cody); }
-.evento-big.bonus-big { border-left: 4px solid var(--green); }
-.evento-big.malus-big { border-left: 4px solid var(--red); }
-.evento-big-header { display: flex; align-items: center; gap: 12px; }
-.evento-big-pts {
+.podio-pos {
   font-family: 'Space Mono', monospace; font-size: 20px; font-weight: 700;
-  min-width: 60px;
+  position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
 }
-.evento-big-pts.pos { color: var(--green); }
-.evento-big-pts.neg { color: var(--red); }
-.evento-big-desc { font-size: 13px; font-weight: 600; flex: 1; }
-.evento-big-type { font-size: 10px; color: var(--text-muted); margin-top: 3px; }
+.podio-1 .podio-bar { height: 120px; background: linear-gradient(180deg, rgba(245,158,11,0.3), rgba(245,158,11,0.1)); border: 1.5px solid var(--gold); }
+.podio-2 .podio-bar { height: 90px; background: linear-gradient(180deg, rgba(168,85,247,0.3), rgba(168,85,247,0.1)); border: 1.5px solid var(--accent-siria); }
+.podio-3 .podio-bar { height: 70px; background: linear-gradient(180deg, rgba(255,107,43,0.3), rgba(255,107,43,0.1)); border: 1.5px solid var(--accent-cody); }
+.podio-name { font-size: 11px; font-weight: 700; margin-bottom: 2px; line-height: 1.2; }
+.podio-pts { font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 700; color: var(--gold); }
+.podio-team { font-size: 10px; color: var(--text-muted); }
 
-/* ── MULTI-SELECT OSPITI ── */
-.ospiti-multi { margin-top: 12px; }
-.ospite-check {
-  display: flex; align-items: center; gap: 12px;
-  padding: 10px 14px; border-radius: 10px;
-  cursor: pointer; transition: background .15s; margin-bottom: 4px;
-}
-.ospite-check:hover { background: var(--surface); }
-.ospite-check.checked { background: rgba(255,107,43,0.1); }
-.check-box {
-  width: 22px; height: 22px; border-radius: 6px;
-  border: 2px solid var(--border); display: flex; align-items: center;
-  justify-content: center; flex-shrink: 0; transition: all .2s;
-}
-.ospite-check.checked .check-box { background: var(--accent-cody); border-color: var(--accent-cody); }
-.check-label { font-size: 14px; font-weight: 600; flex: 1; }
-.check-pts { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--text-muted); }
-
-/* ── PULSANTI AZIONE ── */
-.btn-primary {
-  width: 100%; background: linear-gradient(135deg, var(--accent-cody), var(--accent-siria));
-  color: white; padding: 15px; border-radius: 12px; border: none;
-  font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 700;
-  cursor: pointer; transition: opacity .2s; margin-top: 12px;
-}
-.btn-primary:hover { opacity: .85; }
-.btn-primary:disabled { opacity: .4; cursor: not-allowed; }
-.btn-unlock {
-  width: 100%; background: rgba(245,158,11,0.15); border: 2px solid var(--gold);
-  color: var(--gold); padding: 15px; border-radius: 12px;
-  font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 700;
-  cursor: pointer; transition: all .2s; margin-bottom: 12px;
-}
-.btn-unlock:hover { background: rgba(245,158,11,0.25); }
-.btn-unlock.done { background: rgba(34,197,94,0.1); border-color: var(--green); color: var(--green); cursor: default; }
-
-/* ── STATS BAR ── */
-.stats-bar {
-  display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap;
-}
-.stat-chip {
+/* ── CLASSIFICA ROWS ── */
+.rank-row {
   background: var(--surface); border: 1.5px solid var(--border);
-  border-radius: 8px; padding: 8px 12px; flex: 1; text-align: center; min-width: 70px;
+  border-radius: 12px; padding: 14px 16px; margin-bottom: 8px;
+  display: flex; align-items: center; gap: 14px; transition: all .2s;
 }
-.stat-num { font-family: 'Space Mono', monospace; font-size: 18px; font-weight: 700; display: block; }
-.stat-num.pos { color: var(--green); }
-.stat-num.neg { color: var(--red); }
-.stat-num.info { color: var(--accent-siria); }
-.stat-label { font-size: 10px; color: var(--text-muted); }
+.rank-row.me { border-color: var(--accent-cody); background: rgba(255,107,43,0.05); }
+.rank-row.top1 { border-color: var(--gold); }
+.rank-pos {
+  font-family: 'Space Mono', monospace; font-size: 18px; font-weight: 700;
+  min-width: 32px; color: var(--text-muted);
+}
+.rank-pos.gold { color: var(--gold); }
+.rank-pos.silver { color: #94a3b8; }
+.rank-pos.bronze { color: var(--accent-cody); }
+.rank-info { flex: 1; min-width: 0; }
+.rank-name { font-size: 14px; font-weight: 700; }
+.rank-team { font-size: 11px; color: var(--text-muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rank-pts {
+  font-family: 'Space Mono', monospace; font-size: 18px; font-weight: 700;
+  text-align: right;
+}
+.rank-pts.pos { color: var(--green); }
+.rank-pts.neg { color: var(--red); }
+.rank-pts.zero { color: var(--text-muted); }
+.rank-delta { font-size: 10px; text-align: right; margin-top: 2px; font-family: 'Space Mono', monospace; }
+
+/* ── ALLEANZE ── */
+.alleanza-card {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 14px; padding: 16px; margin-bottom: 10px; transition: all .2s;
+}
+.alleanza-card.winner { border-color: var(--gold); background: rgba(245,158,11,0.05); }
+.alleanza-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.alleanza-name { font-size: 16px; font-weight: 800; }
+.alleanza-pos {
+  font-family: 'Space Mono', monospace; font-size: 13px;
+  padding: 4px 12px; border-radius: 100px; background: var(--border); color: var(--text-muted);
+}
+.alleanza-pos.first { background: rgba(245,158,11,0.2); color: var(--gold); border: 1px solid rgba(245,158,11,0.4); }
+.coefficiente-bar { margin-bottom: 12px; }
+.coefficiente-label {
+  font-family: 'Space Mono', monospace; font-size: 10px;
+  color: var(--text-muted); letter-spacing: .1em; margin-bottom: 6px;
+  display: flex; justify-content: space-between;
+}
+.coeff-formula {
+  font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 700;
+  color: var(--accent-siria);
+}
+.coeff-value {
+  font-family: 'Space Mono', monospace; font-size: 22px; font-weight: 700;
+  color: var(--green);
+}
+.coeff-value.neg { color: var(--red); }
+.track { width: 100%; height: 6px; background: var(--border); border-radius: 3px; margin-top: 6px; }
+.track-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--accent-cody), var(--accent-siria)); transition: width .5s ease; }
+.alleanza-membri {
+  display: flex; flex-wrap: wrap; gap: 4px;
+}
+.membro-chip {
+  font-size: 10px; background: var(--border); border-radius: 100px;
+  padding: 3px 8px; color: var(--text-muted);
+}
+.membro-chip.has-team { color: var(--text); background: rgba(255,107,43,0.1); }
+
+/* ── FAZIONI ── */
+.fazione-card {
+  border-radius: 14px; padding: 16px; margin-bottom: 10px;
+}
+.fazione-cody {
+  background: linear-gradient(135deg, #1a0800, #2d1200);
+  border: 1.5px solid rgba(255,107,43,0.4);
+}
+.fazione-siria {
+  background: linear-gradient(135deg, #0d0020, #1a0035);
+  border: 1.5px solid rgba(168,85,247,0.4);
+}
+.fazione-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.fazione-name { font-size: 18px; font-weight: 800; }
+.fazione-pts { font-family: 'Space Mono', monospace; font-size: 24px; font-weight: 700; }
+.fazione-cody .fazione-pts { color: var(--accent-cody); }
+.fazione-siria .fazione-pts { color: var(--accent-siria); }
+.fazione-bar-wrap { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; margin-bottom: 8px; }
+.fazione-bar-fill { height: 100%; border-radius: 4px; transition: width .5s ease; }
+.fazione-cody .fazione-bar-fill { background: var(--accent-cody); }
+.fazione-siria .fazione-bar-fill { background: var(--accent-siria); }
+.fazione-label { font-size: 11px; color: var(--text-muted); }
+
+/* ── EMPTY ── */
+.empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); }
+.empty-emoji { font-size: 48px; display: block; margin-bottom: 12px; }
+.locked-badge {
+  font-family: 'Space Mono', monospace; font-size: 11px; color: var(--text-muted);
+  background: rgba(255,255,255,0.04); border: 1px dashed var(--border);
+  border-radius: 8px; padding: 6px 10px; display: inline-block;
+}
 
 /* ── TOAST ── */
 .toast {
-  position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
   background: var(--surface); border: 1.5px solid var(--green);
   color: var(--green); font-family: 'Space Mono', monospace;
   font-size: 13px; padding: 12px 20px; border-radius: 100px;
   opacity: 0; transition: opacity .3s; pointer-events: none; white-space: nowrap; z-index: 300;
 }
 .toast.show { opacity: 1; }
-.toast.error { border-color: var(--red); color: var(--red); }
 .toast.warn { border-color: var(--gold); color: var(--gold); }
-
-/* ── SAVE BAR ── */
-.save-bar {
-  position: fixed; bottom: 0; left: 0; right: 0;
-  background: rgba(10,10,15,0.97); border-top: 1px solid var(--border);
-  padding: 14px 16px; z-index: 60;
+/* ── BOTTOM NAV BAR ── */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
+  background: rgba(13,13,20,0.97); backdrop-filter: blur(16px);
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-around;
+  padding: 8px 4px calc(8px + env(safe-area-inset-bottom, 0px));
 }
+.nav-item {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  text-decoration: none; color: var(--text-muted);
+  padding: 6px 10px; border-radius: 12px; transition: all .2s;
+  flex: 1; min-width: 0;
+}
+.nav-item.active { color: var(--accent-cody); }
+.nav-icon { font-size: 20px; line-height: 1; }
+.nav-label { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: .05em; white-space: nowrap; }
+.nav-item-center {
+  position: relative; top: -10px;
+}
+.nav-item-center .nav-icon {
+  width: 46px; height: 46px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-cody), var(--accent-siria));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; box-shadow: 0 4px 16px rgba(255,107,43,0.35);
+}
+.nav-item-center.active .nav-icon { box-shadow: 0 4px 20px rgba(255,107,43,0.6); }
+.nav-item-center .nav-label { color: var(--text-muted); }
+.nav-item-center.active .nav-label { color: var(--text); }
 
-.empty-state { text-align: center; padding: 32px 20px; color: var(--text-muted); font-size: 14px; }
+/* Spazio extra in fondo alla pagina per non sovrapporsi alla nav */
+body { padding-bottom: 90px !important; }
+
+/* ── FAB REGOLAMENTO ── */
+.fab-regolamento {
+  position: fixed; right: 16px; z-index: 199;
+  bottom: 96px;
+  width: 52px; height: 52px; border-radius: 50%;
+  background: var(--surface); border: 1.5px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; text-decoration: none; cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  transition: all .2s;
+}
+.fab-regolamento:hover { border-color: var(--accent-cody); transform: scale(1.05); }
+
 </style>
 <link rel="stylesheet" href="theme.css">
 </head>
@@ -258,141 +241,58 @@ body {
 <!-- NAV -->
 <div class="nav">
   <div>
-    <div class="nav-title">// PANNELLO ADMIN //</div>
+    <div class="nav-title">// CLASSIFICA LIVE //</div>
     <div class="nav-name">FantaCompleanno 🎂</div>
   </div>
   <div style="display:flex;align-items:center;gap:10px;">
-    <div class="admin-badge">PIETRO</div>
-    <button onclick="window.location.href='home.html'" style="background:var(--surface);border:1.5px solid var(--border);color:var(--text-muted);padding:8px 14px;border-radius:10px;font-family:'Space Grotesk',sans-serif;font-size:13px;cursor:pointer;">← Home</button>
-  </div>
+    <div class="live-dot">LIVE</div>
+      </div>
 </div>
 
 <!-- TABS -->
 <div class="tabs">
-  <div class="tab active" onclick="switchTab('ospiti')" id="tab-ospiti">👤 Per Ospite</div>
-  <div class="tab" onclick="switchTab('eventi')" id="tab-eventi">⚡ Per Evento</div>
-  <div class="tab" onclick="switchTab('storico')" id="tab-storico">📋 Storico</div>
-  <div class="tab" onclick="switchTab('tools')" id="tab-tools">🔧 Tools</div>
+  <div class="tab active" onclick="switchTab('invitati')" id="tab-invitati">👤 Invitati</div>
+  <div class="tab" onclick="switchTab('campionato')" id="tab-campionato">🏆 Squadre</div>
+  <div class="tab" onclick="switchTab('alleanze')" id="tab-alleanze">🤝 Alleanze</div>
+  <div class="tab" onclick="switchTab('fazioni')" id="tab-fazioni">⚔️ Fazioni</div>
 </div>
 
-<!-- ══ TAB: PER OSPITE ══ -->
-<div class="tab-content active" id="content-ospiti">
-  <div class="stats-bar" id="stats-bar"></div>
-  <div class="search-wrap">
-    <span class="search-icon">🔍</span>
-    <input class="search-input" id="guest-search" type="text" placeholder="Cerca ospite..." oninput="renderGuestList()" autocomplete="off">
+<!-- TAB INVITATI -->
+<div class="tab-content active" id="content-invitati">
+  <div style="background:rgba(255,107,43,0.08);border:1px solid rgba(255,107,43,0.2);border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:12px;color:var(--text-muted);line-height:1.5;">
+    Punti <strong style="color:var(--text)">personali</strong> di ogni invitato — assegnati automaticamente dall'app o da Pietro in base alle azioni durante la serata.
   </div>
-  <div id="guest-list"></div>
+  <div class="podio" id="podio-invitati"></div>
+  <div id="invitati-list"></div>
 </div>
 
-<!-- ══ TAB: PER EVENTO ══ -->
-<div class="tab-content" id="content-eventi">
-  <div class="search-wrap">
-    <span class="search-icon">🔍</span>
-    <input class="search-input" id="evento-search" type="text" placeholder="Cerca evento..." oninput="renderEventiList()" autocomplete="off">
-  </div>
-  <div id="eventi-list"></div>
+<!-- TAB CAMPIONATO -->
+<div class="tab-content" id="content-campionato">
+  <div class="podio" id="podio"></div>
+  <div id="classifica-list"></div>
 </div>
 
-<!-- ══ TAB: STORICO ══ -->
-<div class="tab-content" id="content-storico">
-  <div class="search-wrap">
-    <span class="search-icon">🔍</span>
-    <input class="search-input" id="storico-search" type="text" placeholder="Cerca per nome..." oninput="renderStorico()" autocomplete="off">
+<!-- TAB ALLEANZE -->
+<div class="tab-content" id="content-alleanze">
+  <div style="background:rgba(168,85,247,0.08);border:1px solid rgba(168,85,247,0.2);border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:12px;color:var(--text-muted);line-height:1.5;">
+    Il coefficiente si calcola sulla <strong style="color:var(--text)">media dei punti squadra</strong> dei membri — non sui punti personali. Conta la qualità media del gruppo.
   </div>
-  <div id="storico-list"></div>
+  <div id="alleanze-list"></div>
 </div>
 
-<!-- ══ TAB: TOOLS ══ -->
-<div class="tab-content" id="content-tools">
-  <div class="section-label" style="margin-top:8px;">Classifica</div>
-  <a href="classifica.html?key=30cody30syria" style="display:block;background:rgba(34,197,94,0.1);border:1.5px solid rgba(34,197,94,0.3);color:var(--green);padding:14px 16px;border-radius:12px;font-weight:700;font-size:14px;text-decoration:none;margin-bottom:12px;">📊 Apri Classifica Live →</a>
-
-  <div class="section-label">Punti Pre-Festa</div>
-  <button class="btn-unlock" id="btn-unlock" onclick="sblocca()">
-    🔓 Sblocca Punti Pre-Festa
-  </button>
-  <button onclick="applicaMalusPreFesta()" style="width:100%;background:rgba(245,158,11,0.1);border:1.5px solid rgba(245,158,11,0.4);color:var(--gold);padding:14px 16px;border-radius:12px;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-top:8px;margin-bottom:12px;">
-    📋 Applica Malus Pre-Festa Mancanti
-  </button>
-  <div style="font-size:11px;color:var(--text-muted);margin-top:-6px;margin-bottom:12px;line-height:1.5;">
-    Da premere a draft chiuso, PRIMA di sbloccare i punti: assegna -30/-20 a chi non si è registrato, non ha fatto squadra, non ha pescato la fazione o non ha visto la pagina alleanza. Sicuro da ripetere — non duplica.
+<!-- TAB FAZIONI -->
+<div class="tab-content" id="content-fazioni">
+  <div style="background:rgba(255,107,43,0.08);border:1px solid rgba(255,107,43,0.2);border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:12px;color:var(--text-muted);line-height:1.5;">
+    Le fazioni si basano sui <strong style="color:var(--text)">punti personali</strong> di ogni ospite — non sulla squadra draftata. Ogni bonus/malus che ricevi va direttamente alla tua fazione.
   </div>
-
-  <div class="section-label">Reset</div>
-  <button onclick="resetPunti()" style="width:100%;background:rgba(239,68,68,0.1);border:1.5px solid rgba(239,68,68,0.4);color:var(--red);padding:14px 16px;border-radius:12px;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:12px;">
-    🗑 Reset Totale Punti
-  </button>
-
-  <div class="section-label">Reset Fazioni</div>
-  <button onclick="resetFazioniTutte()" style="width:100%;background:rgba(168,85,247,0.1);border:1.5px solid rgba(168,85,247,0.4);color:var(--accent-siria);padding:14px 16px;border-radius:12px;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:8px;">
-    ⚔️ Reset Fazioni — Tutti
-  </button>
-  <div style="margin-bottom:12px;">
-    <div class="admin-search" style="margin-bottom:6px;">
-      <input class="admin-search" type="text" id="reset-fazione-search" placeholder="Cerca ospite per reset singolo..." oninput="filterResetFazione()" style="width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:14px;outline:none;">
-    </div>
-    <div id="reset-fazione-list"></div>
-  </div>
-
-  <div class="section-label">Gestione Ospiti</div>
-  <div id="tools-registrations"></div>
-</div>
-
-<!-- ══ MODAL OSPITE ══ -->
-<div class="modal-overlay" id="modal-ospite">
-  <div class="modal-box">
-    <div class="modal-header">
-      <div>
-        <div class="modal-guest-name" id="modal-name">—</div>
-        <div style="font-size:12px;color:var(--text-muted);margin-top:2px;" id="modal-sub">0 eventi assegnati</div>
-      </div>
-      <div style="display:flex;align-items:center;gap:10px;">
-        <div class="modal-pts zero" id="modal-pts">0 pt</div>
-        <button class="btn-close" onclick="closeModal()">✕</button>
-      </div>
-    </div>
-
-    <div class="section-label">Assegna Bonus</div>
-    <div class="eventi-grid" id="modal-bonus-grid"></div>
-
-    <div class="section-label">Assegna Malus</div>
-    <div class="eventi-grid" id="modal-malus-grid"></div>
-
-    <div class="section-label">Storico Ospite</div>
-    <div id="modal-storico"></div>
-  </div>
-</div>
-
-<!-- ══ MODAL EVENTO (per-evento) ══ -->
-<div class="modal-overlay" id="modal-evento">
-  <div class="modal-box">
-    <div class="modal-header">
-      <div>
-        <div class="modal-guest-name" id="evento-modal-title">—</div>
-        <div style="font-size:12px;color:var(--text-muted);margin-top:2px;" id="evento-modal-pts-label">—</div>
-      </div>
-      <button class="btn-close" onclick="closeEventoModal()">✕</button>
-    </div>
-
-    <div class="section-label">Seleziona ospiti</div>
-    <div class="search-wrap">
-      <span class="search-icon">🔍</span>
-      <input class="search-input" id="evento-ospite-search" type="text" placeholder="Filtra ospiti..." oninput="renderOspiteMulti()" autocomplete="off">
-    </div>
-    <div class="ospiti-multi" id="ospiti-multi-list"></div>
-
-    <button class="btn-primary" id="evento-assign-btn" onclick="assegnaEvento()">
-      Assegna a selezionati
-    </button>
-  </div>
+  <div id="fazioni-display"></div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, get, set, push, remove, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getDatabase, ref, get, onValue, remove, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCqLFQW8XQioObmxG0oDPc_MFpdFXJxmac",
@@ -407,661 +307,498 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// ── ADMIN CHECK ──
 const ADMIN_KEY = "30cody30syria";
-const params = new URLSearchParams(window.location.search);
-if (params.get("key") !== ADMIN_KEY) {
-  document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:monospace;color:#ef4444;font-size:18px;">⛔ Accesso negato</div>';
-  throw new Error("Not admin");
-}
+const isAdmin = new URLSearchParams(window.location.search).get("key") === ADMIN_KEY;
 
-// ── LISTA OSPITI ──
+// ── DATI GIOCO ──
 const PLAYERS = [
-  "Alessia Ala","Anna Maria Caione (madre)","Eleonora Tauro","Paolo Bello","Mattia Caione","Mirco Caione","Gloria Rinaldi",
-  "Dario Caione","Gabriele Mangione","Federica Ala","Simone Baldassarre","Desi Ala","Michele Nervo","Zia Anna","Francesca Terlizzi","Nicolas Costa","Giulia Trevisi","Andrea Sozzani","Emilio Pulli","Eleonora Bello","Marta Mignone","Giuseppe Susca",
-  "Annachiara Maci","Davide Secci","Antonio Borelli","Marika Giagnotti","Danilo Schiavone","Ilaria Tenore","Donato Stragapede","Emily Giancane",
-  "Martina Poso","Maycols Sirsi","Laura Capodieci","Davide Attanasio","Manuel Palma","Carlotta D'aversa",
-  "Nicolò Spada","Antonella Lo vecchio","Beatrice Gloria","Mariacarla Spagnolo","Mattia Martina","Andrea Scozzi",
-  "Annalisa Ancora","Roberto Sciurti","Nicolò Maci","Silvia Lamusta","Alessio Maci","Rachele Ponzetta","Erminio Foti","Sara Colletta","Luca Grasso","Annalisa Maci","Alessio Caretto","Silvia Maci","Errico Del monte",
-  "Chiara Del Vecchio","Daniele Padula","Davide Mogavero","Marialuce Serra","Francesco Romano","Mariachiara Longo",
-  "Alberto Bianco","Martina Schiavone","Luca Invidia","Marika Piconese","Stefanuccio","Andrea De Matteis","Lorenzo Taffone"
+  { name: "Alessia Ala", cost: 175 },
+  { name: "Anna Maria Caione (madre)", cost: 150 },
+  { name: "Eleonora Tauro", cost: 90 },
+  { name: "Paolo Bello", cost: 110 },
+  { name: "Mattia Caione", cost: 70 },
+  { name: "Mirco Caione", cost: 85 },
+  { name: "Gloria Rinaldi", cost: 85 },
+  { name: "Dario Caione", cost: 95 },
+  { name: "Gabriele Mangione", cost: 100 },
+  { name: "Federica Ala", cost: 85 },
+  { name: "Simone Baldassarre", cost: 85 },
+  { name: "Desi Ala", cost: 85 },
+  { name: "Michele Nervo", cost: 65 },
+  { name: "Zia Anna", cost: 105 },
+  { name: "Francesca Terlizzi", cost: 140 },
+  { name: "Nicolas Costa", cost: 115 },
+  { name: "Giulia Trevisi", cost: 55 },
+  { name: "Andrea Sozzani", cost: 55 },
+  { name: "Emilio Pulli", cost: 110 },
+  { name: "Eleonora Bello", cost: 110 },
+  { name: "Marta Mignone", cost: 160 },
+  { name: "Giuseppe Susca", cost: 160 },
+  { name: "Annachiara Maci", cost: 85 },
+  { name: "Davide Secci", cost: 50 },
+  { name: "Antonio Borelli", cost: 130 },
+  { name: "Marika Giagnotti", cost: 90 },
+  { name: "Danilo Schiavone", cost: 175 },
+  { name: "Ilaria Tenore", cost: 90 },
+  { name: "Donato Stragapede", cost: 115 },
+  { name: "Emily Giancane", cost: 80 },
+  { name: "Martina Poso", cost: 115 },
+  { name: "Maycols Sirsi", cost: 125 },
+  { name: "Laura Capodieci", cost: 95 },
+  { name: "Davide Attanasio", cost: 135 },
+  { name: "Manuel Palma", cost: 180 },
+  { name: "Carlotta D'aversa", cost: 95 },
+  { name: "Nicolò Spada", cost: 120 },
+  { name: "Antonella Lo vecchio", cost: 50 },
+  { name: "Beatrice Gloria", cost: 80 },
+  { name: "Mariacarla Spagnolo", cost: 45 },
+  { name: "Mattia Martina", cost: 80 },
+  { name: "Andrea Scozzi", cost: 90 },
+  { name: "Annalisa Ancora", cost: 105 },
+  { name: "Roberto Sciurti", cost: 100 },
+  { name: "Nicolò Maci", cost: 85 },
+  { name: "Silvia Lamusta", cost: 50 },
+  { name: "Alessio Maci", cost: 85 },
+  { name: "Rachele Ponzetta", cost: 50 },
+  { name: "Erminio Foti", cost: 165 },
+  { name: "Sara Colletta", cost: 50 },
+  { name: "Luca Grasso", cost: 85 },
+  { name: "Annalisa Maci", cost: 50 },
+  { name: "Alessio Caretto", cost: 85 },
+  { name: "Silvia Maci", cost: 50 },
+  { name: "Errico Del monte", cost: 85 },
+  { name: "Chiara Del Vecchio", cost: 50 },
+  { name: "Daniele Padula", cost: 80 },
+  { name: "Davide Mogavero", cost: 160 },
+  { name: "Marialuce Serra", cost: 85 },
+  { name: "Francesco Romano", cost: 85 },
+  { name: "Mariachiara Longo", cost: 50 },
+  { name: "Alberto Bianco", cost: 100 },
+  { name: "Martina Schiavone", cost: 85 },
+  { name: "Luca Invidia", cost: 80 },
+  { name: "Marika Piconese", cost: 50 },
+  { name: "Stefanuccio", cost: 130 },
+  { name: "Andrea De Matteis", cost: 70 },
+  { name: "Lorenzo Taffone", cost: 70 },
 ];
 
-// ── EVENTI RAPIDI ──
-const EVENTI = [
-  // ── PRE-FESTA ──
-  { id:"b_outfit_spoiler", pts:10, desc:"Spoiler outfit", tipo:"bonus", cat:"Pre-festa" },
-  { id:"b_nome_squadra", pts:5, desc:"Nome squadra originale", tipo:"bonus", cat:"Pre-festa" },
-  { id:"m_chiede_location", pts:-20, desc:"Si perde e chiede informazioni sulla location", tipo:"malus", cat:"Pre-festa" },
-
-  // ── OUTFIT ──
-  { id:"b_orbit", pts:500, desc:"Orbit Orbit — astronauta completo", tipo:"bonus", cat:"Outfit" },
-  { id:"b_platino", pts:500, desc:"Epoca PLATINO — capelli biondo platino", tipo:"bonus", cat:"Outfit" },
-  { id:"b_cosplay", pts:350, desc:"Cosplay anime/manga completo", tipo:"bonus", cat:"Outfit" },
-  { id:"b_romano", pts:300, desc:"Impero Romano — soldato completo", tipo:"bonus", cat:"Outfit" },
-  { id:"b_pigiama", pts:200, desc:"Una serata memorabile — pigiama", tipo:"bonus", cat:"Outfit" },
-  { id:"b_metallaro", pts:150, desc:"Epoca Metallara — look completo", tipo:"bonus", cat:"Outfit" },
-  { id:"b_truzzo", pts:150, desc:"Epoca Truzza — autentico", tipo:"bonus", cat:"Outfit" },
-  { id:"b_daltonico", pts:100, desc:"Daltonico per scelta — scarpe diverse", tipo:"bonus", cat:"Outfit" },
-  { id:"b_overdressed", pts:100, desc:"Overdressed — ricevimento dal re", tipo:"bonus", cat:"Outfit" },
-  { id:"b_random_element", pts:80, desc:"Random Element — capo fuori contesto", tipo:"bonus", cat:"Outfit" },
-  { id:"b_tedesco", pts:80, desc:"Molto Comodo ma Tedesco — infradito+calze", tipo:"bonus", cat:"Outfit" },
-  { id:"b_beagle_fun", pts:70, desc:"Beagle Fun — colori Cody", tipo:"bonus", cat:"Outfit" },
-  { id:"b_outfit_gruppo", pts:70, desc:"Outfit di Gruppo — 3+ persone abbinate", tipo:"bonus", cat:"Outfit", ripetibile:true },
-  { id:"b_cambio_outfit", pts:50, desc:"Cambio Outfit totale durante festa", tipo:"bonus", cat:"Outfit" },
-  { id:"b_scapezzolata", pts:50, desc:"Scapezzolata — capezzoli in vista", tipo:"bonus", cat:"Outfit" },
-  { id:"b_accessorio_oro", pts:50, desc:"Accessorio d'Oro — estraneo all'outfit", tipo:"bonus", cat:"Outfit" },
-  { id:"b_outfit_abbinato", pts:50, desc:"Outfit Abbinato — con partner/affetto", tipo:"bonus", cat:"Outfit", ripetibile:true },
-  { id:"b_comodo", pts:50, desc:"Molto Comodo Grazie — infradito/ciabatte", tipo:"bonus", cat:"Outfit" },
-  { id:"b_costume_sotto", pts:50, desc:"Pronto a Tutto ma Veramente — costume SOTTO", tipo:"bonus", cat:"Outfit" },
-  { id:"b_costume", pts:35, desc:"Pronto a Tutto — porta costume da bagno", tipo:"bonus", cat:"Outfit" },
-  { id:"b_outfit_perfetto", pts:45, desc:"Outfit Perfetto — richiama gusti Pietro", tipo:"bonus", cat:"Outfit" },
-  { id:"b_floreale", pts:20, desc:"Elemento Floreale", tipo:"bonus", cat:"Outfit" },
-
-  // ── FESTA ──
-  { id:"b_storia_ig", pts:20, desc:"Storia Instagram taggando Pietro", tipo:"bonus", cat:"Festa" },
-  { id:"b_foto_festeggiato", pts:15, desc:"Foto con Pietro (non torta)", tipo:"bonus", cat:"Festa" },
-  { id:"b_arriva_orario", pts:10, desc:"Arriva puntuale", tipo:"bonus", cat:"Festa" },
-  { id:"b_ben_idratato_tutto", pts:50, desc:"Ben Idratato e Rinfrescato — corpo intero", tipo:"bonus", cat:"Festa" },
-  { id:"b_ben_idratato_parte", pts:30, desc:"Ben Idratato — parte del corpo", tipo:"bonus", cat:"Festa" },
-  { id:"b_brindisi", pts:35, desc:"Brindisi in rima (applaudito)", tipo:"bonus", cat:"Festa" },
-  { id:"b_discorso", pts:20, desc:"Discorso applaudito", tipo:"bonus", cat:"Festa" },
-  { id:"b_serenata", pts:150, desc:"Serenata — canta e dedica", tipo:"bonus", cat:"Festa" },
-  { id:"b_guanto_sfida", pts:40, desc:"Lancia Guanto di Sfida", tipo:"bonus", cat:"Festa" },
-  { id:"b_flashmob", pts:80, desc:"Flash Mob 35+ persone", tipo:"bonus", cat:"Festa" },
-  { id:"b_animatore", pts:60, desc:"Animatore Provetto — DJ + 10 persone", tipo:"bonus", cat:"Festa" },
-  { id:"b_vocalist", pts:50, desc:"Vocalist per Sbaglio — 5+ in pista", tipo:"bonus", cat:"Festa" },
-  { id:"b_influencer", pts:50, desc:"Influencer TikTok — 10+ persone", tipo:"bonus", cat:"Festa" },
-  { id:"b_regalo_assurdo", pts:30, desc:"Regalo Assurdo (max 5€)", tipo:"bonus", cat:"Festa" },
-  { id:"b_fatti_trascinare", pts:25, desc:"Fatti Trascinare (balla)", tipo:"bonus", cat:"Festa", ripetibile:true },
-  { id:"b_piatto_pulito", pts:15, desc:"Piatto Pulito — finisce tutto", tipo:"bonus", cat:"Festa" },
-  { id:"b_applausi", pts:10, desc:"Applausi for no reason", tipo:"bonus", cat:"Festa" },
-  { id:"b_proposta", pts:780, desc:"Proposta matrimonio con anello 💍", tipo:"bonus", cat:"Festa" },
-  { id:"b_auguri_paese", pts:150, desc:"Video auguri personaggio del paese", tipo:"bonus", cat:"Festa" },
-  { id:"b_auguri_vip", pts:250, desc:"Video auguri VIP (NO IA)", tipo:"bonus", cat:"Festa" },
-  { id:"b_caparezza", pts:1500, desc:"Imbucato: Caparezza 🎸", tipo:"bonus", cat:"Leggendario" },
-  { id:"b_fortunato", pts:20, desc:"Fortunato nella Sfortuna (ruota)", tipo:"bonus", cat:"Festa" },
-
-  // ── GIOCHI ──
-  { id:"b_tripletta", pts:70, desc:"Tripletta — 3 sfide consecutive vinte", tipo:"bonus", cat:"Giochi" },
-  { id:"b_vittoria_sfida", pts:30, desc:"Vince una sfida", tipo:"bonus", cat:"Giochi", ripetibile:true },
-
-  // ── AD PERSONAM ──
-  { id:"b_ap_oned", pts:300, desc:"HS Big Fun — Alessia Ala & Francesca Terlizzi (Harry Styles in coppia)", tipo:"bonus", cat:"Ad Personam", ripetibile:false },
-  { id:"b_ap_madre", pts:100, desc:"Solo Cose Belle — Anna Maria Caione (madre, no discorso scritto)", tipo:"bonus", cat:"Ad Personam" },
-  { id:"b_ap_nicolas", pts:150, desc:"Dilemma Etico — Nicolas Costa (maglia Juve o Milan)", tipo:"bonus", cat:"Ad Personam" },
-  { id:"b_ap_marta_beppe_base", pts:200, desc:"Io Sono Il Mio Lavoro — Marta Mignone & Giuseppe Susca (demo volo x2)", tipo:"bonus", cat:"Ad Personam" },
-  { id:"b_ap_marta_beppe_divise", pts:1000, desc:"Io Sono Il Mio Lavoro CON DIVISE — Marta Mignone & Giuseppe Susca", tipo:"bonus", cat:"Ad Personam" },
-  { id:"b_ap_antonio", pts:150, desc:"Orgoglio Partenopeo — Antonio Borelli (maglia Maradona + canta)", tipo:"bonus", cat:"Ad Personam" },
-  { id:"b_ap_danilo_base", pts:300, desc:"Danilo Schiavone è Nudo — propone spogliarello (senza mostrare tutto)", tipo:"bonus", cat:"Ad Personam" },
-  { id:"b_ap_martina_maicol", pts:100, desc:"Una Cosa Mai Vista — Martina Poso & Maycols Sirsi (orario ESATTO)", tipo:"bonus", cat:"Ad Personam" },
-  { id:"b_ap_davide_a", pts:150, desc:"Bronzo di Riace — Davide Attanasio (50 pieg+50 squat+3 persone)", tipo:"bonus", cat:"Ad Personam" },
-  { id:"b_ap_manuel", pts:800, desc:"Dilemma Etico PT2 — Manuel Palma (Bandiera Rossa 2 ritornelli)", tipo:"bonus", cat:"Ad Personam" },
-  { id:"b_ap_spada", pts:200, desc:"Una Cosa Mai Sentita — Nicolò Spada (mai ad alta voce)", tipo:"bonus", cat:"Ad Personam" },
-  { id:"b_ap_erminio", pts:450, desc:"Una Verità Scomoda — Erminio Foti (discorso FantaSanPio al mic)", tipo:"bonus", cat:"Ad Personam" },
-  { id:"b_ap_davide_m", pts:300, desc:"BATURINA BA BA — Davide Mogavero (esibizione live 45 sec)", tipo:"bonus", cat:"Ad Personam" },
-
-  // ── MALUS RITARDO ──
-  { id:"m_ritardo_30", pts:-10, desc:"30 min di ritardo", tipo:"malus", cat:"Ritardo" },
-  { id:"m_ritardo_60", pts:-20, desc:"1 ora di ritardo", tipo:"malus", cat:"Ritardo" },
-  { id:"m_ritardo_oltre", pts:-80, desc:"Oltre 1 ora di ritardo", tipo:"malus", cat:"Ritardo" },
-
-  // ── MALUS OUTFIT ──
-  { id:"m_nudo", pts:-1000, desc:"Non si veste — arriva nudo/a", tipo:"malus", cat:"Outfit" },
-  { id:"m_fascista", pts:-750, desc:"Riferimenti fascisti o nazisti", tipo:"malus", cat:"Outfit" },
-  { id:"m_cane_sbagliato", pts:-500, desc:"Cane sbagliato (non Beagle)", tipo:"malus", cat:"Outfit" },
-  { id:"m_milan_juve", pts:-300, desc:"Milan o Juve", tipo:"malus", cat:"Outfit" },
-  { id:"m_total_black_white", pts:-30, desc:"Total Black / Total White", tipo:"malus", cat:"Outfit" },
-  { id:"m_no_bonus_outfit", pts:-20, desc:"Zero bonus outfit", tipo:"malus", cat:"Outfit" },
-  { id:"m_no_costume", pts:-10, desc:"Niente costume da bagno", tipo:"malus", cat:"Outfit" },
-
-  // ── MALUS FESTA ──
-  { id:"m_risponde_no", pts:-450, desc:"Risponde No alla proposta", tipo:"malus", cat:"Festa" },
-  { id:"m_tira_torta", pts:-300, desc:"Tira torta in faccia a Pietro", tipo:"malus", cat:"Festa" },
-  { id:"m_annoiato", pts:-150, desc:"Palesemente annoiato", tipo:"malus", cat:"Festa" },
-  { id:"m_spreco_collettivo", pts:-150, desc:"Spreco collettivo buffet (A TUTTI)", tipo:"malus", cat:"Festa" },
-  { id:"m_imbarazzato_serenata", pts:-70, desc:"Imbarazzato per serenata", tipo:"malus", cat:"Festa" },
-  { id:"m_no_bonus_festa", pts:-50, desc:"Zero bonus festa a fine serata", tipo:"malus", cat:"Festa" },
-  { id:"m_no_cibo", pts:-50, desc:"Non mangia nulla", tipo:"malus", cat:"Festa" },
-  { id:"m_polemica", pts:-50, desc:"Polemica con admin/festeggiato", tipo:"malus", cat:"Festa" },
-  { id:"m_spreco_personale", pts:-30, desc:"Spreco cibo personale", tipo:"malus", cat:"Festa" },
-  { id:"m_interrompe", pts:-30, desc:"Interrompe sfida in corso", tipo:"malus", cat:"Giochi" },
-  { id:"m_no_alcool", pts:-20, desc:"Non beve alcool", tipo:"malus", cat:"Festa" },
-  { id:"m_no_foto_torta", pts:-15, desc:"Assente foto taglio torta", tipo:"malus", cat:"Festa" },
-  { id:"m_asciutto", pts:-15, desc:"Completamente asciutto a fine festa", tipo:"malus", cat:"Festa" },
-  { id:"m_no_torta", pts:-5, desc:"Non mangia la torta", tipo:"malus", cat:"Festa" },
-
-  // ── MALUS GIOCHI ──
-  { id:"m_rifiuta_sfida", pts:-50, desc:"Rifiuta guanto di sfida", tipo:"malus", cat:"Giochi" },
-  { id:"m_perde_sfida", pts:-15, desc:"Perde una sfida", tipo:"malus", cat:"Giochi", ripetibile:true },
-
-  // ── MALUS FAZIONE ──
-  { id:"m_spoiler_ruolo", pts:-150, desc:"Spoilera ruolo speciale fazione", tipo:"malus", cat:"Fazione" },
-  { id:"m_spoiler_fazione", pts:-80, desc:"Spoilera fazione segreta", tipo:"malus", cat:"Fazione" },
-
-  // ── MALUS AD PERSONAM ──
-  { id:"m_ap_danilo_tutto", pts:-1000, desc:"Danilo Schiavone mostra tutto (malus spogliarello completo)", tipo:"malus", cat:"Ad Personam" },
-  { id:"m_ap_oned", pts:-20, desc:"HS Big Fun — Alessia Ala & Francesca Terlizzi non cantano (-20 a testa)", tipo:"malus", cat:"Ad Personam" },
-  { id:"m_ap_madre", pts:-20, desc:"Anna Maria Caione (madre) fa discorso scritto", tipo:"malus", cat:"Ad Personam" },
-  { id:"m_ap_nicolas", pts:-20, desc:"Nicolas Costa non porta maglia", tipo:"malus", cat:"Ad Personam" },
-  { id:"m_ap_marta_beppe", pts:-50, desc:"Marta Mignone & Giuseppe Susca non fanno demo (-50 a testa)", tipo:"malus", cat:"Ad Personam" },
-  { id:"m_ap_antonio", pts:-20, desc:"Antonio Borelli non fa Orgoglio Partenopeo", tipo:"malus", cat:"Ad Personam" },
-  { id:"m_ap_danilo", pts:-50, desc:"Danilo Schiavone non propone spogliarello", tipo:"malus", cat:"Ad Personam" },
-  { id:"m_ap_martina_maicol", pts:-50, desc:"Martina Poso & Maycols Sirsi non arrivano all'orario esatto (-50 a testa)", tipo:"malus", cat:"Ad Personam" },
-  { id:"m_ap_davide_a", pts:-30, desc:"Davide Attanasio non fa Bronzo di Riace", tipo:"malus", cat:"Ad Personam" },
-  { id:"m_ap_manuel", pts:-30, desc:"Manuel Palma non canta Bandiera Rossa", tipo:"malus", cat:"Ad Personam" },
-  { id:"m_ap_spada", pts:-50, desc:"Nicolò Spada parla ad alta voce", tipo:"malus", cat:"Ad Personam" },
-  { id:"m_ap_erminio", pts:-50, desc:"Erminio Foti non recita discorso FantaSanPio", tipo:"malus", cat:"Ad Personam" },
-  { id:"m_ap_davide_m", pts:-50, desc:"Davide Mogavero non si esibisce in BATURINA", tipo:"malus", cat:"Ad Personam" },
-];
+const ALLEANZE = {
+  "💰 ISEE Allargato": ["Alessia Ala","Anna Maria Caione (madre)","Eleonora Tauro","Paolo Bello","Mattia Caione","Mirco Caione","Gloria Rinaldi","Dario Caione","Gabriele Mangione","Federica Ala","Simone Baldassarre","Desi Ala","Michele Nervo","Zia Anna"],
+  "💥 Bombette di Cisternino ASAP": ["Francesca Terlizzi","Nicolas Costa","Giulia Trevisi","Andrea Sozzani","Emilio Pulli","Eleonora Bello","Marta Mignone","Giuseppe Susca","Annachiara Maci","Davide Secci"],
+  "😈 Il Buono Il Bello e il Danilo": ["Antonio Borelli","Marika Giagnotti","Danilo Schiavone","Ilaria Tenore","Donato Stragapede","Emily Giancane"],
+  "💸 Cuoricini Broke": ["Martina Poso","Maycols Sirsi","Laura Capodieci","Davide Attanasio","Manuel Palma","Carlotta D'aversa","Nicolò Spada","Antonella Lo vecchio","Beatrice Gloria","Mariacarla Spagnolo","Mattia Martina","Lorenzo Taffone"],
+  "⚽ FantaSanPio 08:00 AM": ["Andrea Scozzi","Annalisa Ancora","Roberto Sciurti","Nicolò Maci","Silvia Lamusta","Alessio Maci","Rachele Ponzetta","Erminio Foti","Sara Colletta","Luca Grasso","Annalisa Maci","Alessio Caretto","Silvia Maci","Errico Del monte","Chiara Del Vecchio","Daniele Padula","Davide Mogavero","Marialuce Serra","Andrea De Matteis"],
+  "🏆 Guinness World Record Partecipazione": ["Francesco Romano","Mariachiara Longo","Alberto Bianco","Martina Schiavone","Luca Invidia","Marika Piconese","Stefanuccio"],
+};
 
 // ── STATO ──
-let punti = {};
-let allTeams = {};
-let teams = {};
-let registrazioni = {}; // { playerKey: deviceCode }
-let currentGuest = null;
-let currentEvento = null;
-let selectedOspiti = new Set();
+let punti = {};   // punti personali per ospite
+let teams = {};   // squadre draft
+let fazioni = {}; // fazioni assegnate
+let prefestaSbloccata = false; // diventa true quando Pietro preme "Sblocca Punti Pre-Festa"
+const myName = localStorage.getItem("fc_player_name");
 
-// ── INIT ──
-function init() {
-  onValue(ref(db, "punti"), snap => {
-    punti = snap.exists() ? snap.val() : {};
-    renderGuestList();
-    renderStorico();
-    updateStats();
-    if (currentGuest) aggiornaModalOspite(currentGuest);
-  });
+function sanitize(s) { return s.replace(/[.#$[\]]/g, "_"); }
 
-  onValue(ref(db, "registrations"), snap => {
-    registrazioni = snap.exists() ? snap.val() : {};
-    renderToolsRegistrations();
-  });
-
-  onValue(ref(db, "teams"), snap => {
-    allTeams = snap.exists() ? snap.val() : {};
-    renderToolsRegistrations();
-  });
-
-  onValue(ref(db, "prefesta_sbloccata"), snap => {
-    const sbloccata = snap.exists() && snap.val() === true;
-    const btn = document.getElementById("btn-unlock");
-    if (sbloccata) {
-      btn.textContent = "✅ Punti Pre-Festa Sbloccati";
-      btn.className = "btn-unlock done";
-    }
-  });
-}
-
-// ── CALCOLO PUNTI ──
-function getPuntiOspite(name) {
-  const key = sanitize(name);
-  if (!punti[key]) return 0;
-  return Object.values(punti[key]).reduce((s, e) => s + (e.pts || 0), 0);
-}
-
-function getEventiOspite(name) {
-  const key = sanitize(name);
-  if (!punti[key]) return [];
-  return Object.entries(punti[key]).map(([id, e]) => ({ id, ...e }))
-    .sort((a, b) => (b.ts || 0) - (a.ts || 0));
-}
-
-function updateStats() {
-  const tots = PLAYERS.map(p => getPuntiOspite(p));
-  const totalEvents = PLAYERS.reduce((s, p) => s + getEventiOspite(p).length, 0);
-  const leader = PLAYERS.reduce((a, b) => getPuntiOspite(a) >= getPuntiOspite(b) ? a : b);
-  const leaderPts = getPuntiOspite(leader);
-
-  document.getElementById("stats-bar").innerHTML = `
-    <div class="stat-chip"><span class="stat-num info">${totalEvents}</span><span class="stat-label">Eventi</span></div>
-    <div class="stat-chip"><span class="stat-num pos">${leaderPts}</span><span class="stat-label">Leader pts</span></div>
-    <div class="stat-chip"><span class="stat-num" style="font-size:11px;color:var(--accent-cody);">${leader.split(" ")[0]}</span><span class="stat-label">In testa</span></div>
-  `;
-}
-
-// ── LISTA OSPITI ──
-window.renderGuestList = function() {
-  const q = (document.getElementById("guest-search").value || "").toLowerCase();
-  const list = document.getElementById("guest-list");
-  list.innerHTML = "";
-
-  const sorted = [...PLAYERS]
-    .filter(p => p.toLowerCase().includes(q))
-    .sort((a, b) => getPuntiOspite(b) - getPuntiOspite(a));
-
-  sorted.forEach(name => {
-    const pts = getPuntiOspite(name);
-    const eventi = getEventiOspite(name).length;
-    const div = document.createElement("div");
-    div.className = "guest-item";
-    div.onclick = () => openModalOspite(name);
-    div.innerHTML = `
-      <div class="guest-info">
-        <div class="guest-name">${name}</div>
-        <div class="guest-pts ${pts > 0 ? 'pos' : pts < 0 ? 'neg' : 'zero'}">
-          ${pts > 0 ? '+' : ''}${pts} pt · ${eventi} eventi
-        </div>
+// Mostra un placeholder "in attesa" al posto di podio + lista, per le tab interamente bloccate
+function renderLockedTab(listId, podioId) {
+  const list = document.getElementById(listId);
+  if (list) {
+    list.innerHTML = `
+      <div class="empty-state">
+        <span class="empty-emoji">🔒</span>
+        I punteggi sono nascosti fino alla chiusura del draft.<br>
+        Continua a costruire la tua squadra — si sbloccano tutti insieme!
       </div>
-      <div class="guest-arrow">→</div>
     `;
-    list.appendChild(div);
-  });
-};
-
-// ── MODAL OSPITE ──
-window.openModalOspite = function(name) {
-  currentGuest = name;
-  aggiornaModalOspite(name);
-  document.getElementById("modal-ospite").classList.add("open");
-};
-
-function aggiornaModalOspite(name) {
-  const pts = getPuntiOspite(name);
-  const eventi = getEventiOspite(name);
-
-  document.getElementById("modal-name").textContent = name;
-  document.getElementById("modal-sub").textContent = `${eventi.length} eventi assegnati`;
-
-  const ptsEl = document.getElementById("modal-pts");
-  ptsEl.textContent = (pts > 0 ? '+' : '') + pts + ' pt';
-  ptsEl.className = "modal-pts " + (pts > 0 ? 'pos' : pts < 0 ? 'neg' : 'zero');
-
-  // Bonus grid
-  const bonusGrid = document.getElementById("modal-bonus-grid");
-  bonusGrid.innerHTML = "";
-  EVENTI.filter(e => e.tipo === "bonus").forEach(ev => {
-    const btn = document.createElement("button");
-    btn.className = "evento-btn bonus-btn";
-    btn.innerHTML = `<span class="evento-pts pos">+${ev.pts}</span><span class="evento-desc">${ev.desc}</span>`;
-    btn.onclick = () => assegnaA(name, ev);
-    bonusGrid.appendChild(btn);
-  });
-
-  // Malus grid
-  const malusGrid = document.getElementById("modal-malus-grid");
-  malusGrid.innerHTML = "";
-  EVENTI.filter(e => e.tipo === "malus").forEach(ev => {
-    const btn = document.createElement("button");
-    btn.className = "evento-btn malus-btn";
-    btn.innerHTML = `<span class="evento-pts neg">${ev.pts}</span><span class="evento-desc">${ev.desc}</span>`;
-    btn.onclick = () => assegnaA(name, ev);
-    malusGrid.appendChild(btn);
-  });
-
-  // Storico ospite
-  const stor = document.getElementById("modal-storico");
-  if (eventi.length === 0) {
-    stor.innerHTML = '<div class="empty-state">Nessun evento ancora</div>';
-  } else {
-    stor.innerHTML = "";
-    eventi.forEach(ev => {
-      const div = document.createElement("div");
-      div.className = "storico-item";
-      const d = new Date(ev.ts);
-      const timeStr = d.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
-      div.innerHTML = `
-        <div class="storico-pts ${ev.pts > 0 ? 'pos' : 'neg'}">${ev.pts > 0 ? '+' : ''}${ev.pts}</div>
-        <div class="storico-info">
-          <div class="storico-desc">${ev.desc}</div>
-          <div class="storico-time">${timeStr}</div>
-        </div>
-        <button class="btn-annulla" onclick="annulla('${name}','${ev.id}')">Annulla</button>
-      `;
-      stor.appendChild(div);
-    });
+  }
+  if (podioId) {
+    const podio = document.getElementById(podioId);
+    if (podio) podio.innerHTML = "";
   }
 }
 
-window.closeModal = function() {
-  document.getElementById("modal-ospite").classList.remove("open");
-  currentGuest = null;
-};
+// ── CALCOLI ──
 
-// ── ASSEGNA PUNTO A OSPITE ──
-async function assegnaA(name, ev) {
+// Punti personali di un singolo ospite (per fazioni e punti personali)
+function getPuntiPersonali(name) {
   const key = sanitize(name);
-  const eventKey = ev.id + (ev.ripetibile ? '_' + Date.now() : '');
-  await set(ref(db, `punti/${key}/${eventKey}`), {
-    pts: ev.pts, desc: ev.desc, ts: Date.now()
+  if (!punti[key]) return { bonus: 0, malus: 0, tot: 0 };
+  let bonus = 0, malus = 0;
+  Object.values(punti[key]).forEach(e => {
+    if (e.pts > 0) bonus += e.pts;
+    else malus += Math.abs(e.pts);
   });
-  showToast(`${ev.pts > 0 ? '+' : ''}${ev.pts} → ${name}`);
+  return { bonus, malus, tot: bonus - malus };
 }
 
-// ── ANNULLA ──
-window.annulla = async function(name, eventId) {
-  if (!confirm(`Annullare questo evento per ${name}?`)) return;
-  await remove(ref(db, `punti/${sanitize(name)}/${eventId}`));
-  showToast("✓ Evento annullato", "warn");
-};
+// Punti squadra di un ospite (somma punti personali delle persone che ha draftato)
+// Il capitano conta x2
+function getPuntiSquadra(ownerName) {
+  const key = sanitize(ownerName);
+  const team = teams[key];
+  if (!team || !team.roster) return { bonus: 0, malus: 0, tot: 0 };
 
-// ── LISTA EVENTI (tab per evento) ──
-window.renderEventiList = function() {
-  const q = (document.getElementById("evento-search").value || "").toLowerCase();
-  const list = document.getElementById("eventi-list");
-  list.innerHTML = "";
+  let bonus = 0, malus = 0;
+  team.roster.forEach(playerName => {
+    const isCap = team.captain === playerName;
+    const pp = getPuntiPersonali(playerName);
+    const mult = isCap ? 2 : 1;
+    bonus += pp.bonus * mult;
+    malus += pp.malus * mult;
+  });
+  return { bonus, malus, tot: bonus - malus };
+}
 
-  const filtered = EVENTI.filter(e => e.desc.toLowerCase().includes(q) || e.cat.toLowerCase().includes(q));
+// Coefficiente alleanza = media bonus squadra membri - media malus squadra membri
+function getCoeffAlleanza(membri) {
+  if (membri.length === 0) return 0;
+  const conSquadra = membri.filter(m => teams[sanitize(m)]);
+  if (conSquadra.length === 0) return 0;
+  const totBonus = conSquadra.reduce((s, m) => s + getPuntiSquadra(m).bonus, 0);
+  const totMalus = conSquadra.reduce((s, m) => s + getPuntiSquadra(m).malus, 0);
+  return (totBonus / conSquadra.length) - (totMalus / conSquadra.length);
+}
 
-  // Raggruppa per categoria
-  const cats = {};
-  filtered.forEach(e => {
-    if (!cats[e.cat]) cats[e.cat] = [];
-    cats[e.cat].push(e);
+// Effetto del ruolo fazione sul totale: a chi vanno i punti e con che moltiplicatore
+// soldato_*        -> propria fazione, x1
+// moltiplicatore_*  -> propria fazione, x2
+// spia_cody         -> Siria, x1 (le mele marce di Cody lavorano per Siria)
+// spia_siria        -> Cody, x1 (le mele marce di Siria lavorano per Cody)
+function getRuoloEffetto(fazioneBase, ruoloId) {
+  if (ruoloId === "moltiplicatore_cody" || ruoloId === "moltiplicatore_siria") {
+    return { target: fazioneBase, multiplier: 2 };
+  }
+  if (ruoloId === "spia_cody") return { target: "siria", multiplier: 1 };
+  if (ruoloId === "spia_siria") return { target: "cody", multiplier: 1 };
+  // soldato_* o ruoloId mancante/non riconosciuto → comportamento di default
+  return { target: fazioneBase, multiplier: 1 };
+}
+
+// Punti totali fazione
+function getPuntiFazione(faz) {
+  let tot = 0;
+  PLAYERS.forEach(p => {
+    const f = fazioni[sanitize(p.name)];
+    if (!f || !f.fazione) return;
+    const { target, multiplier } = getRuoloEffetto(f.fazione, f.ruoloId);
+    if (target === faz) {
+      tot += getPuntiPersonali(p.name).tot * multiplier;
+    }
+  });
+  return tot;
+}
+
+// ── RENDER INVITATI ──
+function renderInvitati() {
+  if (!prefestaSbloccata) { renderLockedTab("invitati-list", "podio-invitati"); return; }
+
+  const classifica = PLAYERS.map(p => {
+    const pp = getPuntiPersonali(p.name);
+    return { name: p.name, pts: pp.tot, bonus: pp.bonus, malus: pp.malus };
+  }).sort((a, b) => b.pts - a.pts);
+
+  // PODIO
+  const podio = document.getElementById("podio-invitati");
+  podio.innerHTML = "";
+  const top3 = classifica.slice(0, 3);
+  const order = [top3[1], top3[0], top3[2]].filter(Boolean);
+  const posClass = ["podio-2", "podio-1", "podio-3"];
+  const posEmoji = ["🥈", "🥇", "🥉"];
+
+  order.forEach((p, i) => {
+    if (!p) return;
+    const div = document.createElement("div");
+    div.className = "podio-slot " + posClass[i];
+    div.innerHTML = `
+      <div class="podio-bar"><span class="podio-pos">${posEmoji[i]}</span></div>
+      <div class="podio-name">${p.name.split(" ")[0]}</div>
+      <div class="podio-pts">${p.pts > 0 ? '+' : ''}${p.pts}</div>
+    `;
+    podio.appendChild(div);
   });
 
-  Object.entries(cats).forEach(([cat, evs]) => {
-    const label = document.createElement("div");
-    label.className = "section-label";
-    label.textContent = cat;
-    list.appendChild(label);
+  // LISTA
+  const list = document.getElementById("invitati-list");
+  list.innerHTML = "";
 
-    evs.forEach(ev => {
+  if (classifica.every(p => p.pts === 0)) {
+    list.innerHTML = '<div class="empty-state"><span class="empty-emoji">⏳</span>Nessun punto ancora assegnato</div>';
+    return;
+  }
+
+  classifica.forEach((p, i) => {
+    const posC = i === 0 ? "gold" : i === 1 ? "silver" : i === 2 ? "bronze" : "";
+    const isMe = p.name === myName;
+    const div = document.createElement("div");
+    div.className = "rank-row" + (isMe ? " me" : "") + (i === 0 ? " top1" : "");
+    div.innerHTML = `
+      <div class="rank-pos ${posC}">${i + 1}</div>
+      <div class="rank-info">
+        <div class="rank-name">${p.name}${isMe ? " 👤" : ""}</div>
+        <div class="rank-team" style="color:var(--green)">+${p.bonus} bonus &nbsp;·&nbsp; <span style="color:var(--red)">-${p.malus} malus</span></div>
+      </div>
+      <div>
+        <div class="rank-pts ${p.pts > 0 ? 'pos' : p.pts < 0 ? 'neg' : 'zero'}">${p.pts > 0 ? '+' : ''}${p.pts}</div>
+      </div>
+    `;
+    list.appendChild(div);
+  });
+}
+
+// ── RENDER CAMPIONATO ──
+function renderCampionato() {
+  if (!prefestaSbloccata) { renderLockedTab("classifica-list", "podio"); return; }
+
+  // Per ogni ospite calcola punti squadra
+  const classifica = PLAYERS.map(p => ({
+    name: p.name,
+    pts: getPuntiSquadra(p.name).tot,
+    bonus: getPuntiSquadra(p.name).bonus,
+    malus: getPuntiSquadra(p.name).malus,
+    teamName: teams[sanitize(p.name)]?.teamName || null,
+  })).sort((a, b) => b.pts - a.pts);
+
+  // PODIO
+  const podio = document.getElementById("podio");
+  podio.innerHTML = "";
+  const top3 = classifica.slice(0, 3);
+  const order = [top3[1], top3[0], top3[2]].filter(Boolean);
+  const posClass = ["podio-2", "podio-1", "podio-3"];
+  const posNum = ["2°", "1°", "3°"];
+  const posEmoji = ["🥈", "🥇", "🥉"];
+
+  order.forEach((p, i) => {
+    if (!p) return;
+    const div = document.createElement("div");
+    div.className = "podio-slot " + posClass[i];
+    div.innerHTML = `
+      <div class="podio-bar"><span class="podio-pos">${posEmoji[i]}</span></div>
+      <div class="podio-name">${p.name.split(" ")[0]}</div>
+      <div class="podio-pts">${p.pts > 0 ? '+' : ''}${p.pts}</div>
+      <div class="podio-team">${p.teamName || '—'}</div>
+    `;
+    podio.appendChild(div);
+  });
+
+  // LISTA
+  const list = document.getElementById("classifica-list");
+  list.innerHTML = "";
+
+  if (classifica.every(p => p.pts === 0)) {
+    list.innerHTML = '<div class="empty-state"><span class="empty-emoji">⏳</span>Nessun punto ancora assegnato</div>';
+    return;
+  }
+
+  classifica.forEach((p, i) => {
+    const div = document.createElement("div");
+    const posC = i === 0 ? "gold" : i === 1 ? "silver" : i === 2 ? "bronze" : "";
+    const isMe = p.name === myName;
+    div.className = "rank-row" + (isMe ? " me" : "") + (i === 0 ? " top1" : "");
+    div.innerHTML = `
+      <div class="rank-pos ${posC}">${i + 1}</div>
+      <div class="rank-info">
+        <div class="rank-name">${p.name}${isMe ? " 👤" : ""}</div>
+        <div class="rank-team">${p.teamName || 'Nessuna squadra'}</div>
+      </div>
+      <div>
+        <div class="rank-pts ${p.pts > 0 ? 'pos' : p.pts < 0 ? 'neg' : 'zero'}">${p.pts > 0 ? '+' : ''}${p.pts}</div>
+        <div class="rank-delta" style="color:var(--green)">+${p.bonus}</div>
+        <div class="rank-delta" style="color:var(--red)">-${p.malus}</div>
+      </div>
+    `;
+    list.appendChild(div);
+  });
+}
+
+// ── RENDER ALLEANZE ──
+function renderAlleanze() {
+  const list = document.getElementById("alleanze-list");
+  list.innerHTML = "";
+
+  if (!prefestaSbloccata) {
+    // Pre-festa: mostra le alleanze e chi ha già fatto la squadra, ma non coefficienti/posizioni
+    Object.entries(ALLEANZE).forEach(([nome, membri]) => {
+      const formate = membri.filter(m => teams[sanitize(m)]).length;
       const div = document.createElement("div");
-      div.className = `evento-big ${ev.tipo === 'bonus' ? 'bonus-big' : 'malus-big'}`;
-      div.onclick = () => openEventoModal(ev);
+      div.className = "alleanza-card";
+      const myAlleanza = membri.includes(myName);
       div.innerHTML = `
-        <div class="evento-big-header">
-          <div class="evento-big-pts ${ev.pts > 0 ? 'pos' : 'neg'}">${ev.pts > 0 ? '+' : ''}${ev.pts}</div>
-          <div>
-            <div class="evento-big-desc">${ev.desc}</div>
-            <div class="evento-big-type">${ev.cat} · ${ev.tipo === 'bonus' ? 'Bonus' : 'Malus'}${ev.ripetibile ? ' · ripetibile' : ''}</div>
-          </div>
+        <div class="alleanza-header">
+          <div class="alleanza-name">${nome}${myAlleanza ? " 👤" : ""}</div>
+          <div class="locked-badge">🔒 in attesa</div>
+        </div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px;">
+          ✂️ ${formate}/${membri.length} squadre formate
+        </div>
+        <div class="alleanza-membri">
+          ${membri.map(m => `<span class="membro-chip ${teams[sanitize(m)] ? 'has-team' : ''}">${m.split(" ")[0]}</span>`).join("")}
         </div>
       `;
       list.appendChild(div);
     });
-  });
-};
-
-// ── MODAL EVENTO ──
-window.openEventoModal = function(ev) {
-  currentEvento = ev;
-  selectedOspiti = new Set();
-  document.getElementById("evento-modal-title").textContent = ev.desc;
-  document.getElementById("evento-modal-pts-label").textContent = `${ev.pts > 0 ? '+' : ''}${ev.pts} pt · ${ev.cat}`;
-  document.getElementById("evento-ospite-search").value = "";
-  renderOspiteMulti();
-  document.getElementById("modal-evento").classList.add("open");
-};
-
-window.closeEventoModal = function() {
-  document.getElementById("modal-evento").classList.remove("open");
-  currentEvento = null;
-  selectedOspiti = new Set();
-};
-
-window.renderOspiteMulti = function() {
-  const q = (document.getElementById("evento-ospite-search").value || "").toLowerCase();
-  const list = document.getElementById("ospiti-multi-list");
-  list.innerHTML = "";
-
-  PLAYERS.filter(p => p.toLowerCase().includes(q)).forEach(name => {
-    const checked = selectedOspiti.has(name);
-    const pts = getPuntiOspite(name);
-    const div = document.createElement("div");
-    div.className = "ospite-check" + (checked ? " checked" : "");
-    div.onclick = () => toggleOspite(name, div);
-    div.innerHTML = `
-      <div class="check-box">${checked ? '✓' : ''}</div>
-      <div class="check-label">${name}</div>
-      <div class="check-pts">${pts > 0 ? '+' : ''}${pts} pt</div>
-    `;
-    list.appendChild(div);
-  });
-
-  document.getElementById("evento-assign-btn").textContent =
-    selectedOspiti.size > 0
-      ? `Assegna a ${selectedOspiti.size} ospite${selectedOspiti.size > 1 ? 'i' : ''}`
-      : "Assegna a selezionati";
-  document.getElementById("evento-assign-btn").disabled = selectedOspiti.size === 0;
-};
-
-window.toggleOspite = function(name, el) {
-  if (selectedOspiti.has(name)) {
-    selectedOspiti.delete(name);
-    el.classList.remove("checked");
-    el.querySelector(".check-box").textContent = "";
-  } else {
-    selectedOspiti.add(name);
-    el.classList.add("checked");
-    el.querySelector(".check-box").textContent = "✓";
-  }
-  document.getElementById("evento-assign-btn").textContent =
-    selectedOspiti.size > 0
-      ? `Assegna a ${selectedOspiti.size} ospite${selectedOspiti.size > 1 ? 'i' : ''}`
-      : "Assegna a selezionati";
-  document.getElementById("evento-assign-btn").disabled = selectedOspiti.size === 0;
-};
-
-window.assegnaEvento = async function() {
-  if (!currentEvento || selectedOspiti.size === 0) return;
-  const btn = document.getElementById("evento-assign-btn");
-  btn.disabled = true;
-  btn.textContent = "Salvataggio...";
-
-  for (const name of selectedOspiti) {
-    const key = sanitize(name);
-    const eventKey = currentEvento.id + (currentEvento.ripetibile ? '_' + Date.now() : '');
-    await set(ref(db, `punti/${key}/${eventKey}`), {
-      pts: currentEvento.pts, desc: currentEvento.desc, ts: Date.now()
-    });
-  }
-
-  showToast(`✓ Assegnato a ${selectedOspiti.size} ospiti`);
-  closeEventoModal();
-};
-
-// ── STORICO GLOBALE ──
-window.renderStorico = function() {
-  const q = (document.getElementById("storico-search").value || "").toLowerCase();
-  const list = document.getElementById("storico-list");
-  list.innerHTML = "";
-
-  // Tutti gli eventi con nome ospite
-  const all = [];
-  PLAYERS.forEach(name => {
-    getEventiOspite(name).forEach(ev => {
-      all.push({ name, ...ev });
-    });
-  });
-
-  all.sort((a, b) => (b.ts || 0) - (a.ts || 0));
-  const filtered = all.filter(e => e.name.toLowerCase().includes(q));
-
-  if (filtered.length === 0) {
-    list.innerHTML = '<div class="empty-state">Nessun evento ancora</div>';
     return;
   }
 
-  filtered.forEach(ev => {
+  const ranked = Object.entries(ALLEANZE).map(([nome, membri]) => ({
+    nome, membri, coeff: getCoeffAlleanza(membri)
+  })).sort((a, b) => b.coeff - a.coeff);
+
+  const maxCoeff = Math.max(...ranked.map(a => Math.abs(a.coeff)), 1);
+
+  ranked.forEach((a, i) => {
     const div = document.createElement("div");
-    div.className = "storico-item";
-    const d = new Date(ev.ts);
-    const timeStr = d.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+    div.className = "alleanza-card" + (i === 0 ? " winner" : "");
+    const pct = Math.min(100, Math.max(0, ((a.coeff + maxCoeff) / (2 * maxCoeff)) * 100));
+    const myAlleanza = a.membri.includes(myName);
+
     div.innerHTML = `
-      <div class="storico-pts ${ev.pts > 0 ? 'pos' : 'neg'}">${ev.pts > 0 ? '+' : ''}${ev.pts}</div>
-      <div class="storico-info">
-        <div class="storico-desc">${ev.name} — ${ev.desc}</div>
-        <div class="storico-time">${timeStr}</div>
+      <div class="alleanza-header">
+        <div class="alleanza-name">${a.nome}${myAlleanza ? " 👤" : ""}</div>
+        <div class="alleanza-pos ${i === 0 ? 'first' : ''}">${i === 0 ? '🥇 1°' : (i + 1) + '°'}</div>
       </div>
-      <button class="btn-annulla" onclick="annulla('${ev.name}','${ev.id}')">✕</button>
+      <div class="coefficiente-bar">
+        <div class="coefficiente-label">
+          <span>COEFFICIENTE</span>
+          <span class="coeff-formula">media bonus − media malus</span>
+        </div>
+        <div class="coeff-value ${a.coeff < 0 ? 'neg' : ''}">${a.coeff > 0 ? '+' : ''}${a.coeff.toFixed(1)}</div>
+        <div class="track"><div class="track-fill" style="width:${pct}%"></div></div>
+      </div>
+      <div class="alleanza-membri">
+        ${a.membri.map(m => `<span class="membro-chip ${teams[sanitize(m)] ? 'has-team' : ''}">${m.split(" ")[0]}</span>`).join("")}
+      </div>
     `;
     list.appendChild(div);
-  });
-};
-
-// ── TOOLS ──
-window.sblocca = async function() {
-  const btn = document.getElementById("btn-unlock");
-  if (btn.classList.contains("done")) return;
-  if (!confirm("Sbloccare i punti pre-festa per tutti gli ospiti? Questa azione è irreversibile.")) return;
-  await set(ref(db, "prefesta_sbloccata"), true);
-  showToast("✓ Punti pre-festa sbloccati!");
-};
-
-function renderToolsRegistrations() {
-  const container = document.getElementById("tools-registrations");
-  container.innerHTML = "";
-  const linked = Object.keys(registrazioni).length;
-  const total = PLAYERS.length;
-
-  const stats = document.createElement("div");
-  stats.className = "stats-bar";
-  stats.innerHTML = `
-    <div class="stat-chip"><span class="stat-num pos">${linked}</span><span class="stat-label">Registrati</span></div>
-    <div class="stat-chip"><span class="stat-num" style="color:var(--gold)">${total - linked}</span><span class="stat-label">Mancanti</span></div>
-    <div class="stat-chip"><span class="stat-num info">${total}</span><span class="stat-label">Totale</span></div>
-  `;
-  container.appendChild(stats);
-
-  PLAYERS.forEach(name => {
-    const key = sanitize(name);
-    const code = registrazioni[key];
-    const hasTeam = !!(allTeams && allTeams[key]);
-    const row = document.createElement("div");
-    row.className = "storico-item";
-
-    let buttons = '';
-    if (code) {
-      buttons += `<button class="btn-annulla" onclick="scollegaOspite('${name}')">Scollega</button>`;
-    }
-    if (hasTeam) {
-      buttons += `<button class="btn-annulla" style="margin-left:4px;border-color:rgba(245,158,11,0.4);color:var(--gold);" onclick="cancellaSquadra('${name}')">✂️ Squadra</button>`;
-    }
-
-    row.innerHTML = `
-      <div class="storico-info">
-        <div class="storico-desc">${name}</div>
-        <div class="storico-time" style="color:${code ? 'var(--green)' : 'var(--text-muted)'}">
-          ${code ? '🔑 ' + code : '— non registrato'}
-          ${hasTeam ? ' · ✂️ squadra creata' : ''}
-        </div>
-      </div>
-      <div style="display:flex;gap:4px;flex-shrink:0;">${buttons}</div>
-    `;
-    container.appendChild(row);
   });
 }
 
-window.resetPunti = async function() {
-  if (!confirm("RESET TOTALE di tutti i punti assegnati? Azione irreversibile!")) return;
-  if (!confirm("Sei SICURO? Tutti i punti verranno azzerati.")) return;
-  await remove(ref(db, "punti"));
-  showToast("✓ Tutti i punti resettati", "warn");
-};
+// ── RENDER FAZIONI ──
+function renderFazioni() {
+  const container = document.getElementById("fazioni-display");
 
-window.resetFazioniTutte = async function() {
-  if (!confirm("Reset TOTALE fazioni? Tutti i giocatori dovranno riaprire la busta.")) return;
-  if (!confirm("Sei SICURO? Tutte le carte fazione verranno cancellate.")) return;
-  await remove(ref(db, "fazioni"));
-  showToast("✓ Fazioni resettate", "warn");
-};
-
-// ── MALUS PRE-FESTA MANCANTI ──
-// Controlla, per ogni ospite, le azioni automatiche Cat.1 che mancano alla chiusura del draft
-// e assegna il malus corrispondente (una sola volta, tracciato in autoEvents).
-window.applicaMalusPreFesta = async function() {
-  if (!confirm("Applicare i malus pre-festa a chi non ha completato le azioni automatiche (registrazione, squadra, fazione, alleanza)?\n\nVa fatto a draft chiuso. Azione sicura: non duplica malus già dati.")) return;
-
-  const [snapReg, snapTeams, snapFaz, snapAuto] = await Promise.all([
-    get(ref(db, "registrations")),
-    get(ref(db, "teams")),
-    get(ref(db, "fazioni")),
-    get(ref(db, "autoEvents")),
-  ]);
-  const regs = snapReg.exists() ? snapReg.val() : {};
-  const tms = snapTeams.exists() ? snapTeams.val() : {};
-  const fzs = snapFaz.exists() ? snapFaz.val() : {};
-  const autoE = snapAuto.exists() ? snapAuto.val() : {};
-
-  const MALUS = [
-    { id: "m_non_registrato",     pts: -30, desc: "Non accede al sito / non si abbina", check: key => !!regs[key] },
-    { id: "m_squadra_non_creata", pts: -30, desc: "Non crea la squadra",                 check: key => !!tms[key]  },
-    { id: "m_fazione_non_pescata",pts: -30, desc: "Non pesca la carta fazione",          check: key => !!fzs[key]  },
-    { id: "m_alleanza_non_vista", pts: -20, desc: "Non visualizza la pagina alleanza",   check: key => !!(autoE[key] && autoE[key].b_alleanza_vista) },
-  ];
-
-  let applicati = 0;
-  for (const name of PLAYERS) {
-    const key = sanitize(name);
-    for (const m of MALUS) {
-      const giàFatto = m.check(key);
-      const giàAssegnato = !!(autoE[key] && autoE[key][m.id]);
-      if (!giàFatto && !giàAssegnato) {
-        await set(ref(db, `punti/${key}/${m.id}`), { pts: m.pts, desc: m.desc, ts: Date.now() });
-        await set(ref(db, `autoEvents/${key}/${m.id}`), true);
-        applicati++;
-      }
-    }
+  if (!prefestaSbloccata) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <span class="empty-emoji">🔒</span>
+        I totali Cody vs Siria sono nascosti fino alla chiusura del draft.<br>
+        Le fazioni restano segrete — ci pensiamo a festa iniziata!
+      </div>
+    `;
+    return;
   }
 
-  showToast(applicati > 0 ? `✓ Applicati ${applicati} malus pre-festa` : "✓ Nessun malus da applicare — tutti in regola!", applicati > 0 ? "warn" : "ok");
-};
+  const ptsCody = getPuntiFazione("cody");
+  const ptsSiria = getPuntiFazione("siria");
+  const tot = Math.max(ptsCody + ptsSiria, 1);
+  const pctCody = Math.round((ptsCody / tot) * 100);
+  const pctSiria = 100 - pctCody;
 
-window.resetFazioneSingola = async function(name) {
-  if (!confirm(`Reset fazione di ${name}? Dovrà riaprire la busta.`)) return;
-  const key = sanitize(name);
-  await remove(ref(db, `fazioni/${key}`));
-  showToast(`✓ Fazione di ${name} resettata`, "warn");
-};
+  container.innerHTML = `
+    <div class="fazione-card fazione-cody">
+      <div class="fazione-header">
+        <div class="fazione-name">🐕 Team Cody</div>
+        <div class="fazione-pts">${ptsCody > 0 ? '+' : ''}${ptsCody}</div>
+      </div>
+      <div class="fazione-bar-wrap"><div class="fazione-bar-fill" style="width:${pctCody}%"></div></div>
+      <div class="fazione-label">${pctCody}% dei punti totali</div>
+    </div>
 
-window.filterResetFazione = function() {
-  const q = (document.getElementById("reset-fazione-search").value || "").toLowerCase();
-  const list = document.getElementById("reset-fazione-list");
-  list.innerHTML = "";
-  if (!q) return;
-  PLAYERS.filter(p => p.toLowerCase().includes(q)).slice(0, 5).forEach(name => {
-    const div = document.createElement("div");
-    div.className = "storico-item";
-    div.style.marginBottom = "4px";
-    div.innerHTML = `
-      <div class="storico-info"><div class="storico-desc">${name}</div></div>
-      <button class="btn-annulla" style="border-color:rgba(168,85,247,0.4);color:var(--accent-siria);" onclick="resetFazioneSingola('${name}')">Reset</button>
-    `;
-    list.appendChild(div);
-  });
-};
+    <div class="fazione-card fazione-siria">
+      <div class="fazione-header">
+        <div class="fazione-name">🐱 Team Siria</div>
+        <div class="fazione-pts">${ptsSiria > 0 ? '+' : ''}${ptsSiria}</div>
+      </div>
+      <div class="fazione-bar-wrap"><div class="fazione-bar-fill" style="width:${pctSiria}%"></div></div>
+      <div class="fazione-label">${pctSiria}% dei punti totali</div>
+    </div>
 
-window.cancellaSquadra = async function(name) {
-  if (!confirm(`Cancellare la squadra di ${name}?`)) return;
-  const key = sanitize(name);
-  await remove(ref(db, `teams/${key}`));
-  showToast(`✓ Squadra di ${name} cancellata`, "warn");
-};
+    <div style="margin-top:16px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;font-size:12px;color:var(--text-muted);">
+      ⚠️ Le fazioni sono segrete — i totali mostrano solo il punteggio aggregato senza rivelare chi è in quale fazione.
+    </div>
+  `;
+}
 
-window.scollegaOspite = async function(name) {
-  if (!confirm(`Scollegare ${name}? Verranno cancellati anche la registrazione e la squadra.`)) return;
-  const key = sanitize(name);
-  // Cancella registrazione E squadra
-  await remove(ref(db, `registrations/${key}`));
-  await remove(ref(db, `teams/${key}`));
-  showToast(`✓ ${name} scollegato e squadra cancellata`, "warn");
-};
-
-// ── UTILS ──
+// ── TABS ──
 window.switchTab = function(tab) {
   document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
   document.querySelectorAll(".tab-content").forEach(t => t.classList.remove("active"));
   document.getElementById("tab-" + tab).classList.add("active");
   document.getElementById("content-" + tab).classList.add("active");
-  if (tab === "eventi") renderEventiList();
-  if (tab === "storico") renderStorico();
 };
 
-function sanitize(str) { return str.replace(/[.#$[\]]/g, "_"); }
-
+// ── TOAST ──
 function showToast(msg, type = "ok") {
   const t = document.getElementById("toast");
   t.textContent = msg;
-  t.className = "toast show" + (type === "error" ? " error" : type === "warn" ? " warn" : "");
+  t.className = "toast show" + (type === "warn" ? " warn" : "");
   clearTimeout(window._tt);
   window._tt = setTimeout(() => { t.className = "toast"; }, 2500);
 }
 
+// ── INIT ──
+function init() {
+  // Ascolta punti in tempo reale
+  onValue(ref(db, "punti"), snap => {
+    punti = snap.exists() ? snap.val() : {};
+    renderInvitati();
+    renderCampionato();
+    renderAlleanze();
+    renderFazioni();
+  });
+
+  // Ascolta squadre
+  onValue(ref(db, "teams"), snap => {
+    teams = snap.exists() ? snap.val() : {};
+    renderInvitati();
+    renderCampionato();
+    renderAlleanze();
+  });
+
+  // Ascolta fazioni
+  onValue(ref(db, "fazioni"), snap => {
+    fazioni = snap.exists() ? snap.val() : {};
+    renderFazioni();
+  });
+
+  // Ascolta lo sblocco punti pre-festa
+  onValue(ref(db, "prefesta_sbloccata"), snap => {
+    prefestaSbloccata = snap.exists() && snap.val() === true;
+    renderInvitati();
+    renderCampionato();
+    renderAlleanze();
+    renderFazioni();
+  });
+
+}
+
 init();
-renderEventiList();
 </script>
+<a href="regolamento.html" class="fab-regolamento" title="Regolamento">📖</a>
+
+<!-- BOTTOM NAV BAR -->
+<div class="bottom-nav">
+  <a href="classifica.html" class="nav-item active" data-page="classifica">
+    <span class="nav-icon">📊</span>
+    <span class="nav-label">Classifica</span>
+  </a>
+  <a href="alleanze.html" class="nav-item" data-page="alleanze">
+    <span class="nav-icon">🤝</span>
+    <span class="nav-label">Alleanze</span>
+  </a>
+  <a href="home.html" class="nav-item nav-item-center" data-page="home">
+    <span class="nav-icon">🏠</span>
+    <span class="nav-label">Home</span>
+  </a>
+  <a href="squadra.html" class="nav-item" data-page="squadra">
+    <span class="nav-icon">✂️</span>
+    <span class="nav-label">Squadra</span>
+  </a>
+  <a href="profilo.html" class="nav-item" data-page="profilo">
+    <span class="nav-icon">👤</span>
+    <span class="nav-label">Profilo</span>
+  </a>
+</div>
+
 </body>
 </html>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FantaCompleanno — La Tua Fazione</title>
+<title>FantaCompleanno — Il Mio Profilo</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700;800&family=Space+Mono:wght@400;700&display=swap');
 
@@ -17,233 +17,178 @@
 body {
   font-family: 'Space Grotesk', sans-serif;
   background: var(--bg); color: var(--text);
-  min-height: 100vh; display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  padding: 20px; overflow: hidden;
+  min-height: 100vh; padding-bottom: 40px;
 }
 
 /* ── NAV ── */
 .nav {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+  position: sticky; top: 0; z-index: 50;
   background: rgba(10,10,15,0.97); backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
   padding: 12px 20px; display: flex; align-items: center; justify-content: space-between;
 }
 .nav-label { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--text-muted); letter-spacing:.1em; }
-.nav-name { font-size: 15px; font-weight: 800; }
+.nav-name { font-size: 16px; font-weight: 800; }
 .btn-home {
   background: var(--surface); border: 1.5px solid var(--border);
   color: var(--text-muted); padding: 8px 14px; border-radius: 10px;
   font-family: 'Space Grotesk', sans-serif; font-size: 13px; cursor: pointer;
 }
 
-/* ── SCHERMO ATTESA ── */
-.screen { display: none; width: 100%; max-width: 400px; animation: fadeIn .4s ease; margin-top: 60px; }
-.screen.active { display: flex; flex-direction: column; align-items: center; }
-@keyframes fadeIn { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
-
-/* ── BUSTA ── */
-.busta-wrap {
-  width: 280px; height: 280px; position: relative;
-  cursor: pointer; margin-bottom: 32px;
-  filter: drop-shadow(0 0 40px rgba(168,85,247,0.3));
+/* ── HERO ── */
+.hero {
+  padding: 24px 20px 0;
 }
-
-.busta {
-  width: 100%; height: 100%; position: relative;
+.hero-top {
+  display: flex; align-items: center; gap: 16px; margin-bottom: 20px;
 }
-
-/* Corpo busta */
-.busta-corpo {
-  position: absolute; bottom: 0; left: 0; right: 0;
-  height: 200px; background: var(--surface);
-  border: 2px solid rgba(168,85,247,0.5);
-  border-radius: 0 0 20px 20px;
-  overflow: hidden;
-}
-.busta-corpo::before {
-  content: ''; position: absolute; bottom: 0; left: 0; right: 0; top: 0;
-  background: linear-gradient(135deg, rgba(168,85,247,0.08), rgba(255,107,43,0.08));
-}
-
-/* Lembo busta (triangolo sopra) */
-.busta-lembo {
-  position: absolute; top: 80px; left: 0; right: 0;
-  width: 0; height: 0;
-  border-left: 140px solid transparent;
-  border-right: 140px solid transparent;
-  border-top: 120px solid var(--surface);
-  filter: drop-shadow(0 2px 4px rgba(168,85,247,0.2));
-  transform-origin: top center;
-  transition: transform .6s cubic-bezier(.4,0,.2,1);
-  z-index: 10;
-}
-.busta-lembo.aperto {
-  transform: rotateX(180deg);
-}
-
-/* Linee diagonali busta */
-.busta-diag-sx {
-  position: absolute; top: 200px; left: 0;
-  width: 0; height: 0;
-  border-bottom: 100px solid rgba(168,85,247,0.15);
-  border-right: 140px solid transparent;
-}
-.busta-diag-dx {
-  position: absolute; top: 200px; right: 0;
-  width: 0; height: 0;
-  border-bottom: 100px solid rgba(168,85,247,0.15);
-  border-left: 140px solid transparent;
-}
-
-/* Sigillo */
-.sigillo {
-  position: absolute; top: 160px; left: 50%; transform: translateX(-50%);
-  width: 50px; height: 50px; border-radius: 50%;
+.avatar {
+  width: 64px; height: 64px; border-radius: 16px;
   background: linear-gradient(135deg, var(--accent-cody), var(--accent-siria));
   display: flex; align-items: center; justify-content: center;
-  font-size: 22px; z-index: 20;
-  box-shadow: 0 0 20px rgba(168,85,247,0.5);
-  animation: glow 2s infinite;
-  transition: opacity .3s;
+  font-size: 26px; font-weight: 800; font-family: 'Space Mono', monospace;
+  color: white; flex-shrink: 0;
 }
-@keyframes glow {
-  0%,100% { box-shadow: 0 0 20px rgba(168,85,247,0.5); }
-  50% { box-shadow: 0 0 40px rgba(168,85,247,0.8); }
+.hero-info { flex: 1; }
+.hero-name { font-size: 22px; font-weight: 800; line-height: 1.1; }
+.hero-team { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+
+/* ── PUNTI HERO ── */
+.punti-hero {
+  background: linear-gradient(135deg, #150800, #2d1200);
+  border: 1.5px solid rgba(255,107,43,0.4);
+  border-radius: 16px; padding: 20px; margin-bottom: 16px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.punti-num {
+  font-family: 'Space Mono', monospace; font-size: 48px; font-weight: 700;
+  line-height: 1;
+}
+.punti-num.pos { color: var(--accent-cody); }
+.punti-num.neg { color: var(--red); }
+.punti-num.zero { color: var(--text-muted); }
+.punti-label { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--text-muted); letter-spacing: .1em; margin-bottom: 4px; }
+.punti-sub { font-size: 12px; color: var(--text-muted); }
+.punti-breakdown { text-align: right; }
+.punti-breakdown-row { font-family: 'Space Mono', monospace; font-size: 14px; margin-bottom: 4px; }
+
+/* ── STATS GRID ── */
+.stats-grid {
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px; margin-bottom: 16px; padding: 0 20px;
+}
+.stat-card {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 12px; padding: 12px; text-align: center;
+}
+.stat-card-num {
+  font-family: 'Space Mono', monospace; font-size: 20px; font-weight: 700;
+  display: block; margin-bottom: 3px;
+}
+.stat-card-num.gold { color: var(--gold); }
+.stat-card-num.green { color: var(--green); }
+.stat-card-num.siria { color: var(--accent-siria); }
+.stat-card-label { font-size: 10px; color: var(--text-muted); }
+
+/* ── SEZIONI ── */
+.section { padding: 0 20px; margin-bottom: 20px; }
+.section-title {
+  font-family: 'Space Mono', monospace; font-size: 11px;
+  color: var(--text-muted); letter-spacing: .12em; text-transform: uppercase;
+  margin-bottom: 10px;
 }
 
-/* Carta che esce dalla busta */
-.carta-preview {
-  position: absolute; bottom: 60px; left: 50%; transform: translateX(-50%);
-  width: 140px; height: 180px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #1a0a00, #2d1200);
-  border: 2px solid rgba(255,107,43,0.4);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 60px; z-index: 5;
-  transition: transform .6s cubic-bezier(.4,0,.2,1), opacity .3s;
-  transform: translateX(-50%) translateY(60px);
-  opacity: 0;
+/* ── SQUADRA ── */
+.squadra-header {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 14px; padding: 14px 16px; margin-bottom: 8px;
 }
-.carta-preview.esce {
-  transform: translateX(-50%) translateY(0px);
-  opacity: 1;
+.squadra-nome { font-size: 16px; font-weight: 800; margin-bottom: 4px; }
+.squadra-budget { font-size: 12px; color: var(--text-muted); }
+
+.giocatore-row {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 10px; padding: 12px 14px; margin-bottom: 6px;
+  display: flex; align-items: center; gap: 12px;
 }
-.carta-preview.cody-preview {
-  background: linear-gradient(135deg, #1a0800, #2d1200);
-  border-color: rgba(255,107,43,0.5);
+.giocatore-row.capitano { border-color: var(--gold); background: rgba(245,158,11,0.05); }
+.giocatore-avatar {
+  width: 36px; height: 36px; border-radius: 8px;
+  background: var(--border); display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 800; font-family: 'Space Mono', monospace;
+  color: var(--text-muted); flex-shrink: 0;
 }
-.carta-preview.siria-preview {
+.giocatore-row.capitano .giocatore-avatar { background: rgba(245,158,11,0.2); color: var(--gold); }
+.giocatore-info { flex: 1; }
+.giocatore-nome { font-size: 14px; font-weight: 700; }
+.giocatore-ruolo { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.giocatore-pts {
+  font-family: 'Space Mono', monospace; font-size: 15px; font-weight: 700; text-align: right;
+}
+.giocatore-pts.pos { color: var(--green); }
+.giocatore-pts.neg { color: var(--red); }
+.giocatore-pts.zero { color: var(--text-muted); }
+.cap-x2 { font-size: 10px; color: var(--gold); text-align: right; margin-top: 2px; font-family: 'Space Mono', monospace; }
+
+/* ── POSIZIONE ── */
+.posizione-row {
+  display: flex; gap: 8px;
+}
+.pos-card {
+  flex: 1; background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 12px; padding: 14px; text-align: center;
+}
+.pos-card.highlight { border-color: var(--accent-cody); background: rgba(255,107,43,0.05); }
+.pos-num {
+  font-family: 'Space Mono', monospace; font-size: 28px; font-weight: 700;
+  color: var(--accent-cody); display: block; margin-bottom: 4px;
+}
+.pos-label { font-size: 11px; color: var(--text-muted); }
+.pos-sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+/* ── ALLEANZA ── */
+.alleanza-mini {
   background: linear-gradient(135deg, #0d0020, #1a0035);
-  border-color: rgba(168,85,247,0.5);
+  border: 1.5px solid rgba(168,85,247,0.35);
+  border-radius: 14px; padding: 16px; cursor: pointer; transition: all .2s;
 }
+.alleanza-mini:hover { border-color: var(--accent-siria); }
+.alleanza-mini-name { font-size: 16px; font-weight: 800; margin-bottom: 6px; }
+.alleanza-mini-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.alleanza-mini-coeff { font-family: 'Space Mono', monospace; font-size: 18px; font-weight: 700; color: var(--accent-siria); }
+.alleanza-mini-pos { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--text-muted); }
+.alleanza-mini-track { width: 100%; height: 4px; background: var(--border); border-radius: 2px; }
+.alleanza-mini-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--accent-cody), var(--accent-siria)); transition: width .5s; }
 
-/* ── TESTO BUSTA ── */
-.busta-label {
-  font-family: 'Space Mono', monospace; font-size: 11px;
-  color: var(--text-muted); letter-spacing: .15em; text-transform: uppercase;
-  margin-bottom: 8px; text-align: center;
+/* ── STORICO ── */
+.storico-item {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 10px; padding: 12px 14px; margin-bottom: 6px;
+  display: flex; align-items: center; gap: 12px;
 }
-.busta-title { font-size: 20px; font-weight: 800; text-align: center; margin-bottom: 6px; }
-.busta-sub { font-size: 13px; color: var(--text-muted); text-align: center; line-height: 1.5; }
+.storico-pts {
+  font-family: 'Space Mono', monospace; font-size: 16px; font-weight: 700;
+  min-width: 52px; flex-shrink: 0;
+}
+.storico-pts.pos { color: var(--green); }
+.storico-pts.neg { color: var(--red); }
+.storico-info { flex: 1; }
+.storico-desc { font-size: 13px; font-weight: 600; }
+.storico-time { font-size: 10px; color: var(--text-muted); margin-top: 2px; font-family: 'Space Mono', monospace; }
 
-.btn-apri {
-  width: 100%; background: linear-gradient(135deg, var(--accent-cody), var(--accent-siria));
-  color: white; padding: 16px; border-radius: 14px; border: none;
-  font-family: 'Space Grotesk', sans-serif; font-size: 16px; font-weight: 700;
-  cursor: pointer; transition: opacity .2s; margin-top: 24px;
-  animation: breathe 2s infinite;
-}
-@keyframes breathe {
-  0%,100% { opacity:1; } 50% { opacity:.85; }
-}
-.btn-apri:hover { opacity: .85; animation: none; }
+/* ── EMPTY ── */
+.empty-state { text-align: center; padding: 24px; color: var(--text-muted); font-size: 13px; }
 
-/* ── PARTICELLE ── */
-.particle {
-  position: fixed; pointer-events: none; z-index: 100;
-  width: 8px; height: 8px; border-radius: 50%;
-  animation: particle-fly 1.5s ease-out forwards;
+/* ── LIVE ── */
+.live-dot {
+  display: flex; align-items: center; gap: 6px;
+  font-family: 'Space Mono', monospace; font-size: 11px; color: var(--green);
 }
-@keyframes particle-fly {
-  0% { transform: translate(0,0) scale(1); opacity: 1; }
-  100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+.live-dot::before {
+  content:''; width:8px; height:8px; border-radius:50%;
+  background:var(--green); animation:pulse 1.5s infinite;
 }
-
-/* ── CARTA RIVELATA ── */
-.carta-revealed {
-  width: 300px; border-radius: 20px; padding: 28px 24px;
-  text-align: center; margin-bottom: 20px;
-  animation: cardReveal .6s cubic-bezier(.4,0,.2,1);
-}
-@keyframes cardReveal {
-  0% { transform: scale(0.8) rotateY(90deg); opacity: 0; }
-  100% { transform: scale(1) rotateY(0deg); opacity: 1; }
-}
-.carta-cody {
-  background-image: linear-gradient(135deg, rgba(26,8,0,0.78), rgba(45,18,0,0.78), rgba(26,8,0,0.78)), url('assets/cornice_cody.jpg');
-  background-size: 100% 100%; background-repeat: no-repeat;
-  border: 2px solid var(--accent-cody);
-  box-shadow: 0 0 40px rgba(255,107,43,0.3);
-}
-.carta-siria {
-  background-image: linear-gradient(135deg, rgba(13,0,32,0.78), rgba(26,0,53,0.78), rgba(13,0,32,0.78)), url('assets/cornice_siria.jpg');
-  background-size: 100% 100%; background-repeat: no-repeat;
-  border: 2px solid var(--accent-siria);
-  box-shadow: 0 0 40px rgba(168,85,247,0.3);
-}
-.carta-emoji { font-size: 64px; display: block; margin-bottom: 12px; }
-.carta-ruolo-icon {
-  width: 96px; height: 96px; border-radius: 16px; object-fit: cover;
-  margin: 0 auto 12px; display: block; background: #000;
-}
-.carta-cody .carta-ruolo-icon { box-shadow: 0 0 24px rgba(255,107,43,0.35); border: 1.5px solid rgba(255,107,43,0.4); }
-.carta-siria .carta-ruolo-icon { box-shadow: 0 0 24px rgba(168,85,247,0.35); border: 1.5px solid rgba(168,85,247,0.4); }
-.carta-fazione-row { display: flex; align-items: center; justify-content: center; gap: 8px; }
-.carta-team-badge { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
-.carta-cody .carta-team-badge { box-shadow: 0 0 12px rgba(255,107,43,0.5); }
-.carta-siria .carta-team-badge { box-shadow: 0 0 12px rgba(168,85,247,0.5); }
-.carta-fazione-label {
-  font-family: 'Space Mono', monospace; font-size: 11px;
-  letter-spacing: .2em; text-transform: uppercase; margin-bottom: 6px;
-  opacity: .7;
-}
-.carta-fazione-name { font-size: 26px; font-weight: 800; margin-bottom: 4px; }
-.carta-cody .carta-fazione-name { color: var(--accent-cody); }
-.carta-siria .carta-fazione-name { color: var(--accent-siria); }
-.carta-ruolo-label {
-  font-family: 'Space Mono', monospace; font-size: 10px;
-  letter-spacing: .15em; text-transform: uppercase;
-  opacity: .5; margin-top: 16px; margin-bottom: 4px;
-}
-.carta-ruolo-name { font-size: 18px; font-weight: 800; margin-bottom: 8px; }
-.carta-ruolo-desc {
-  font-size: 12px; color: var(--text-muted); line-height: 1.6;
-  font-style: italic; padding: 0 8px;
-}
-.carta-regola {
-  margin-top: 14px; padding: 10px 14px; border-radius: 10px;
-  font-family: 'Space Mono', monospace; font-size: 11px;
-  line-height: 1.5;
-}
-.carta-cody .carta-regola { background: rgba(255,107,43,0.15); color: var(--accent-cody); }
-.carta-siria .carta-regola { background: rgba(168,85,247,0.15); color: var(--accent-siria); }
-
-.segreto-badge {
-  display: inline-flex; align-items: center; gap: 6px;
-  background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3);
-  color: var(--red); font-family: 'Space Mono', monospace; font-size: 10px;
-  padding: 5px 12px; border-radius: 100px; margin-top: 12px;
-  letter-spacing: .1em;
-}
-
-.btn-secondary {
-  width: 100%; background: var(--surface); border: 1.5px solid var(--border);
-  color: var(--text-muted); padding: 14px; border-radius: 12px;
-  font-family: 'Space Grotesk', sans-serif; font-size: 14px;
-  cursor: pointer; margin-top: 10px; transition: all .2s;
-}
-.btn-secondary:hover { border-color: var(--text-muted); color: var(--text); }
+@keyframes pulse { 0%,100%{opacity:1}50%{opacity:.3} }
 /* ── BOTTOM NAV BAR ── */
 .bottom-nav {
   position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
@@ -298,43 +243,96 @@ body { padding-bottom: 90px !important; }
 <!-- NAV -->
 <div class="nav">
   <div>
-    <div class="nav-label">// CASA TAURO //</div>
+    <div class="nav-label">// IL MIO PROFILO //</div>
     <div class="nav-name" id="nav-name">...</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <div class="live-dot">LIVE</div>
   </div>
 </div>
 
-<!-- SCREEN 1: BUSTA -->
-<div class="screen active" id="screen-busta">
-  <div class="busta-label">// Missione Segreta //</div>
-  <div class="busta-title">La tua carta ti aspetta</div>
-  <div class="busta-sub" style="margin-bottom:24px;">Scopri a quale fazione appartieni.<br>Il tuo destino è già scritto.</div>
-
-  <div class="busta-wrap" id="busta-wrap">
-    <div class="busta">
-      <div class="busta-lembo" id="busta-lembo"></div>
-      <div class="carta-preview" id="carta-preview">🏠</div>
-      <div class="busta-corpo">
-        <div class="busta-diag-sx"></div>
-        <div class="busta-diag-dx"></div>
-      </div>
-      <div class="sigillo" id="sigillo">⚔️</div>
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-top">
+    <div class="avatar" id="avatar">?</div>
+    <div class="hero-info">
+      <div class="hero-name" id="hero-name">...</div>
+      <div class="hero-team" id="hero-team">Caricamento...</div>
     </div>
   </div>
 
-  <button class="btn-apri" id="btn-apri" onclick="apriBusta()">
-    ✉️ Apri la busta
+  <!-- PUNTI PERSONALI -->
+  <div class="punti-hero" style="margin: 0 0 16px;">
+    <div>
+      <div class="punti-label">PUNTI PERSONALI</div>
+      <div class="punti-num zero" id="punti-num">0</div>
+      <div class="punti-sub">assegnati durante la festa</div>
+    </div>
+    <div class="punti-breakdown">
+      <div class="punti-breakdown-row" style="color:var(--green)" id="punti-bonus">+0 bonus</div>
+      <div class="punti-breakdown-row" style="color:var(--red)" id="punti-malus">-0 malus</div>
+      <div class="punti-breakdown-row" style="color:var(--text-muted)" id="punti-eventi">0 eventi</div>
+    </div>
+  </div>
+</div>
+
+<!-- STATS GRID -->
+<div class="stats-grid" style="grid-template-columns: 1.3fr 1fr;">
+  <div class="stat-card" style="text-align:left;padding:14px 16px;">
+    <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:2px;">
+      <span class="stat-card-num gold" id="pos-camp" style="font-size:24px;">—</span>
+      <span class="stat-card-label">posizione Classifica</span>
+    </div>
+    <div style="font-size:11px;color:var(--text-muted);">
+      <span id="pts-squadra" class="green" style="color:var(--green);font-family:'Space Mono',monospace;font-weight:700;">0</span> pt squadra — determina la tua posizione
+    </div>
+  </div>
+  <div class="stat-card">
+    <span class="stat-card-num siria" id="pos-alleanza">—</span>
+    <span class="stat-card-label">Alleanza</span>
+  </div>
+</div>
+
+<!-- AZIONI RAPIDE -->
+<div class="section" style="padding-top:0;padding-bottom:0;">
+  <button onclick="window.location.href='tutorial.html'" style="width:100%;background:var(--surface);border:1.5px solid var(--border);color:var(--text-muted);padding:12px;border-radius:10px;font-family:'Space Grotesk',sans-serif;font-size:13px;cursor:pointer;">
+    🎬 Rivedi il tutorial
   </button>
 </div>
 
-<!-- SCREEN 2: CARTA RIVELATA -->
-<div class="screen" id="screen-carta">
-  <div id="carta-container"></div>
-  <button class="btn-secondary" onclick="window.location.href='home.html'">← Torna alla Home</button>
+<!-- FAZIONE -->
+<div class="section">
+  <div class="section-title">La mia fazione</div>
+  <div id="fazione-content"></div>
+</div>
+
+<!-- SQUADRA -->
+<div class="section">
+  <div class="section-title">La mia squadra</div>
+  <div id="squadra-content"></div>
+</div>
+
+<!-- POSIZIONE IN CLASSIFICA -->
+<div class="section">
+  <div class="section-title">Posizione</div>
+  <div class="posizione-row" id="posizione-row"></div>
+</div>
+
+<!-- ALLEANZA -->
+<div class="section">
+  <div class="section-title">La mia alleanza</div>
+  <div id="alleanza-content"></div>
+</div>
+
+<!-- STORICO EVENTI -->
+<div class="section">
+  <div class="section-title">Storico eventi personali</div>
+  <div id="storico-content"></div>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCqLFQW8XQioObmxG0oDPc_MFpdFXJxmac",
@@ -352,230 +350,353 @@ const db = getDatabase(app);
 const myName = localStorage.getItem("fc_player_name");
 if (!myName) { window.location.replace("register.html"); }
 
-document.getElementById("nav-name").textContent = myName;
+const PLAYERS = [
+  { name: "Alessia Ala", cost: 175 },
+  { name: "Anna Maria Caione (madre)", cost: 150 },
+  { name: "Eleonora Tauro", cost: 90 },
+  { name: "Paolo Bello", cost: 110 },
+  { name: "Mattia Caione", cost: 70 },
+  { name: "Mirco Caione", cost: 85 },
+  { name: "Gloria Rinaldi", cost: 85 },
+  { name: "Dario Caione", cost: 95 },
+  { name: "Gabriele Mangione", cost: 100 },
+  { name: "Federica Ala", cost: 85 },
+  { name: "Simone Baldassarre", cost: 85 },
+  { name: "Desi Ala", cost: 85 },
+  { name: "Michele Nervo", cost: 65 },
+  { name: "Zia Anna", cost: 105 },
+  { name: "Francesca Terlizzi", cost: 140 },
+  { name: "Nicolas Costa", cost: 115 },
+  { name: "Giulia Trevisi", cost: 55 },
+  { name: "Andrea Sozzani", cost: 55 },
+  { name: "Emilio Pulli", cost: 110 },
+  { name: "Eleonora Bello", cost: 110 },
+  { name: "Marta Mignone", cost: 160 },
+  { name: "Giuseppe Susca", cost: 160 },
+  { name: "Annachiara Maci", cost: 85 },
+  { name: "Davide Secci", cost: 50 },
+  { name: "Antonio Borelli", cost: 130 },
+  { name: "Marika Giagnotti", cost: 90 },
+  { name: "Danilo Schiavone", cost: 175 },
+  { name: "Ilaria Tenore", cost: 90 },
+  { name: "Donato Stragapede", cost: 115 },
+  { name: "Emily Giancane", cost: 80 },
+  { name: "Martina Poso", cost: 115 },
+  { name: "Maycols Sirsi", cost: 125 },
+  { name: "Laura Capodieci", cost: 95 },
+  { name: "Davide Attanasio", cost: 135 },
+  { name: "Manuel Palma", cost: 180 },
+  { name: "Carlotta D'aversa", cost: 95 },
+  { name: "Nicolò Spada", cost: 120 },
+  { name: "Antonella Lo vecchio", cost: 50 },
+  { name: "Beatrice Gloria", cost: 80 },
+  { name: "Mariacarla Spagnolo", cost: 45 },
+  { name: "Mattia Martina", cost: 80 },
+  { name: "Andrea Scozzi", cost: 90 },
+  { name: "Annalisa Ancora", cost: 105 },
+  { name: "Roberto Sciurti", cost: 100 },
+  { name: "Nicolò Maci", cost: 85 },
+  { name: "Silvia Lamusta", cost: 50 },
+  { name: "Alessio Maci", cost: 85 },
+  { name: "Rachele Ponzetta", cost: 50 },
+  { name: "Erminio Foti", cost: 165 },
+  { name: "Sara Colletta", cost: 50 },
+  { name: "Luca Grasso", cost: 85 },
+  { name: "Annalisa Maci", cost: 50 },
+  { name: "Alessio Caretto", cost: 85 },
+  { name: "Silvia Maci", cost: 50 },
+  { name: "Errico Del monte", cost: 85 },
+  { name: "Chiara Del Vecchio", cost: 50 },
+  { name: "Daniele Padula", cost: 80 },
+  { name: "Davide Mogavero", cost: 160 },
+  { name: "Marialuce Serra", cost: 85 },
+  { name: "Francesco Romano", cost: 85 },
+  { name: "Mariachiara Longo", cost: 50 },
+  { name: "Alberto Bianco", cost: 100 },
+  { name: "Martina Schiavone", cost: 85 },
+  { name: "Luca Invidia", cost: 80 },
+  { name: "Marika Piconese", cost: 50 },
+  { name: "Stefanuccio", cost: 130 },
+  { name: "Andrea De Matteis", cost: 70 },
+  { name: "Lorenzo Taffone", cost: 70 },
+];
 
-// ── COSTI GIOCATORI (per regola segreta ruoli speciali) ──
-const PLAYER_COSTS = {
-  "Alessia Ala":175,"Anna Maria Caione (madre)":150,"Eleonora Tauro":90,"Paolo Bello":110,
-  "Mattia Caione":70,"Mirco Caione":85,"Gloria Rinaldi":85,"Dario Caione":95,"Gabriele Mangione":100,
-  "Federica Ala":85,"Simone Baldassarre":85,"Desi Ala":85,"Michele Nervo":65,"Zia Anna":105,
-  "Francesca Terlizzi":140,"Nicolas Costa":115,"Giulia Trevisi":55,"Andrea Sozzani":55,
-  "Emilio Pulli":110,"Eleonora Bello":110,"Marta Mignone":160,"Giuseppe Susca":160,"Annachiara Maci":85,
-  "Davide Secci":50,"Antonio Borelli":130,"Marika Giagnotti":90,"Danilo Schiavone":175,"Ilaria Tenore":90,
-  "Donato Stragapede":115,"Emily Giancane":80,"Martina Poso":115,"Maycols Sirsi":125,"Laura Capodieci":95,
-  "Davide Attanasio":135,"Manuel Palma":180,"Carlotta D'aversa":95,"Nicolò Spada":120,
-  "Antonella Lo vecchio":50,"Beatrice Gloria":80,"Mariacarla Spagnolo":45,"Mattia Martina":80,
-  "Andrea Scozzi":90,"Annalisa Ancora":105,"Roberto Sciurti":100,"Nicolò Maci":85,"Silvia Lamusta":50,
-  "Alessio Maci":85,"Rachele Ponzetta":50,"Erminio Foti":165,"Sara Colletta":50,
-  "Luca Grasso":85,"Annalisa Maci":50,"Alessio Caretto":85,"Silvia Maci":50,"Errico Del monte":85,
-  "Chiara Del Vecchio":50,"Daniele Padula":80,"Davide Mogavero":160,"Marialuce Serra":85,"Francesco Romano":85,
-  "Mariachiara Longo":50,"Alberto Bianco":100,"Martina Schiavone":85,"Luca Invidia":80,"Marika Piconese":50,
-  "Stefanuccio":130,"Andrea De Matteis":70,"Lorenzo Taffone":70
+const ALLEANZE = {
+  "💰 ISEE Allargato": ["Alessia Ala","Anna Maria Caione (madre)","Eleonora Tauro","Paolo Bello","Mattia Caione","Mirco Caione","Gloria Rinaldi","Dario Caione","Gabriele Mangione","Federica Ala","Simone Baldassarre","Desi Ala","Michele Nervo","Zia Anna"],
+  "💥 Bombette di Cisternino ASAP": ["Francesca Terlizzi","Nicolas Costa","Giulia Trevisi","Andrea Sozzani","Emilio Pulli","Eleonora Bello","Marta Mignone","Giuseppe Susca","Annachiara Maci","Davide Secci"],
+  "😈 Il Buono Il Bello e il Danilo": ["Antonio Borelli","Marika Giagnotti","Danilo Schiavone","Ilaria Tenore","Donato Stragapede","Emily Giancane"],
+  "💸 Cuoricini Broke": ["Martina Poso","Maycols Sirsi","Laura Capodieci","Davide Attanasio","Manuel Palma","Carlotta D'aversa","Nicolò Spada","Antonella Lo vecchio","Beatrice Gloria","Mariacarla Spagnolo","Mattia Martina","Lorenzo Taffone"],
+  "⚽ FantaSanPio 08:00 AM": ["Andrea Scozzi","Annalisa Ancora","Roberto Sciurti","Nicolò Maci","Silvia Lamusta","Alessio Maci","Rachele Ponzetta","Erminio Foti","Sara Colletta","Luca Grasso","Annalisa Maci","Alessio Caretto","Silvia Maci","Errico Del monte","Chiara Del Vecchio","Daniele Padula","Davide Mogavero","Marialuce Serra","Andrea De Matteis"],
+  "🏆 Guinness World Record Partecipazione": ["Francesco Romano","Mariachiara Longo","Alberto Bianco","Martina Schiavone","Luca Invidia","Marika Piconese","Stefanuccio"],
 };
 
-// ── RUOLI ──
+let punti = {};
+let teams = {};
+let fazioni = {};
+
 const RUOLI = {
   cody: {
-    soldato: {
-      id: "soldato_cody",
-      img: "assets/ruoli/soldato_cody.jpg",
-      nome: "🍖 Dispenser di Croccantini",
-      desc: "Sei un semplice dispenser per croccantini. Cody potrebbe ignorarti per cibi migliori, ma sa che tu ci sarai sempre per lui e non lo lascerai mai morire di fame. Ora sei chiamato in guerra per la supremazia e farai di tutto per far vincere la tua divinità. Forza Cody bau.",
-      regola: "Ruolo comune — i tuoi punti contribuiscono normalmente (x1) al totale della fazione Cody.",
-      effetto: "x1"
-    },
-    moltiplicatore: {
-      id: "moltiplicatore_cody",
-      img: "assets/ruoli/moltiplicatore_cody.jpg",
-      nome: "👨‍🍳 Cuoco di Corte",
-      desc: "Che tu sia il suo padrone, la sua zia, un suo conoscente, o un estraneo con cattive intenzioni, chiunque si metta ai fornelli è condannato ad essere la persona più importante per Cody in quel momento. È un assaggio al reale Cody — non lo riuscirai proprio a rifiutare.",
-      regola: "Ruolo speciale — a fine serata i tuoi punti conquistati raddoppiano per la tua fazione.",
-      effetto: "x2"
-    },
-    spia: {
-      id: "spia_cody",
-      img: "assets/ruoli/spia_cody.jpg",
-      nome: "✨ Glitter di Beagle",
-      desc: "Siete i tantissimi peli del reale Cody che dispensa sul pavimento ogni giorno. Più in là si va, più diventate di più e affluenti. Iniziate a covare una propria coscienza collettiva che diventa una sola coscienza, a tal punto che vi siete chiesti: e se sono io il vero Cody? Ora, rinati da questa nuova idea, non vi resta che allearvi con Siria, cacciare il falso idolo e prendervi ciò che spetta.",
-      regola: "Ruolo speciale — sei una spia del regno di Siria. I tuoi punti andranno a Siria invece che a Cody.",
-      effetto: "spia"
-    }
+    soldato: { id:"soldato_cody", nome:"🍖 Dispenser di Croccantini", regola:"Ruolo comune — i tuoi punti contribuiscono normalmente (x1) al totale della fazione Cody.", effetto:"x1" },
+    moltiplicatore: { id:"moltiplicatore_cody", nome:"👨‍🍳 Cuoco di Corte", regola:"Ruolo speciale — i tuoi punti raddoppiano per la tua fazione.", effetto:"x2" },
+    spia: { id:"spia_cody", nome:"✨ Glitter di Beagle", regola:"Ruolo speciale — sei una spia di Siria. I tuoi punti vanno a Siria.", effetto:"spia" }
   },
   siria: {
-    soldato: {
-      id: "soldato_siria",
-      img: "assets/ruoli/soldato_siria.jpg",
-      nome: "🚽 Pulitore di Lettiera",
-      desc: "Siria è una despota. Il tuo, pur essendo un ruolo comune, è vitale nell'equilibrio del regno. Se non ci sei tu, tutte le coltivazioni del regno Tauro saranno invase dalla pupù della reale Siria. Investito di questo arduo compito non puoi far nient'altro che combattere per lei.",
-      regola: "Ruolo comune — i tuoi punti contribuiscono normalmente (x1) al totale della fazione Siria.",
-      effetto: "x1"
-    },
-    moltiplicatore: {
-      id: "moltiplicatore_siria",
-      img: "assets/ruoli/moltiplicatore_siria.jpg",
-      nome: "❤️ Umano Preferito",
-      desc: "Siria è una despota bisbetica gatta, ma se ti inquadra come suo umano preferito, non conta quanto la ignori — lei preferirà te per le coccole. Poche e quando vuole lei, ma preferirà te a tutti.",
-      regola: "Ruolo speciale — a fine serata i tuoi punti conquistati raddoppiano per la tua fazione.",
-      effetto: "x2"
-    },
-    spia: {
-      id: "spia_siria",
-      img: "assets/ruoli/spia_siria.jpg",
-      nome: "🌸 Fioriera come Lettiera",
-      desc: "Di per sé nel regno di Casa Tauro avete un ruolo ben preciso: regalare colori e sorrisi. Ma da quando è arrivata la bisbetica regina Siria a reclamare il territorio, siete ormai messe alla mercé come una lettiera di secondo grado. Troppo spesso siete prese di mira dai reali bisognini di Siria. Questa è la vostra occasione — lavorate in segreto per Re Cody e dite basta a questo mobbing e demansionamento.",
-      regola: "Ruolo speciale — sei una spia di Cody. I tuoi punti andranno a Cody invece che a Siria.",
-      effetto: "spia"
-    }
+    soldato: { id:"soldato_siria", nome:"🚽 Pulitore di Lettiera", regola:"Ruolo comune — i tuoi punti contribuiscono normalmente (x1) al totale della fazione Siria.", effetto:"x1" },
+    moltiplicatore: { id:"moltiplicatore_siria", nome:"❤️ Umano Preferito", regola:"Ruolo speciale — i tuoi punti raddoppiano per la tua fazione.", effetto:"x2" },
+    spia: { id:"spia_siria", nome:"🌸 Fioriera come Lettiera", regola:"Ruolo speciale — sei una spia di Cody. I tuoi punti vanno a Cody.", effetto:"spia" }
   }
 };
+
+function getRuolo(fazione, ruoloId) {
+  for (const tipo of ['soldato','moltiplicatore','spia']) {
+    if (RUOLI[fazione][tipo].id === ruoloId) return RUOLI[fazione][tipo];
+  }
+  return RUOLI[fazione].soldato;
+}
 
 function sanitize(s) { return s.replace(/[.#$[\]]/g, "_"); }
 
-// ── ESTRAI FAZIONE ──
-function estraiRuolo(fazione, costo) {
-  // Regola segreta: costo >= 110 → può avere ruolo speciale
-  if (costo >= 110) {
-    const r = Math.random();
-    if (r < 0.20) return RUOLI[fazione].spia;       // 20% spia
-    if (r < 0.40) return RUOLI[fazione].moltiplicatore; // 20% moltiplicatore
-    return RUOLI[fazione].soldato;                    // 60% soldato
+// ── CALCOLI ──
+function getPuntiPersonali(name) {
+  const key = sanitize(name);
+  if (!punti[key]) return { bonus: 0, malus: 0, tot: 0, eventi: [] };
+  let bonus = 0, malus = 0, eventi = [];
+  Object.entries(punti[key]).forEach(([id, e]) => {
+    if (e.pts > 0) bonus += e.pts; else malus += Math.abs(e.pts);
+    eventi.push({ id, ...e });
+  });
+  return { bonus, malus, tot: bonus - malus, eventi: eventi.sort((a,b) => (b.ts||0)-(a.ts||0)) };
+}
+
+function getPuntiSquadra(ownerName) {
+  const key = sanitize(ownerName);
+  const team = teams[key];
+  if (!team || !team.roster) return 0;
+  let tot = 0;
+  team.roster.forEach(p => {
+    const isCap = team.captain === p;
+    const pp = getPuntiPersonali(p);
+    tot += (pp.bonus - pp.malus) * (isCap ? 2 : 1);
+  });
+  return tot;
+}
+
+function getMiaAlleanza() {
+  for (const [nome, membri] of Object.entries(ALLEANZE)) {
+    if (membri.includes(myName)) return { nome, membri };
   }
-  return RUOLI[fazione].soldato; // costo < 110 → sempre soldato
+  return null;
+}
+
+function getCoeffAlleanza(membri) {
+  const conSq = membri.filter(m => teams[sanitize(m)]);
+  if (!conSq.length) return 0;
+  const totB = conSq.reduce((s,m) => s + getPuntiPersonali(m).bonus, 0);
+  const totM = conSq.reduce((s,m) => s + getPuntiPersonali(m).malus, 0);
+  return (totB / conSq.length) - (totM / conSq.length);
+}
+
+// ── RENDER ──
+function render() {
+  const pp = getPuntiPersonali(myName);
+  const myKey = sanitize(myName);
+  const myTeam = teams[myKey];
+  const ptsSq = getPuntiSquadra(myName);
+  const initials = myName.split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase();
+
+  // Nav + avatar
+  document.getElementById("nav-name").textContent = myName;
+  document.getElementById("avatar").textContent = initials;
+  document.getElementById("hero-name").textContent = myName;
+  document.getElementById("hero-team").textContent = myTeam ? `✂️ ${myTeam.teamName || "Squadra senza nome"}` : "Nessuna squadra ancora";
+
+  // ── FAZIONE ──
+  const myKeyFaz = sanitize(myName);
+  const fazContainer = document.getElementById("fazione-content");
+  const mioFaz = fazioni[myKeyFaz];
+  if (!mioFaz) {
+    fazContainer.innerHTML = `
+      <div style="background:var(--surface);border:1.5px dashed var(--border);border-radius:14px;padding:16px;text-align:center;cursor:pointer;" onclick="window.location.href='fazione.html'">
+        <div style="font-size:32px;margin-bottom:8px;">✉️</div>
+        <div style="font-size:13px;color:var(--text-muted);">Non hai ancora aperto la tua busta fazione.</div>
+        <div style="font-size:12px;color:var(--accent-siria);margin-top:6px;">Tocca per scoprirla →</div>
+      </div>
+    `;
+  } else {
+    const isCody = mioFaz.fazione === "cody";
+    const ruolo = getRuolo(mioFaz.fazione, mioFaz.ruoloId);
+    const isSpeciale = ruolo.effetto !== "x1";
+    const gradient = isCody ? "linear-gradient(135deg, #1a0800, #2d1200)" : "linear-gradient(135deg, #0d0020, #1a0035)";
+    const borderColor = isCody ? "rgba(255,107,43,0.4)" : "rgba(168,85,247,0.4)";
+    const accentColor = isCody ? "var(--accent-cody)" : "var(--accent-siria)";
+    fazContainer.innerHTML = `
+      <div style="background:${gradient};border:1.5px solid ${borderColor};border-radius:14px;padding:16px;cursor:pointer;" onclick="window.location.href='fazione.html'">
+        <div style="display:flex;align-items:center;gap:14px;">
+          <div style="font-size:40px;flex-shrink:0;">${isCody ? "🐕" : "🐱"}</div>
+          <div style="flex:1;">
+            <div style="font-size:15px;font-weight:800;color:${accentColor};">${isCody ? "Team Cody" : "Team Siria"}</div>
+            <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">${ruolo.nome}</div>
+          </div>
+          <div style="color:var(--text-muted);font-size:16px;">→</div>
+        </div>
+        ${isSpeciale ? `<div style="margin-top:10px;font-family:'Space Mono',monospace;font-size:10px;color:var(--red);background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:100px;padding:4px 10px;display:inline-block;">🔒 Ruolo Speciale</div>` : ''}
+      </div>
+    `;
+  }
+
+  // Punti personali
+  const pEl = document.getElementById("punti-num");
+  pEl.textContent = (pp.tot > 0 ? "+" : "") + pp.tot;
+  pEl.className = "punti-num " + (pp.tot > 0 ? "pos" : pp.tot < 0 ? "neg" : "zero");
+  document.getElementById("punti-bonus").textContent = `+${pp.bonus} bonus`;
+  document.getElementById("punti-malus").textContent = `-${pp.malus} malus`;
+  document.getElementById("punti-eventi").textContent = `${pp.eventi.length} eventi`;
+
+  // Posizione campionato (basata su punti squadra)
+  const classifica = PLAYERS.map(p => ({ name: p.name, pts: getPuntiSquadra(p.name) }))
+    .sort((a,b) => b.pts - a.pts);
+  const myPos = classifica.findIndex(p => p.name === myName) + 1;
+
+  // Posizione alleanza
+  const miaAll = getMiaAlleanza();
+  const allanzeRanked = Object.entries(ALLEANZE)
+    .map(([n,m]) => ({ nome: n, coeff: getCoeffAlleanza(m) }))
+    .sort((a,b) => b.coeff - a.coeff);
+  const myAllPos = miaAll ? allanzeRanked.findIndex(a => a.nome === miaAll.nome) + 1 : null;
+
+  // Stats grid
+  document.getElementById("pos-camp").textContent = myPos + "°";
+  document.getElementById("pts-squadra").textContent = (ptsSq > 0 ? "+" : "") + ptsSq;
+  document.getElementById("pos-alleanza").textContent = myAllPos ? myAllPos + "°" : "—";
+
+  // ── SQUADRA ──
+  const sqContainer = document.getElementById("squadra-content");
+  sqContainer.innerHTML = "";
+  if (!myTeam || !myTeam.roster) {
+    sqContainer.innerHTML = '<div class="empty-state">Non hai ancora creato la squadra.<br><br><button onclick="window.location.href=\'squadra.html\'" style="background:linear-gradient(135deg,var(--accent-cody),var(--accent-siria));color:white;padding:12px 24px;border-radius:10px;border:none;font-family:\'Space Grotesk\',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">Crea squadra →</button></div>';
+  } else {
+    const header = document.createElement("div");
+    header.className = "squadra-header";
+    const spesi = myTeam.roster.reduce((s,n) => s + (PLAYERS.find(p=>p.name===n)?.cost||0), 0);
+    header.innerHTML = `<div class="squadra-nome">${myTeam.teamName || "Squadra senza nome"}</div><div class="squadra-budget">✂️ ${spesi}/500 Capelli spesi · ${myTeam.roster.length}/5 giocatori</div>`;
+    sqContainer.appendChild(header);
+
+    myTeam.roster.forEach(pName => {
+      const isCap = myTeam.captain === pName;
+      const pPts = getPuntiPersonali(pName);
+      const pData = PLAYERS.find(p => p.name === pName);
+      const initials2 = pName.split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase();
+      const ptsConMolt = isCap ? (pPts.bonus - pPts.malus) * 2 : pPts.tot;
+
+      const div = document.createElement("div");
+      div.className = "giocatore-row" + (isCap ? " capitano" : "");
+      div.innerHTML = `
+        <div class="giocatore-avatar">${isCap ? "⭐" : initials2}</div>
+        <div class="giocatore-info">
+          <div class="giocatore-nome">${pName}</div>
+          <div class="giocatore-ruolo">${pData?.cost || 0} ✂️${isCap ? " · CAPITANO x2" : ""}</div>
+        </div>
+        <div>
+          <div class="giocatore-pts ${ptsConMolt > 0 ? 'pos' : ptsConMolt < 0 ? 'neg' : 'zero'}">${ptsConMolt > 0 ? '+' : ''}${ptsConMolt}</div>
+          ${isCap ? '<div class="cap-x2">x2 applicato</div>' : ''}
+        </div>
+      `;
+      sqContainer.appendChild(div);
+    });
+
+    // Tasto modifica
+    const editBtn = document.createElement("button");
+    editBtn.onclick = () => window.location.href = "squadra.html";
+    editBtn.style.cssText = "width:100%;background:var(--surface);border:1.5px solid var(--border);color:var(--text-muted);padding:12px;border-radius:10px;font-family:'Space Grotesk',sans-serif;font-size:13px;cursor:pointer;margin-top:8px;";
+    editBtn.textContent = "✏️ Modifica squadra";
+    sqContainer.appendChild(editBtn);
+  }
+
+  // ── POSIZIONE IN CLASSIFICA ──
+  const posRow = document.getElementById("posizione-row");
+  posRow.innerHTML = "";
+  const prevName = myPos > 1 ? classifica[myPos-2].name : null;
+  const nextName = myPos < classifica.length ? classifica[myPos].name : null;
+  const prevPts = prevName ? getPuntiSquadra(prevName) : null;
+  const nextPts = nextName ? getPuntiSquadra(nextName) : null;
+
+  if (prevName) {
+    const div = document.createElement("div");
+    div.className = "pos-card";
+    div.innerHTML = `<span class="pos-num" style="font-size:14px;color:var(--text-muted)">${prevName.split(" ")[0]}</span><span class="pos-label">Sopra di te</span><span class="pos-sub">+${prevPts} pt</span>`;
+    posRow.appendChild(div);
+  }
+
+  const myCard = document.createElement("div");
+  myCard.className = "pos-card highlight";
+  myCard.innerHTML = `<span class="pos-num">${myPos}°</span><span class="pos-label">su ${PLAYERS.length}</span><span class="pos-sub">${ptsSq > 0 ? '+' : ''}${ptsSq} pt squadra</span>`;
+  posRow.appendChild(myCard);
+
+  if (nextName) {
+    const div = document.createElement("div");
+    div.className = "pos-card";
+    div.innerHTML = `<span class="pos-num" style="font-size:14px;color:var(--text-muted)">${nextName.split(" ")[0]}</span><span class="pos-label">Sotto di te</span><span class="pos-sub">${nextPts > 0 ? '+' : ''}${nextPts} pt</span>`;
+    posRow.appendChild(div);
+  }
+
+  // ── ALLEANZA ──
+  const allContainer = document.getElementById("alleanza-content");
+  if (!miaAll) {
+    allContainer.innerHTML = '<div class="empty-state">Non sei in nessuna alleanza.</div>';
+  } else {
+    const coeff = getCoeffAlleanza(miaAll.membri);
+    const sqFormate = miaAll.membri.filter(m => teams[sanitize(m)]).length;
+    allContainer.innerHTML = `
+      <div class="alleanza-mini" onclick="window.location.href='alleanze.html'">
+        <div class="alleanza-mini-name">${miaAll.nome}</div>
+        <div class="alleanza-mini-row">
+          <div class="alleanza-mini-coeff">${coeff > 0 ? '+' : ''}${coeff.toFixed(1)}</div>
+          <div class="alleanza-mini-pos">${myAllPos}° su 6 · ${sqFormate}/${miaAll.membri.length} squadre</div>
+        </div>
+        <div class="alleanza-mini-track">
+          <div class="alleanza-mini-fill" style="width:${Math.min(100, Math.max(5, 50 + coeff))}%"></div>
+        </div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:8px;">Tocca per vedere il dettaglio →</div>
+      </div>
+    `;
+  }
+
+  // ── STORICO PERSONALE ──
+  const storContainer = document.getElementById("storico-content");
+  storContainer.innerHTML = "";
+  if (pp.eventi.length === 0) {
+    storContainer.innerHTML = '<div class="empty-state">Nessun evento ancora assegnato.</div>';
+  } else {
+    pp.eventi.forEach(ev => {
+      const div = document.createElement("div");
+      div.className = "storico-item";
+      const d = new Date(ev.ts);
+      const timeStr = d.toLocaleTimeString('it-IT', { hour:'2-digit', minute:'2-digit' });
+      div.innerHTML = `
+        <div class="storico-pts ${ev.pts > 0 ? 'pos' : 'neg'}">${ev.pts > 0 ? '+' : ''}${ev.pts}</div>
+        <div class="storico-info">
+          <div class="storico-desc">${ev.desc}</div>
+          <div class="storico-time">${timeStr}</div>
+        </div>
+      `;
+      storContainer.appendChild(div);
+    });
+  }
 }
 
 // ── INIT ──
-async function init() {
-  const key = sanitize(myName);
-  const snap = await get(ref(db, `fazioni/${key}`));
-
-  if (snap.exists()) {
-    // Già estratta — mostra direttamente la carta
-    const saved = snap.val();
-    mostraCartaDirectly(saved);
-  }
-  // Altrimenti: schermata busta normale
-}
-
-function mostraCartaDirectly(saved) {
-  // Salta animazione busta, mostra carta subito
-  showScreen('screen-carta');
-  renderCarta(saved.fazione, saved.ruoloId);
-}
-
-// ── ANIMAZIONE BUSTA ──
-window.apriBusta = async function() {
-  const btn = document.getElementById("btn-apri");
-  btn.disabled = true;
-  btn.textContent = "⏳ Apertura in corso...";
-
-  // 1. Apri lembo
-  document.getElementById("busta-lembo").classList.add("aperto");
-  document.getElementById("sigillo").style.opacity = "0";
-
-  await sleep(600);
-
-  // 2. Determina fazione e ruolo
-  const costo = PLAYER_COSTS[myName] || 50;
-  const fazione = Math.random() < 0.5 ? "cody" : "siria";
-  const ruolo = estraiRuolo(fazione, costo);
-
-  // 3. Anteprima carta che esce
-  const preview = document.getElementById("carta-preview");
-  preview.className = `carta-preview ${fazione}-preview esce`;
-  preview.textContent = fazione === "cody" ? "🐕" : "🐱";
-
-  await sleep(800);
-
-  // 4. Particelle
-  spawnParticles(fazione);
-
-  await sleep(400);
-
-  // 5. Salva su Firebase
-  const key = sanitize(myName);
-  await set(ref(db, `fazioni/${key}`), {
-    fazione,
-    ruoloId: ruolo.id,
-    nome: myName,
-    ts: Date.now()
-  });
-
-  await sleep(300);
-
-  // 6. Mostra carta
-  showScreen('screen-carta');
-  renderCarta(fazione, ruolo.id);
-};
-
-function renderCarta(fazione, ruoloId) {
-  // Trova ruolo dai dati
-  let ruolo = null;
-  for (const tipo of ['soldato','moltiplicatore','spia']) {
-    if (RUOLI[fazione][tipo].id === ruoloId) {
-      ruolo = RUOLI[fazione][tipo];
-      break;
-    }
-  }
-  // Fallback
-  if (!ruolo) ruolo = RUOLI[fazione].soldato;
-
-  const isCody = fazione === "cody";
-  const fazioneNome = isCody ? "🐕 Team Cody" : "🐱 Team Siria";
-  const fazione_class = isCody ? "carta-cody" : "carta-siria";
-  const isSpeciale = ruolo.effetto !== "x1";
-
-  const container = document.getElementById("carta-container");
-  container.innerHTML = `
-    <div class="carta-revealed ${fazione_class}">
-      <img class="carta-ruolo-icon" src="${ruolo.img}" alt="${ruolo.nome}">
-      <div class="carta-fazione-label">Sei nel</div>
-      <div class="carta-fazione-row">
-        <img class="carta-team-badge" src="assets/badge_team_${fazione}.jpg" alt="">
-        <div class="carta-fazione-name">${fazioneNome}</div>
-      </div>
-
-      <div class="carta-ruolo-label">Il tuo ruolo</div>
-      <div class="carta-ruolo-name">${ruolo.nome}</div>
-      <div class="carta-ruolo-desc">"${ruolo.desc}"</div>
-
-      <div class="carta-regola">${ruolo.regola}</div>
-
-      ${isSpeciale ? `<div class="segreto-badge">🔒 Ruolo Speciale — Non rivelare</div>` : ''}
-    </div>
-    <div class="segreto-badge" style="margin-bottom:12px;">🔒 Non rivelare la tua fazione — -80 pt</div>
-  `;
-}
-
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  window.scrollTo(0,0);
-}
-
-function spawnParticles(fazione) {
-  const colors = fazione === "cody"
-    ? ["#ff6b2b","#ff8c55","#ffb38a","#f59e0b"]
-    : ["#a855f7","#c084fc","#e879f9","#7c3aed"];
-
-  for (let i = 0; i < 20; i++) {
-    const p = document.createElement("div");
-    p.className = "particle";
-    p.style.background = colors[Math.floor(Math.random() * colors.length)];
-    p.style.left = (30 + Math.random() * 40) + "vw";
-    p.style.top = (30 + Math.random() * 30) + "vh";
-    const angle = Math.random() * Math.PI * 2;
-    const dist = 80 + Math.random() * 120;
-    p.style.setProperty("--tx", Math.cos(angle) * dist + "px");
-    p.style.setProperty("--ty", Math.sin(angle) * dist + "px");
-    p.style.animationDelay = Math.random() * 0.3 + "s";
-    document.body.appendChild(p);
-    setTimeout(() => p.remove(), 2000);
-  }
-}
-
-function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
-
-init();
+onValue(ref(db, "punti"), snap => {
+  punti = snap.exists() ? snap.val() : {};
+  render();
+});
+onValue(ref(db, "teams"), snap => {
+  teams = snap.exists() ? snap.val() : {};
+  render();
+});
+onValue(ref(db, "fazioni"), snap => {
+  fazioni = snap.exists() ? snap.val() : {};
+  render();
+});
 </script>
 <a href="regolamento.html" class="fab-regolamento" title="Regolamento">📖</a>
 
@@ -597,7 +718,7 @@ init();
     <span class="nav-icon">✂️</span>
     <span class="nav-label">Squadra</span>
   </a>
-  <a href="profilo.html" class="nav-item" data-page="profilo">
+  <a href="profilo.html" class="nav-item active" data-page="profilo">
     <span class="nav-icon">👤</span>
     <span class="nav-label">Profilo</span>
   </a>
