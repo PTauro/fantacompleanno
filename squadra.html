@@ -555,10 +555,10 @@ function calcolaCat2(roster, captainName) {
     if (p) results.push({ id: "b_cat2_affetto", pts: 25, desc: `Bonus Affetto Stabile — ${p.name} in squadra` });
   }
 
-  // +50 Smartworking
-  { const p = hasTag("remoto");
-    if (p) results.push({ id: "b_cat2_smartworking", pts: 50, desc: `Smartworking — ${p.name} (gioca da remoto)` });
-  }
+  // +50 Smartworking — cumulabile: un bonus per ogni giocatore "remoto" in squadra
+  roster.filter(p => (p.tags || []).includes("remoto")).forEach(p => {
+    results.push({ id: `b_cat2_smartworking_${sanitize(p.name)}`, pts: 50, desc: `Smartworking — ${p.name} (gioca da remoto)` });
+  });
 
   // +30 Love is in the Air — entrambi i partner di una coppia, per ogni coppia completa
   COPPIE.forEach(([a, b], i) => {
@@ -588,8 +588,9 @@ function calcolaCat2(roster, captainName) {
 // Tutti i possibili id Cat.2 (per sapere quali rimuovere se non più applicabili)
 const CAT2_ALL_IDS = [
   "b_cat2_budget_perfetto", "b_cat2_pupilli", "b_cat2_maternita", "b_cat2_paternita",
-  "b_cat2_affetto", "b_cat2_smartworking", "b_cat2_underdog", "b_cat2_stefanuccio", "b_cat2_firstlady",
-  ...COPPIE.map((_, i) => `b_cat2_love_${i}`)
+  "b_cat2_affetto", "b_cat2_underdog", "b_cat2_stefanuccio", "b_cat2_firstlady",
+  ...COPPIE.map((_, i) => `b_cat2_love_${i}`),
+  ...PLAYERS.filter(p => (p.tags || []).includes("remoto")).map(p => `b_cat2_smartworking_${sanitize(p.name)}`)
 ];
 
 // Ricalcola e riscrive i bonus Cat.2 su Firebase, rimuovendo quelli non più validi
