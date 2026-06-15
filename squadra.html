@@ -441,6 +441,8 @@ const PLAYERS = [
 
 const BUDGET = 500;
 const MAX_PLAYERS = 5;
+const DRAFT_DATE = new Date('2026-06-26T18:00:00');
+const draftChiuso = Date.now() > DRAFT_DATE.getTime();
 
 // ── STATO ──
 let myName = localStorage.getItem("fc_player_name");
@@ -471,6 +473,22 @@ async function init() {
   renderSquad();
   renderPlayerList();
   updateBudget();
+
+  // ── DRAFT CHIUSO: blocca modifiche ──
+  if (draftChiuso) {
+    const nameInput = document.getElementById("team-name-input");
+    nameInput.disabled = true;
+    nameInput.title = "Draft chiuso — non modificabile";
+
+    const saveBtn = document.getElementById("save-btn");
+    saveBtn.disabled = true;
+    saveBtn.textContent = "🔒 Draft Chiuso";
+
+    const banner = document.createElement("div");
+    banner.style.cssText = "background:rgba(245,158,11,0.1);border:1.5px solid rgba(245,158,11,0.4);color:var(--gold);border-radius:12px;padding:14px 16px;margin:0 16px 16px;font-size:13px;font-weight:700;text-align:center;";
+    banner.textContent = "🔒 Il draft è chiuso (26/06 ore 18:00) — la tua squadra non è più modificabile.";
+    document.body.prepend(banner);
+  }
 
   // Ascolta tutte le squadre in tempo reale
   onValue(ref(db, "teams"), (snap) => {
@@ -767,6 +785,7 @@ function renderOtherTeams() {
 
 // ── AZIONI ──
 window.togglePlayer = function(player) {
+  if (draftChiuso) { showToast("🔒 Draft chiuso — la squadra non è più modificabile", "error"); return; }
   const idx = myTeam.findIndex(t => t.name === player.name);
   if (idx >= 0) {
     removePlayer(player.name);
@@ -781,6 +800,7 @@ window.togglePlayer = function(player) {
 };
 
 window.removePlayer = function(name) {
+  if (draftChiuso) { showToast("🔒 Draft chiuso — la squadra non è più modificabile", "error"); return; }
   myTeam = myTeam.filter(p => p.name !== name);
   if (myCaptain === name) myCaptain = null;
   renderSquad();
@@ -788,6 +808,7 @@ window.removePlayer = function(name) {
 };
 
 window.toggleCaptain = function(name) {
+  if (draftChiuso) { showToast("🔒 Draft chiuso — la squadra non è più modificabile", "error"); return; }
   myCaptain = (myCaptain === name) ? null : name;
   renderSquad();
   renderPlayerList();
@@ -795,6 +816,7 @@ window.toggleCaptain = function(name) {
 };
 
 window.saveTeam = async function() {
+  if (draftChiuso) { showToast("🔒 Draft chiuso — la squadra non è più modificabile", "error"); return; }
   if (myTeam.length === 0) { showToast("Aggiungi almeno 1 giocatore!", "error"); return; }
   const btn = document.getElementById("save-btn");
   btn.textContent = "Salvataggio...";
