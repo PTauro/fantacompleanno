@@ -262,11 +262,11 @@ body { padding-bottom: 90px !important; }
   </div>
 
   <!-- PUNTI PERSONALI -->
-  <div class="punti-hero" style="margin: 0 0 16px;">
+  <div class="punti-hero" style="margin: 0 0 16px; cursor:pointer;" onclick="document.getElementById('storico-section').scrollIntoView({behavior:'smooth'})">
     <div>
       <div class="punti-label">PUNTI PERSONALI</div>
       <div class="punti-num zero" id="punti-num">0</div>
-      <div class="punti-sub">assegnati durante la festa</div>
+      <div class="punti-sub">assegnati durante la festa — tocca per i dettagli ↓</div>
     </div>
     <div class="punti-breakdown">
       <div class="punti-breakdown-row" style="color:var(--green)" id="punti-bonus">+0 bonus</div>
@@ -325,7 +325,7 @@ body { padding-bottom: 90px !important; }
 </div>
 
 <!-- STORICO EVENTI -->
-<div class="section">
+<div class="section" id="storico-section">
   <div class="section-title">Storico eventi personali</div>
   <div id="storico-content"></div>
 </div>
