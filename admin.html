@@ -347,9 +347,8 @@ body {
 
   <div class="section-label">Ruoli Speciali Fazione</div>
   <button onclick="renderRuoliSpeciali()" style="width:100%;background:rgba(168,85,247,0.1);border:1.5px solid rgba(168,85,247,0.4);color:var(--accent-siria);padding:12px 16px;border-radius:12px;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:8px;">
-    👁 Aggiorna pannello ruoli speciali
+    👁 Pannello ruoli speciali
   </button>
-  <div id="ruoli-speciali-panel" style="margin-bottom:16px;"></div>
 
   <div class="section-label">Reset Fazioni</div>
   <button onclick="resetFazioniTutte()" style="width:100%;background:rgba(168,85,247,0.1);border:1.5px solid rgba(168,85,247,0.4);color:var(--accent-siria);padding:14px 16px;border-radius:12px;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:8px;">
@@ -401,6 +400,17 @@ body {
 
     <div class="section-label">Storico Ospite</div>
     <div id="modal-storico"></div>
+  </div>
+</div>
+
+<!-- ══ MODAL RUOLI SPECIALI ══ -->
+<div class="modal-overlay" id="modal-ruoli" onclick="closeRuoliModal()">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-guest-name">⚔️ Ruoli Speciali Fazione</div>
+      <button class="btn-close" onclick="closeRuoliModal()">✕</button>
+    </div>
+    <div id="ruoli-speciali-panel"></div>
   </div>
 </div>
 
@@ -1290,7 +1300,12 @@ window.applicaMalusPreFesta = async function() {
   showToast(applicati > 0 ? `✓ Applicati ${applicati} malus pre-festa` : "✓ Nessun malus da applicare — tutti in regola!", applicati > 0 ? "warn" : "ok");
 };
 
+window.closeRuoliModal = function() {
+  document.getElementById("modal-ruoli").classList.remove("open");
+};
+
 window.renderRuoliSpeciali = async function() {
+  document.getElementById("modal-ruoli").classList.add("open");
   const panel = document.getElementById("ruoli-speciali-panel");
   panel.innerHTML = '<div style="color:var(--text-muted);font-size:13px;padding:8px 0;">Caricamento...</div>';
 
