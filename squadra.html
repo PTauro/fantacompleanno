@@ -690,10 +690,10 @@ function renderSquad() {
           <div class="slot-name">${player.name}</div>
           <div class="slot-cost">${player.cost} ✂️ ${isCap ? '<span style="color:var(--gold);font-size:11px;">CAPITANO x2</span>' : ''}</div>
         </div>
-        <button class="btn-set-cap ${isCap ? 'is-cap' : ''}" onclick="toggleCaptain('${player.name}')">
+        <button class="btn-set-cap ${isCap ? 'is-cap' : ''}" onclick="toggleCaptain(this.dataset.name)" data-name="${player.name.replace(/"/g, '&quot;')}">
           ${isCap ? "⭐ Cap" : "⭐ Cap?"}
         </button>
-        <button class="btn-remove" onclick="removePlayer('${player.name}')">✕</button>
+        <button class="btn-remove" onclick="removePlayer(this.dataset.name)" data-name="${player.name.replace(/"/g, '&quot;')}">✕</button>
       `;
     } else {
       div.innerHTML = `
