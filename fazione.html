@@ -368,7 +368,7 @@ const PLAYER_COSTS = {
   "Luca Grasso":85,"Annalisa Maci":50,"Alessio Caretto":85,"Silvia Maci":50,"Errico Del monte":85,
   "Chiara Del Vecchio":50,"Daniele Padula":80,"Davide Mogavero":160,"Marialuce Serra":85,"Francesco Romano":85,
   "Mariachiara Longo":50,"Alberto Bianco":100,"Martina Schiavone":85,"Luca Invidia":80,"Marika Piconese":50,
-  "Stefanuccio":130,"Andrea De Matteis":70,"Lorenzo Taffone":70
+  "Stefanuccio":130,"Lorenzo Taffone":70
 };
 
 // ── RUOLI ──
@@ -430,15 +430,33 @@ const RUOLI = {
 function sanitize(s) { return s.replace(/[.#$[\]]/g, "_"); }
 
 // ── ESTRAI FAZIONE ──
-function estraiRuolo(fazione, costo) {
-  // Regola segreta: costo >= 110 → può avere ruolo speciale
-  if (costo >= 110) {
-    const r = Math.random();
-    if (r < 0.20) return RUOLI[fazione].spia;       // 20% spia
-    if (r < 0.40) return RUOLI[fazione].moltiplicatore; // 20% moltiplicatore
-    return RUOLI[fazione].soldato;                    // 60% soldato
-  }
-  return RUOLI[fazione].soldato; // costo < 110 → sempre soldato
+// ── ESTRAZIONE RUOLO (a riempimento, cap fisso 3+3 per fazione) ──
+// Probabilità per costo: ≥150 → 50%, 110-149 → 25%, <110 → 8%
+// Se i posti speciali (3 molt + 3 spie per fazione) sono esauriti → sempre soldato
+async function estraiRuolo(fazione, costo) {
+  // Conta ruoli speciali già assegnati in questa fazione
+  const snapFaz = await get(ref(db, "fazioni"));
+  const tutti = snapFaz.exists() ? Object.values(snapFaz.val()) : [];
+  const miaFazione = tutti.filter(f => f.fazione === fazione);
+  const nMolt = miaFazione.filter(f => f.ruoloId && f.ruoloId.startsWith("moltiplicatore")).length;
+  const nSpia = miaFazione.filter(f => f.ruoloId && f.ruoloId.startsWith("spia")).length;
+
+  const MAX = 3; // max per tipo per fazione
+  const postiMolt = MAX - nMolt;
+  const postiSpia = MAX - nSpia;
+  const postiTot = postiMolt + postiSpia;
+
+  // Se non ci sono più posti speciali → soldato
+  if (postiTot <= 0) return RUOLI[fazione].soldato;
+
+  // Probabilità basata sul costo
+  const prob = costo >= 150 ? 0.50 : costo >= 110 ? 0.25 : 0.08;
+  if (Math.random() >= prob) return RUOLI[fazione].soldato;
+
+  // Pesca il tipo di ruolo disponibile (equamente se entrambi disponibili)
+  const scegliMolt = postiMolt > 0 && (postiSpia === 0 || Math.random() < 0.5);
+  if (scegliMolt) return RUOLI[fazione].moltiplicatore;
+  return RUOLI[fazione].spia;
 }
 
 // ── INIT ──
@@ -475,7 +493,7 @@ window.apriBusta = async function() {
   // 2. Determina fazione e ruolo
   const costo = PLAYER_COSTS[myName] || 50;
   const fazione = Math.random() < 0.5 ? "cody" : "siria";
-  const ruolo = estraiRuolo(fazione, costo);
+  const ruolo = await estraiRuolo(fazione, costo);
 
   // 3. Anteprima carta che esce
   const preview = document.getElementById("carta-preview");
