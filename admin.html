@@ -1369,7 +1369,8 @@ window.setRuoloManuale = async function(nome, fazione, tipo) {
   showToast(`✓ ${nome} → ${tipo} ${fazione}`);
   renderRuoliSpeciali();
 };
-  if (!confirm(`Reset fazione di ${name}? Dovrà riaprire la busta.`)) return;
+
+window.resetFazioneSingola = async function(name) {
   const key = sanitize(name);
   await remove(ref(db, `fazioni/${key}`));
   showToast(`✓ Fazione di ${name} resettata`, "warn");
