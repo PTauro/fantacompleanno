@@ -345,6 +345,12 @@ body {
     ☢️ Reset Totale Gioco (registrazioni + squadre + fazioni + punti)
   </button>
 
+  <div class="section-label">Ruoli Speciali Fazione</div>
+  <button onclick="renderRuoliSpeciali()" style="width:100%;background:rgba(168,85,247,0.1);border:1.5px solid rgba(168,85,247,0.4);color:var(--accent-siria);padding:12px 16px;border-radius:12px;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:8px;">
+    👁 Aggiorna pannello ruoli speciali
+  </button>
+  <div id="ruoli-speciali-panel" style="margin-bottom:16px;"></div>
+
   <div class="section-label">Reset Fazioni</div>
   <button onclick="resetFazioniTutte()" style="width:100%;background:rgba(168,85,247,0.1);border:1.5px solid rgba(168,85,247,0.4);color:var(--accent-siria);padding:14px 16px;border-radius:12px;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:8px;">
     ⚔️ Reset Fazioni — Tutti
@@ -1284,7 +1290,85 @@ window.applicaMalusPreFesta = async function() {
   showToast(applicati > 0 ? `✓ Applicati ${applicati} malus pre-festa` : "✓ Nessun malus da applicare — tutti in regola!", applicati > 0 ? "warn" : "ok");
 };
 
-window.resetFazioneSingola = async function(name) {
+window.renderRuoliSpeciali = async function() {
+  const panel = document.getElementById("ruoli-speciali-panel");
+  panel.innerHTML = '<div style="color:var(--text-muted);font-size:13px;padding:8px 0;">Caricamento...</div>';
+
+  const snap = await get(ref(db, "fazioni"));
+  const tutti = snap.exists() ? snap.val() : {};
+
+  const fazioni = { cody: { molt: [], spia: [], soldato: [] }, siria: { molt: [], spia: [], soldato: [] } };
+  Object.values(tutti).forEach(f => {
+    if (!f.fazione || !fazioni[f.fazione]) return;
+    const tipo = f.ruoloId?.startsWith("moltiplicatore") ? "molt"
+               : f.ruoloId?.startsWith("spia") ? "spia" : "soldato";
+    fazioni[f.fazione][tipo].push(f.nome);
+  });
+
+  const MAX = 3;
+  let html = "";
+
+  for (const [faz, label, color] of [["cody","🐕 Cody","var(--accent-cody)"],["siria","🐱 Siria","var(--accent-siria)"]]) {
+    const f = fazioni[faz];
+    html += `<div style="background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px;">
+      <div style="font-weight:800;color:${color};margin-bottom:10px;">${label}</div>`;
+
+    // Moltiplicatori
+    html += `<div style="margin-bottom:8px;">
+      <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px;">👨‍🍳 Moltiplicatori ${f.molt.length}/${MAX}</div>`;
+    for (let i = 0; i < MAX; i++) {
+      const nome = f.molt[i];
+      html += nome
+        ? `<div style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:8px;padding:6px 10px;margin-bottom:4px;font-size:13px;display:flex;justify-content:space-between;align-items:center;">
+            <span>${nome}</span>
+            <button onclick="setRuoloManuale('${nome.replace(/'/g,"\\'")}','${faz}','moltiplicatore')" style="background:none;border:1px solid var(--border);color:var(--text-muted);border-radius:6px;padding:2px 8px;font-size:11px;cursor:pointer;">cambia</button>
+           </div>`
+        : `<div style="border:1px dashed var(--border);border-radius:8px;padding:6px 10px;margin-bottom:4px;font-size:12px;color:var(--text-muted);display:flex;justify-content:space-between;align-items:center;">
+            <span>— posto libero —</span>
+            <button onclick="assegnaRuoloManuale('${faz}','moltiplicatore')" style="background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.4);color:var(--gold);border-radius:6px;padding:2px 8px;font-size:11px;cursor:pointer;">+ assegna</button>
+           </div>`;
+    }
+    html += `</div>`;
+
+    // Spie
+    html += `<div>
+      <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px;">✨ Spie ${f.spia.length}/${MAX}</div>`;
+    for (let i = 0; i < MAX; i++) {
+      const nome = f.spia[i];
+      html += nome
+        ? `<div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);border-radius:8px;padding:6px 10px;margin-bottom:4px;font-size:13px;display:flex;justify-content:space-between;align-items:center;">
+            <span>${nome}</span>
+            <button onclick="setRuoloManuale('${nome.replace(/'/g,"\\'")}','${faz}','spia')" style="background:none;border:1px solid var(--border);color:var(--text-muted);border-radius:6px;padding:2px 8px;font-size:11px;cursor:pointer;">cambia</button>
+           </div>`
+        : `<div style="border:1px dashed var(--border);border-radius:8px;padding:6px 10px;margin-bottom:4px;font-size:12px;color:var(--text-muted);display:flex;justify-content:space-between;align-items:center;">
+            <span>— posto libero —</span>
+            <button onclick="assegnaRuoloManuale('${faz}','spia')" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:var(--red);border-radius:6px;padding:2px 8px;font-size:11px;cursor:pointer;">+ assegna</button>
+           </div>`;
+    }
+    html += `</div></div>`;
+  }
+
+  panel.innerHTML = html;
+};
+
+// Assegna ruolo speciale a un ospite già in una fazione (cerca il nome)
+window.assegnaRuoloManuale = async function(fazione, tipo) {
+  const nome = prompt(`Nome ESATTO dell'ospite da assegnare come ${tipo} in ${fazione}:`);
+  if (!nome) return;
+  await setRuoloManuale(nome.trim(), fazione, tipo);
+};
+
+window.setRuoloManuale = async function(nome, fazione, tipo) {
+  const key = sanitize(nome);
+  const snap = await get(ref(db, `fazioni/${key}`));
+  if (!snap.exists()) {
+    showToast(`${nome} non ha ancora pescato la fazione`, "warn"); return;
+  }
+  const ruoloId = `${tipo}_${fazione}`;
+  await set(ref(db, `fazioni/${key}/ruoloId`), ruoloId);
+  showToast(`✓ ${nome} → ${tipo} ${fazione}`);
+  renderRuoliSpeciali();
+};
   if (!confirm(`Reset fazione di ${name}? Dovrà riaprire la busta.`)) return;
   const key = sanitize(name);
   await remove(ref(db, `fazioni/${key}`));
