@@ -206,11 +206,15 @@
 </div>
 
 <script>
-  // ── SE HA GIA' UN NOME SALVATO → MANDA A REGISTER CHE DECIDE DOVE ANDARE ──
+  // ── SE HA GIA' UN NOME SALVATO → MANDA DIRETTAMENTE A HOME ──
+  // home.html fa il suo check Firebase e rimanda al quiz se necessario
   (function() {
     const savedName = localStorage.getItem("fc_player_name");
-    if (savedName) {
-      window.location.replace("register.html");
+    const tutorialDone = localStorage.getItem("fc_tutorial_done");
+    if (savedName && tutorialDone) {
+      window.location.replace("home.html");
+    } else if (savedName) {
+      window.location.replace("tutorial.html");
     }
   })();
 
