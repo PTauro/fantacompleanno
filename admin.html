@@ -367,8 +367,8 @@ body {
 </div>
 
 <!-- ══ MODAL OSPITE ══ -->
-<div class="modal-overlay" id="modal-ospite">
-  <div class="modal-box">
+<div class="modal-overlay" id="modal-ospite" onclick="closeModal()">
+  <div class="modal-box" onclick="event.stopPropagation()">
     <div class="modal-header">
       <div>
         <div class="modal-guest-name" id="modal-name">—</div>
