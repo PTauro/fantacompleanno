@@ -340,6 +340,14 @@ body {
     🗑 Reset Totale Punti
   </button>
 
+  <div class="section-label">Accesso Spettatore (solo admin)</div>
+  <button onclick="registraSpettatore()" style="width:100%;background:rgba(34,197,94,0.1);border:1.5px solid rgba(34,197,94,0.4);color:var(--green);padding:12px 16px;border-radius:12px;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:6px;">
+    👁 Entra come Spettatore (solo questo device)
+  </button>
+  <div style="font-size:11px;color:var(--text-muted);margin-bottom:16px;line-height:1.5;">
+    Registra questo device come "Pietro (admin)" — non appare nella lista ospiti, non ha squadra né alleanza. Serve solo per girare l'app come utente normale.
+  </div>
+
   <div class="section-label">Reset Totale Gioco — Tutti tornano al Quiz</div>
   <button onclick="resetTotaleGioco()" style="width:100%;background:rgba(239,68,68,0.18);border:1.5px solid var(--red);color:var(--red);padding:14px 16px;border-radius:12px;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:800;cursor:pointer;margin-bottom:12px;">
     ☢️ Reset Totale Gioco (registrazioni + squadre + fazioni + punti)
@@ -468,7 +476,7 @@ if (params.get("key") !== ADMIN_KEY) {
 // ── LISTA OSPITI ──
 const PLAYERS = [
   "Alessia Ala","Anna Maria Caione (madre)","Eleonora Tauro","Paolo Bello","Mattia Caione","Mirco Caione","Gloria Rinaldi",
-  "Dario Caione","Gabriele Mangione","Federica Ala","Simone Baldassarre","Desi Ala","Michele Nervo","Zia Anna","Francesca Terlizzi","Nicolas Costa","Giulia Trevisi","Andrea Sozzani","Emilio Pulli","Eleonora Bello","Marta Mignone","Giuseppe Susca",
+  "Dario Caione","Gabriele Mangione","Federica Ala","Simone Baldassarre","Desi Ala","Michele Nervo","Zia Anna","Arianna Forte","Francesca Terlizzi","Nicolas Costa","Giulia Trevisi","Andrea Sozzani","Emilio Pulli","Eleonora Bello","Marta Mignone","Giuseppe Susca",
   "Annachiara Maci","Davide Secci","Antonio Borelli","Marika Giagnotti","Danilo Schiavone","Ilaria Tenore","Donato Stragapede","Emily Giancane",
   "Martina Poso","Maycols Sirsi","Laura Capodieci","Davide Attanasio","Manuel Palma","Carlotta D'aversa",
   "Nicolò Spada","Antonella Lo vecchio","Beatrice Gloria","Mariacarla Spagnolo","Mattia Martina","Andrea Scozzi",
@@ -482,7 +490,7 @@ const PLAYER_COSTS = {
   "Alessia Ala":175,"Anna Maria Caione (madre)":150,"Eleonora Tauro":90,"Paolo Bello":110,
   "Mattia Caione":70,"Mirco Caione":85,"Gloria Rinaldi":85,"Dario Caione":95,
   "Gabriele Mangione":100,"Federica Ala":85,"Simone Baldassarre":85,"Desi Ala":85,
-  "Michele Nervo":65,"Zia Anna":105,"Francesca Terlizzi":140,"Nicolas Costa":115,
+  "Michele Nervo":65,"Zia Anna":105,"Arianna Forte":65,"Francesca Terlizzi":140,"Nicolas Costa":115,
   "Giulia Trevisi":55,"Andrea Sozzani":55,"Emilio Pulli":110,"Eleonora Bello":110,
   "Marta Mignone":160,"Giuseppe Susca":160,"Annachiara Maci":85,"Davide Secci":50,
   "Antonio Borelli":130,"Marika Giagnotti":90,"Danilo Schiavone":175,"Ilaria Tenore":90,
@@ -498,7 +506,7 @@ const PLAYER_COSTS = {
   "Marika Piconese":50,"Stefanuccio":130,"Lorenzo Taffone":70
 };
 const ALLEANZE = {
-  "💰 ISEE Allargato": ["Alessia Ala","Anna Maria Caione (madre)","Eleonora Tauro","Paolo Bello","Mattia Caione","Mirco Caione","Gloria Rinaldi","Dario Caione","Gabriele Mangione","Federica Ala","Simone Baldassarre","Desi Ala","Michele Nervo","Zia Anna"],
+  "💰 ISEE Allargato": ["Alessia Ala","Anna Maria Caione (madre)","Eleonora Tauro","Paolo Bello","Mattia Caione","Mirco Caione","Gloria Rinaldi","Dario Caione","Gabriele Mangione","Federica Ala","Simone Baldassarre","Desi Ala","Michele Nervo","Zia Anna","Arianna Forte"],
   "💥 Bombette di Cisternino ASAP": ["Francesca Terlizzi","Nicolas Costa","Giulia Trevisi","Andrea Sozzani","Emilio Pulli","Eleonora Bello","Marta Mignone","Giuseppe Susca","Annachiara Maci","Davide Secci"],
   "😈 Il Buono Il Bello e il Danilo": ["Antonio Borelli","Marika Giagnotti","Danilo Schiavone","Ilaria Tenore","Donato Stragapede","Emily Giancane"],
   "💸 Cuoricini Broke": ["Martina Poso","Maycols Sirsi","Laura Capodieci","Davide Attanasio","Manuel Palma","Carlotta D'aversa","Nicolò Spada","Antonella Lo vecchio","Beatrice Gloria","Mariacarla Spagnolo","Mattia Martina","Lorenzo Taffone"],
@@ -1183,6 +1191,17 @@ window.resetPunti = async function() {
   await remove(ref(db, "punti"));
   await remove(ref(db, "autoEvents"));
   showToast("✓ Punti e automatismi resettati", "warn");
+};
+
+window.registraSpettatore = async function() {
+  const NOME = "Pietro (admin)";
+  const key = sanitize(NOME);
+  const codice = "ADMIN1";
+  await set(ref(db, `registrations/${key}`), codice);
+  localStorage.setItem("fc_player_name", NOME);
+  localStorage.setItem("fc_tutorial_done", "1");
+  localStorage.setItem("fc_device_code", codice);
+  showToast("✓ Sei entrato come spettatore — vai su home.html");
 };
 
 window.resetTotaleGioco = async function() {
