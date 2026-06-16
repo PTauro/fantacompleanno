@@ -581,10 +581,8 @@ function calcolaCat2(roster, captainName) {
     }
   });
 
-  // +30 Capellone Underdog — meno della metà del budget, squadra da 5
-  if (spent < BUDGET / 2 && roster.length === MAX_PLAYERS) {
-    results.push({ id: "b_cat2_underdog", pts: 30, desc: `Capellone Underdog — squadra da 5 con solo ${spent}/${BUDGET} Capelli spesi` });
-  }
+  // NOTA: "Capellone Underdog" NON viene assegnato qui —
+  // viene verificato a draft chiuso dal bottone admin "Applica Bonus/Malus Pre-Festa".
 
   // +30 Bonus Stefanuccio — solo se Stefanuccio è specificamente in squadra
   if (names.includes("Stefanuccio")) {

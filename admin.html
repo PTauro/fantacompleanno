@@ -1235,6 +1235,17 @@ window.applicaMalusPreFesta = async function() {
         return spesa === BUDGET && t.roster.length < 5;
       }
     },
+    {
+      id: "b_cat2_underdog",
+      pts: 30,
+      desc: "Capellone Underdog — squadra da 5 con meno della metà del budget",
+      check: key => {
+        const t = tms[key];
+        if (!t || !t.roster) return false;
+        const spesa = t.roster.reduce((s, n) => s + (PLAYER_COSTS[n] || 0), 0);
+        return t.roster.length === 5 && spesa < BUDGET / 2;
+      }
+    },
   ];
 
   const MALUS = [
