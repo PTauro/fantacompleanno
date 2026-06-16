@@ -34,6 +34,7 @@ body {
 .budget-bar {
   background: var(--surface); border-bottom: 1px solid var(--border);
   padding: 14px 20px;
+  position: sticky; top: 57px; z-index: 45;
 }
 .budget-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
 .budget-label { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--text-muted); letter-spacing: .1em; }
@@ -47,7 +48,7 @@ body {
 /* ── TABS ── */
 .tabs {
   display: flex; border-bottom: 1px solid var(--border);
-  background: var(--surface); position: sticky; top: 57px; z-index: 40;
+  background: var(--surface); position: sticky; top: 129px; z-index: 40;
 }
 .tab {
   flex: 1; padding: 12px; text-align: center;
