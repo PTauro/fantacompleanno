@@ -551,15 +551,8 @@ function calcolaCat2(roster, captainName) {
   const names = roster.map(p => p.name);
   const hasTag = (tag) => roster.find(p => (p.tags || []).includes(tag));
 
-  // +10 Divisione del budget perfetta — spende esattamente 500
-  if (spent === BUDGET) {
-    results.push({ id: "b_cat2_budget_perfetto", pts: 10, desc: "Divisione del budget perfetta (500/500 Capelli)" });
-  }
-
-  // +10 Pupilli — tutti i capelli spesi, squadra incompleta (<5)
-  if (spent === BUDGET && roster.length < MAX_PLAYERS) {
-    results.push({ id: "b_cat2_pupilli", pts: 10, desc: "Pupilli — 500 Capelli spesi con squadra incompleta" });
-  }
+  // NOTA: "Divisione del budget perfetta" e "Pupilli" NON vengono assegnati qui —
+  // vengono verificati a draft chiuso dal bottone admin "Applica Bonus/Malus Pre-Festa".
 
   // +20 Bonus Maternità — cumulabile per ogni giocatrice taggata
   roster.filter(p => (p.tags || []).includes("maternita")).forEach(p => {

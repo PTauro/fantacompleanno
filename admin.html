@@ -313,7 +313,7 @@ body {
     🔓 Sblocca Punti Pre-Festa
   </button>
   <button onclick="applicaMalusPreFesta()" style="width:100%;background:rgba(245,158,11,0.1);border:1.5px solid rgba(245,158,11,0.4);color:var(--gold);padding:14px 16px;border-radius:12px;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-top:8px;margin-bottom:12px;">
-    📋 Applica Malus Pre-Festa Mancanti
+    📋 Applica Bonus/Malus Pre-Festa Mancanti
   </button>
   <div style="font-size:11px;color:var(--text-muted);margin-top:-6px;margin-bottom:12px;line-height:1.5;">
     Da premere a draft chiuso, PRIMA di sbloccare i punti: assegna -30/-20 a chi non si è registrato, non ha fatto squadra, non ha pescato la fazione o non ha visto la pagina alleanza. Sicuro da ripetere — non duplica.
@@ -461,7 +461,26 @@ const PLAYERS = [
   "Alberto Bianco","Martina Schiavone","Luca Invidia","Marika Piconese","Stefanuccio","Lorenzo Taffone"
 ];
 
-// ── ALLEANZE (per il calcolo bonus finale 150/100/50) ──
+// Costi per il calcolo bonus "budget perfetto" e "pupilli" a draft chiuso
+const PLAYER_COSTS = {
+  "Alessia Ala":175,"Anna Maria Caione (madre)":150,"Eleonora Tauro":90,"Paolo Bello":110,
+  "Mattia Caione":70,"Mirco Caione":85,"Gloria Rinaldi":85,"Dario Caione":95,
+  "Gabriele Mangione":100,"Federica Ala":85,"Simone Baldassarre":85,"Desi Ala":85,
+  "Michele Nervo":65,"Zia Anna":105,"Francesca Terlizzi":140,"Nicolas Costa":115,
+  "Giulia Trevisi":55,"Andrea Sozzani":55,"Emilio Pulli":110,"Eleonora Bello":110,
+  "Marta Mignone":160,"Giuseppe Susca":160,"Annachiara Maci":85,"Davide Secci":50,
+  "Antonio Borelli":130,"Marika Giagnotti":90,"Danilo Schiavone":175,"Ilaria Tenore":90,
+  "Donato Stragapede":115,"Emily Giancane":80,"Martina Poso":115,"Maycols Sirsi":125,
+  "Laura Capodieci":95,"Davide Attanasio":135,"Manuel Palma":180,"Carlotta D'aversa":95,
+  "Nicolò Spada":120,"Antonella Lo vecchio":50,"Beatrice Gloria":80,"Mariacarla Spagnolo":45,
+  "Mattia Martina":80,"Andrea Scozzi":90,"Annalisa Ancora":105,"Roberto Sciurti":100,
+  "Nicolò Maci":85,"Silvia Lamusta":50,"Alessio Maci":85,"Rachele Ponzetta":50,
+  "Erminio Foti":165,"Sara Colletta":50,"Luca Grasso":85,"Annalisa Maci":50,
+  "Alessio Caretto":85,"Silvia Maci":50,"Errico Del monte":85,"Chiara Del Vecchio":50,
+  "Daniele Padula":80,"Davide Mogavero":160,"Marialuce Serra":85,"Francesco Romano":85,
+  "Mariachiara Longo":50,"Alberto Bianco":100,"Martina Schiavone":85,"Luca Invidia":80,
+  "Marika Piconese":50,"Stefanuccio":130,"Lorenzo Taffone":70
+};
 const ALLEANZE = {
   "💰 ISEE Allargato": ["Alessia Ala","Anna Maria Caione (madre)","Eleonora Tauro","Paolo Bello","Mattia Caione","Mirco Caione","Gloria Rinaldi","Dario Caione","Gabriele Mangione","Federica Ala","Simone Baldassarre","Desi Ala","Michele Nervo","Zia Anna"],
   "💥 Bombette di Cisternino ASAP": ["Francesca Terlizzi","Nicolas Costa","Giulia Trevisi","Andrea Sozzani","Emilio Pulli","Eleonora Bello","Marta Mignone","Giuseppe Susca","Annachiara Maci","Davide Secci"],
@@ -1177,7 +1196,7 @@ window.resetFazioniTutte = async function() {
 // Controlla, per ogni ospite, le azioni automatiche Cat.1 che mancano alla chiusura del draft
 // e assegna il malus corrispondente (una sola volta, tracciato in autoEvents).
 window.applicaMalusPreFesta = async function() {
-  if (!confirm("Applicare i malus pre-festa a chi non ha completato le azioni automatiche (registrazione, squadra, fazione, alleanza)?\n\nVa fatto a draft chiuso. Azione sicura: non duplica malus già dati.")) return;
+  if (!confirm("Applicare bonus/malus pre-festa a draft chiuso?\n\nAssegna:\n• +10 Divisione del budget perfetta (500/500)\n• +10 Pupilli (500 spesi, squadra <5)\n• -30/-20 malus a chi non ha completato le azioni\n\nAzione sicura: non duplica mai.")) return;
 
   const [snapReg, snapTeams, snapFaz, snapAuto] = await Promise.all([
     get(ref(db, "registrations")),
@@ -1190,6 +1209,34 @@ window.applicaMalusPreFesta = async function() {
   const fzs = snapFaz.exists() ? snapFaz.val() : {};
   const autoE = snapAuto.exists() ? snapAuto.val() : {};
 
+  const BUDGET = 500;
+
+  // ── BONUS a draft chiuso ──
+  const BONUS = [
+    {
+      id: "b_cat2_budget_perfetto",
+      pts: 10,
+      desc: "Divisione del budget perfetta (500/500 Capelli)",
+      check: key => {
+        const t = tms[key];
+        if (!t || !t.roster) return false;
+        const spesa = t.roster.reduce((s, n) => s + (PLAYER_COSTS[n] || 0), 0);
+        return spesa === BUDGET;
+      }
+    },
+    {
+      id: "b_cat2_pupilli",
+      pts: 10,
+      desc: "Pupilli — 500 Capelli spesi con squadra incompleta",
+      check: key => {
+        const t = tms[key];
+        if (!t || !t.roster) return false;
+        const spesa = t.roster.reduce((s, n) => s + (PLAYER_COSTS[n] || 0), 0);
+        return spesa === BUDGET && t.roster.length < 5;
+      }
+    },
+  ];
+
   const MALUS = [
     { id: "m_non_registrato",     pts: -30, desc: "Non accede al sito / non si abbina", check: key => !!regs[key] },
     { id: "m_squadra_non_creata", pts: -30, desc: "Non crea la squadra",                 check: key => !!tms[key]  },
@@ -1200,6 +1247,18 @@ window.applicaMalusPreFesta = async function() {
   let applicati = 0;
   for (const name of PLAYERS) {
     const key = sanitize(name);
+
+    // ── assegna BONUS (idempotente via autoEvents) ──
+    for (const b of BONUS) {
+      const merita = b.check(key);
+      const giàAssegnato = !!(autoE[key] && autoE[key][b.id]);
+      if (merita && !giàAssegnato) {
+        await set(ref(db, `punti/${key}/${b.id}`), { pts: b.pts, desc: b.desc, ts: Date.now() });
+        await set(ref(db, `autoEvents/${key}/${b.id}`), true);
+        applicati++;
+      }
+    }
+
     for (const m of MALUS) {
       const giàFatto = m.check(key);
       const giàAssegnato = !!(autoE[key] && autoE[key][m.id]);
