@@ -250,6 +250,33 @@ body {
     <button class="btn-primary" onclick="showScreen('screen-register')" style="margin-top:16px;">
       Abbina il tuo nome →
     </button>
+
+    <button onclick="showScreen('screen-recovery')" style="width:100%;background:none;border:none;color:var(--text-muted);font-size:13px;margin-top:12px;cursor:pointer;padding:8px;text-decoration:underline;">
+      Hai già un codice? Recupera accesso
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SCREEN RECOVERY — INSERISCI CODICE VECCHIO
+══════════════════════════════════════════ -->
+<div class="screen" id="screen-recovery">
+  <div style="padding: 40px 20px 20px;">
+    <p class="label">// Recupero accesso //</p>
+    <span class="welcome-emoji">🔑</span>
+    <h1 class="headline" style="font-size:28px;">Inserisci il tuo codice</h1>
+    <p class="subline">Chiedi a Pietro il tuo codice personale dal pannello admin e inseriscilo qui sotto.</p>
+
+    <input id="recovery-input" type="text" maxlength="6"
+      placeholder="Es. 54RVKV"
+      style="width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:16px;color:var(--text);font-family:'Space Mono',monospace;font-size:24px;text-align:center;letter-spacing:4px;text-transform:uppercase;margin:16px 0;box-sizing:border-box;outline:none;">
+
+    <button class="btn-primary" onclick="recuperaAccesso()" style="margin-top:8px;">
+      Recupera accesso →
+    </button>
+    <button onclick="showScreen('screen-welcome')" style="width:100%;background:none;border:none;color:var(--text-muted);font-size:13px;margin-top:12px;cursor:pointer;padding:8px;">
+      ← Torna indietro
+    </button>
   </div>
 </div>
 
@@ -584,6 +611,33 @@ window.openModal = function(name) {
 window.closeModal = function() {
   document.getElementById("confirm-modal").classList.remove("open");
   selectedPlayer = null;
+};
+
+// ── RECUPERO ACCESSO CON CODICE VECCHIO ──
+window.recuperaAccesso = async function() {
+  const input = document.getElementById("recovery-input").value.trim().toUpperCase();
+  if (input.length < 5) { showToast("Inserisci un codice valido", "error"); return; }
+
+  const snap = await get(ref(db, "registrations"));
+  if (!snap.exists()) { showToast("Nessuna registrazione trovata", "error"); return; }
+  const regs = snap.val();
+
+  const found = Object.entries(regs).find(([k, v]) => v === input);
+  if (!found) { showToast("Codice non riconosciuto — chiedi a Pietro", "error"); return; }
+
+  const nameKey = found[0];
+  const player = PLAYERS.find(p => p.name.replace(/[.#$[\]]/g, "_") === nameKey);
+  const nome = player ? player.name : nameKey;
+
+  // Aggiorna Firebase con il nuovo codice del device corrente
+  const nuovoCodice = localStorage.getItem("fc_device_code") || input;
+  await set(ref(db, `registrations/${nameKey}`), nuovoCodice);
+  localStorage.setItem("fc_player_name", nome);
+  localStorage.setItem("fc_device_code", nuovoCodice);
+  localStorage.setItem("fc_tutorial_done", "1");
+
+  showToast(`✓ Bentornato/a ${nome}!`);
+  setTimeout(() => window.location.replace("home.html"), 1200);
 };
 
 async function confirmSelection(name) {
