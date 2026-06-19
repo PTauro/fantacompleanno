@@ -75,7 +75,12 @@ body {
 .view-sub { font-size: 14px; color: var(--text-muted); margin-top: 4px; font-family: 'Space Mono', monospace; }
 
 /* ══════════ CLASSIFICA ROTANTE ══════════ */
-.lb-body { flex: 1; overflow: hidden; display: flex; flex-direction: column; gap: 10px; max-width: 1000px; margin: 0 auto; width: 100%; }
+.lb-body {
+  flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px;
+  max-width: 1000px; margin: 0 auto; width: 100%;
+  scrollbar-width: none; -ms-overflow-style: none;
+}
+.lb-body::-webkit-scrollbar { display: none; }
 .lb-row {
   display: flex; align-items: center; gap: 20px;
   background: var(--surface); border: 1.5px solid var(--border); border-radius: 16px;
@@ -481,57 +486,73 @@ const LB_TABS = [
   { key: "fazioni", title: "Fazioni", sub: "— Cody vs Siria —" },
 ];
 let lbIndex = 0;
-let lbTimer = null;
 
-function renderLbCampionato() {
+function buildLbCampionatoHtml() {
   const data = PLAYERS
     .filter(p => teams[sanitize(p.name)] && teams[sanitize(p.name)].roster && teams[sanitize(p.name)].roster.length)
     .map(p => ({ name: p.name, teamName: teams[sanitize(p.name)].teamName, pts: getPuntiSquadra(p.name).tot }))
-    .sort((a,b) => b.pts - a.pts).slice(0, 8);
-  const body = document.getElementById("lb-body");
-  if (!data.length) { body.innerHTML = '<div class="lb-empty">Nessuna squadra ancora creata</div>'; return; }
-  body.innerHTML = data.map((p,i) => `
-    <div class="lb-row ${i===0?'top1':''}" style="animation-delay:${i*0.06}s">
+    .sort((a,b) => b.pts - a.pts);
+  if (!data.length) return '<div class="lb-empty">Nessuna squadra ancora creata</div>';
+  return data.map((p,i) => `
+    <div class="lb-row ${i===0?'top1':''}" style="animation-delay:${Math.min(i*0.06,1)}s">
       <div class="lb-pos">${i+1}°</div>
-      <div class="lb-info"><div class="lb-name">${p.name}</div><div class="lb-meta">${p.teamName||'—'}</div></div>
+      <div class="lb-info"><div class="lb-name">${p.teamName||'(senza nome)'}</div><div class="lb-meta">👤 ${p.name}</div></div>
       <div class="lb-pts ${p.pts<0?'neg':''}">${p.pts>0?'+':''}${p.pts}</div>
     </div>
   `).join("");
 }
+function renderLbCampionato() {
+  document.getElementById("lb-body").innerHTML = buildLbCampionatoHtml();
+  scheduleAutoScroll();
+}
+function renderLbCampionatoContentOnly() {
+  document.getElementById("lb-body").innerHTML = buildLbCampionatoHtml();
+}
 
-function renderLbInvitati() {
+function buildLbInvitatiHtml() {
   const data = PLAYERS.map(p => ({ name: p.name, pts: getPuntiPersonali(p.name).tot }))
-    .sort((a,b) => b.pts - a.pts).slice(0, 8);
-  const body = document.getElementById("lb-body");
-  body.innerHTML = data.map((p,i) => `
-    <div class="lb-row ${i===0?'top1':''}" style="animation-delay:${i*0.06}s">
+    .sort((a,b) => b.pts - a.pts);
+  return data.map((p,i) => `
+    <div class="lb-row ${i===0?'top1':''}" style="animation-delay:${Math.min(i*0.06,1)}s">
       <div class="lb-pos">${i+1}°</div>
       <div class="lb-info"><div class="lb-name">${p.name}</div></div>
       <div class="lb-pts ${p.pts<0?'neg':''}">${p.pts>0?'+':''}${p.pts}</div>
     </div>
   `).join("");
 }
+function renderLbInvitati() {
+  document.getElementById("lb-body").innerHTML = buildLbInvitatiHtml();
+  scheduleAutoScroll();
+}
+function renderLbInvitatiContentOnly() {
+  document.getElementById("lb-body").innerHTML = buildLbInvitatiHtml();
+}
 
-function renderLbAlleanze() {
+function buildLbAlleanzeHtml() {
   const data = Object.entries(ALLEANZE).map(([nome, membri]) => ({ nome, coeff: getCoeffAlleanza(membri) }))
     .sort((a,b) => b.coeff - a.coeff);
-  const body = document.getElementById("lb-body");
-  body.innerHTML = data.map((a,i) => `
-    <div class="lb-row ${i===0?'top1':''}" style="animation-delay:${i*0.08}s">
+  return data.map((a,i) => `
+    <div class="lb-row ${i===0?'top1':''}" style="animation-delay:${Math.min(i*0.08,1)}s">
       <div class="lb-pos">${i+1}°</div>
       <div class="lb-info"><div class="lb-name">${a.nome}</div></div>
       <div class="lb-pts ${a.coeff<0?'neg':''}">${a.coeff>0?'+':''}${a.coeff.toFixed(1)}</div>
     </div>
   `).join("");
 }
+function renderLbAlleanze() {
+  document.getElementById("lb-body").innerHTML = buildLbAlleanzeHtml();
+  scheduleAutoScroll();
+}
+function renderLbAlleanzeContentOnly() {
+  document.getElementById("lb-body").innerHTML = buildLbAlleanzeHtml();
+}
 
-function renderLbFazioni() {
+function buildLbFazioniHtml() {
   const ptsCody = getPuntiFazione("cody");
   const ptsSiria = getPuntiFazione("siria");
   const tot = Math.max(ptsCody + ptsSiria, 1);
   const pctCody = Math.round((ptsCody/tot)*100);
-  const body = document.getElementById("lb-body");
-  body.innerHTML = `
+  return `
     <div class="faz-bars-wrap">
       <div class="faz-bar-card">
         <div class="faz-bar-head">
@@ -550,26 +571,95 @@ function renderLbFazioni() {
     </div>
   `;
 }
+function renderLbFazioni() {
+  document.getElementById("lb-body").innerHTML = buildLbFazioniHtml();
+  scheduleAutoScroll();
+}
+function renderLbFazioniContentOnly() {
+  document.getElementById("lb-body").innerHTML = buildLbFazioniHtml();
+}
+
+// Aggiorna il contenuto della slide corrente SENZA resettare il timer di rotazione
+// (usato quando arrivano nuovi dati da Firebase mentre una slide è già in corso)
+function refreshCurrentLbContent() {
+  if (!LB_TABS[lbIndex]) return;
+  const tab = LB_TABS[lbIndex];
+  if (tab.key === "campionato") renderLbCampionatoContentOnly();
+  else if (tab.key === "invitati") renderLbInvitatiContentOnly();
+  else if (tab.key === "alleanze") renderLbAlleanzeContentOnly();
+  else if (tab.key === "fazioni") renderLbFazioniContentOnly();
+}
 
 function renderLb() {
   const tab = LB_TABS[lbIndex];
   document.getElementById("lb-title").textContent = tab.title;
   document.getElementById("lb-sub").textContent = tab.sub;
+  document.getElementById("lb-body").scrollTop = 0;
   if (tab.key === "campionato") renderLbCampionato();
   else if (tab.key === "invitati") renderLbInvitati();
   else if (tab.key === "alleanze") renderLbAlleanze();
   else if (tab.key === "fazioni") renderLbFazioni();
 }
 
+// ── AUTO-SCROLL per liste più lunghe dello spazio visibile ──
+let scrollAnimFrame = null;
+let lbAdvanceTimer = null;
+
+function scheduleAutoScroll() {
+  cancelAutoScroll();
+  if (lbAdvanceTimer) clearTimeout(lbAdvanceTimer);
+  const body = document.getElementById("lb-body");
+  const MIN_SLIDE_TIME = 10000;
+  requestAnimationFrame(() => {
+    const overflow = body.scrollHeight - body.clientHeight;
+    if (overflow <= 4) {
+      // contenuto già tutto visibile — slide dura il tempo minimo standard
+      lbAdvanceTimer = setTimeout(advanceLb, MIN_SLIDE_TIME);
+      return;
+    }
+    const SCROLL_SPEED = 32; // px/secondo — lento e leggibile
+    const PAUSE_START = 1800;
+    const PAUSE_END = 1800;
+    const scrollDuration = (overflow / SCROLL_SPEED) * 1000;
+    const totalSlideTime = Math.max(MIN_SLIDE_TIME, PAUSE_START + scrollDuration + PAUSE_END + 600);
+    lbAdvanceTimer = setTimeout(advanceLb, totalSlideTime);
+
+    let startTs = null;
+    function step(ts) {
+      if (!startTs) startTs = ts;
+      const elapsed = ts - startTs;
+      if (elapsed < PAUSE_START) { scrollAnimFrame = requestAnimationFrame(step); return; }
+      const scrollElapsed = elapsed - PAUSE_START;
+      if (scrollElapsed <= scrollDuration) {
+        body.scrollTop = (scrollElapsed / scrollDuration) * overflow;
+        scrollAnimFrame = requestAnimationFrame(step);
+      } else if (scrollElapsed <= scrollDuration + PAUSE_END) {
+        body.scrollTop = overflow;
+        scrollAnimFrame = requestAnimationFrame(step);
+      }
+    }
+    scrollAnimFrame = requestAnimationFrame(step);
+  });
+}
+function cancelAutoScroll() {
+  if (scrollAnimFrame) cancelAnimationFrame(scrollAnimFrame);
+  scrollAnimFrame = null;
+}
+function advanceLb() {
+  cancelAutoScroll();
+  lbIndex = (lbIndex + 1) % LB_TABS.length;
+  renderLb();
+}
+
 function startLbRotation() {
   stopLbRotation();
   renderLb();
-  lbTimer = setInterval(() => {
-    lbIndex = (lbIndex + 1) % LB_TABS.length;
-    renderLb();
-  }, 9000);
 }
-function stopLbRotation() { if (lbTimer) clearInterval(lbTimer); lbTimer = null; }
+function stopLbRotation() {
+  cancelAutoScroll();
+  if (lbAdvanceTimer) clearTimeout(lbAdvanceTimer);
+  lbAdvanceTimer = null;
+}
 
 // ══════════════════════════════════════
 // RUOTE
@@ -777,18 +867,18 @@ window.prevAct = function() {
 // INIT
 // ══════════════════════════════════════
 function init() {
-  onValue(ref(db, "punti"), snap => { punti = snap.exists() ? snap.val() : {}; if (LB_TABS[lbIndex]) renderLb(); });
-  onValue(ref(db, "teams"), snap => { teams = snap.exists() ? snap.val() : {}; if (LB_TABS[lbIndex]) renderLb(); });
+  onValue(ref(db, "punti"), snap => { punti = snap.exists() ? snap.val() : {}; refreshCurrentLbContent(); });
+  onValue(ref(db, "teams"), snap => { teams = snap.exists() ? snap.val() : {}; refreshCurrentLbContent(); });
   onValue(ref(db, "fazioni"), snap => {
     fazioni = snap.exists() ? snap.val() : {};
-    if (LB_TABS[lbIndex]) renderLb();
+    refreshCurrentLbContent();
     if (document.getElementById("view-reveal").classList.contains("active") && !revealBuilt) {
       buildRevealCards();
       revealBuilt = true;
       renderAct();
     }
   });
-  onValue(ref(db, "alleanzaBonusFinale"), snap => { alleanzaBonusFinale = snap.exists() ? snap.val() : {}; if (LB_TABS[lbIndex]) renderLb(); });
+  onValue(ref(db, "alleanzaBonusFinale"), snap => { alleanzaBonusFinale = snap.exists() ? snap.val() : {}; refreshCurrentLbContent(); });
 
   buildWheel("wheel-persone", getNomiOspiti());
   buildWheel("wheel-prove", PROVE);
