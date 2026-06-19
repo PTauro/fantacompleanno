@@ -335,6 +335,14 @@ body {
     Calcola il podio delle 6 alleanze (stesso coefficiente della tab Alleanze) e assegna al PUNTEGGIO CAMPIONATO di ogni squadra appartenente a un'alleanza in podio: +150 (1ª), +100 (2ª), +50 (3ª). Non raddoppiato dal capitano. Puoi ripremere dopo correzioni — si ricalcola da zero senza duplicare.
   </div>
 
+  <div class="section-label">Podio Finale</div>
+  <button class="btn-unlock" id="btn-podio" onclick="toggleMostraPodio()">
+    🏆 Mostra Podio a Tutti
+  </button>
+  <div style="font-size:11px;color:var(--text-muted);margin-top:6px;margin-bottom:12px;line-height:1.5;">
+    Sblocca podio.html per tutti gli ospiti — visibile da ogni telefono, resta accessibile per sempre come ricordo della serata. Da premere per ultimo, dopo Rivela Ruoli e Bonus Alleanze.
+  </div>
+
   <div class="section-label">Reset</div>
   <button onclick="resetPunti()" style="width:100%;background:rgba(239,68,68,0.1);border:1.5px solid rgba(239,68,68,0.4);color:var(--red);padding:14px 16px;border-radius:12px;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:12px;">
     🗑 Reset Totale Punti
@@ -762,6 +770,18 @@ function init() {
       btn.className = "btn-unlock";
     }
   });
+
+  onValue(ref(db, "podio_sbloccato"), snap => {
+    const sbloccato = snap.exists() && snap.val() === true;
+    const btn = document.getElementById("btn-podio");
+    if (sbloccato) {
+      btn.textContent = "✅ Podio Visibile a Tutti";
+      btn.className = "btn-unlock done";
+    } else {
+      btn.textContent = "🏆 Mostra Podio a Tutti";
+      btn.className = "btn-unlock";
+    }
+  });
 }
 
 // ── CALCOLO PUNTI ──
@@ -1149,6 +1169,20 @@ window.assegnaBonusAlleanze = async function() {
   showToast(`✓ Bonus assegnato — 1°: ${podio[0]?.nome || '—'}`, "ok");
 };
 
+window.toggleMostraPodio = async function() {
+  const snap = await get(ref(db, "podio_sbloccato"));
+  const giàSbloccato = snap.exists() && snap.val() === true;
+  if (!giàSbloccato) {
+    if (!confirm("🏆 Sbloccare il podio per TUTTI gli ospiti?\n\nDa questo momento ogni telefono potrà vedere podio.html con campionato, fazione vincente e alleanze. Resta visibile per sempre dopo, come ricordo della serata.")) return;
+    await set(ref(db, "podio_sbloccato"), true);
+    showToast("🏆 Podio sbloccato per tutti!");
+  } else {
+    if (!confirm("Nascondere di nuovo il podio? Utile solo per test/correzioni prima di ri-sbloccarlo.")) return;
+    await remove(ref(db, "podio_sbloccato"));
+    showToast("✓ Podio nascosto di nuovo", "warn");
+  }
+};
+
 function renderToolsRegistrations() {
   const container = document.getElementById("tools-registrations");
   container.innerHTML = "";
@@ -1252,6 +1286,7 @@ window.resetTotaleGioco = async function() {
     remove(ref(db, "prefesta_sbloccata")),
     remove(ref(db, "ruoli_rivelati")),
     remove(ref(db, "alleanzaBonusFinale")),
+    remove(ref(db, "podio_sbloccato")),
   ]);
   showToast("✓ Reset totale completato — tutti torneranno al quiz", "warn");
 };
