@@ -348,6 +348,14 @@ body {
     Registra questo device come "Pietro (admin)" — non appare nella lista ospiti, non ha squadra né alleanza. Serve solo per girare l'app come utente normale.
   </div>
 
+  <div class="section-label">Cerca Giocatore in Tutte le Squadre</div>
+  <div style="display:flex;gap:8px;margin-bottom:8px;">
+    <input id="search-player-input" type="text" placeholder="Nome esatto o parziale (es. Mirco)"
+      style="flex:1;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:13px;outline:none;">
+    <button onclick="cercaGiocatoreInSquadre()" style="background:rgba(168,85,247,0.15);border:1.5px solid rgba(168,85,247,0.4);color:var(--accent-siria);border-radius:10px;padding:10px 16px;font-weight:700;font-size:13px;cursor:pointer;">Cerca</button>
+  </div>
+  <div id="search-player-result" style="margin-bottom:16px;"></div>
+
   <div class="section-label">Reset Totale Gioco — Tutti tornano al Quiz</div>
   <button onclick="resetTotaleGioco()" style="width:100%;background:rgba(239,68,68,0.18);border:1.5px solid var(--red);color:var(--red);padding:14px 16px;border-radius:12px;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:800;cursor:pointer;margin-bottom:12px;">
     ☢️ Reset Totale Gioco (registrazioni + squadre + fazioni + punti)
@@ -1202,6 +1210,34 @@ window.registraSpettatore = async function() {
   localStorage.setItem("fc_tutorial_done", "1");
   localStorage.setItem("fc_device_code", codice);
   showToast("✓ Sei entrato come spettatore — vai su home.html");
+};
+
+window.cercaGiocatoreInSquadre = function() {
+  const q = (document.getElementById("search-player-input").value || "").trim().toLowerCase();
+  const resultDiv = document.getElementById("search-player-result");
+  if (!q) { resultDiv.innerHTML = ""; return; }
+
+  const matches = [];
+  Object.entries(allTeams).forEach(([key, team]) => {
+    if (!team.roster) return;
+    team.roster.forEach(playerName => {
+      if (playerName.toLowerCase().includes(q)) {
+        matches.push({ drafter: team.owner || key, playerName, teamName: team.teamName || "(senza nome)" });
+      }
+    });
+  });
+
+  if (!matches.length) {
+    resultDiv.innerHTML = `<div style="color:var(--text-muted);font-size:13px;padding:8px 0;">Nessuna squadra contiene "${q}"</div>`;
+    return;
+  }
+
+  resultDiv.innerHTML = matches.map(m => `
+    <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:6px;font-size:13px;">
+      <strong>${m.playerName}</strong> è nel roster di <strong style="color:var(--accent-siria);">${m.drafter}</strong>
+      <div style="color:var(--text-muted);font-size:11px;margin-top:2px;">Squadra: "${m.teamName}"</div>
+    </div>
+  `).join("");
 };
 
 window.resetTotaleGioco = async function() {
