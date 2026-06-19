@@ -435,6 +435,7 @@ let punti = {};
 let teams = {};
 let fazioni = {};
 let alleanzaBonusFinale = {};
+let prefestaSbloccata = false;
 
 const RUOLI = {
   cody: {
@@ -583,7 +584,7 @@ function render() {
   document.getElementById("punti-malus").textContent = `-${pp.malus} malus`;
   document.getElementById("punti-eventi").textContent = `${pp.eventi.length} eventi`;
 
-  // Posizione campionato (basata su punti squadra)
+  // Posizione campionato (basata su punti squadra) — nascosta finché non sbloccato
   const classifica = PLAYERS.map(p => ({ name: p.name, pts: getPuntiSquadra(p.name).tot }))
     .sort((a,b) => b.pts - a.pts);
   const myPos = classifica.findIndex(p => p.name === myName) + 1;
@@ -596,9 +597,15 @@ function render() {
   const myAllPos = miaAll ? allanzeRanked.findIndex(a => a.nome === miaAll.nome) + 1 : null;
 
   // Stats grid
-  document.getElementById("pos-camp").textContent = myPos + "°";
-  document.getElementById("pts-squadra").textContent = (ptsSq > 0 ? "+" : "") + ptsSq;
-  document.getElementById("pos-alleanza").textContent = myAllPos ? myAllPos + "°" : "—";
+  if (prefestaSbloccata) {
+    document.getElementById("pos-camp").textContent = myPos + "°";
+    document.getElementById("pts-squadra").textContent = (ptsSq > 0 ? "+" : "") + ptsSq;
+    document.getElementById("pos-alleanza").textContent = myAllPos ? myAllPos + "°" : "—";
+  } else {
+    document.getElementById("pos-camp").textContent = "🔒";
+    document.getElementById("pts-squadra").textContent = "in attesa di sblocco";
+    document.getElementById("pos-alleanza").textContent = "🔒";
+  }
 
   // ── SQUADRA ──
   const sqContainer = document.getElementById("squadra-content");
@@ -650,28 +657,37 @@ function render() {
   // ── POSIZIONE IN CLASSIFICA ──
   const posRow = document.getElementById("posizione-row");
   posRow.innerHTML = "";
-  const prevName = myPos > 1 ? classifica[myPos-2].name : null;
-  const nextName = myPos < classifica.length ? classifica[myPos].name : null;
-  const prevPts = prevName ? getPuntiSquadra(prevName).tot : null;
-  const nextPts = nextName ? getPuntiSquadra(nextName).tot : null;
 
-  if (prevName) {
-    const div = document.createElement("div");
-    div.className = "pos-card";
-    div.innerHTML = `<span class="pos-num" style="font-size:14px;color:var(--text-muted)">${prevName.split(" ")[0]}</span><span class="pos-label">Sopra di te</span><span class="pos-sub">+${prevPts} pt</span>`;
-    posRow.appendChild(div);
-  }
+  if (!prefestaSbloccata) {
+    const lockCard = document.createElement("div");
+    lockCard.className = "pos-card highlight";
+    lockCard.style.gridColumn = "1 / -1";
+    lockCard.innerHTML = `<span class="pos-num">🔒</span><span class="pos-label">Classifica nascosta</span><span class="pos-sub">si sblocca all'inizio della festa</span>`;
+    posRow.appendChild(lockCard);
+  } else {
+    const prevName = myPos > 1 ? classifica[myPos-2].name : null;
+    const nextName = myPos < classifica.length ? classifica[myPos].name : null;
+    const prevPts = prevName ? getPuntiSquadra(prevName).tot : null;
+    const nextPts = nextName ? getPuntiSquadra(nextName).tot : null;
 
-  const myCard = document.createElement("div");
-  myCard.className = "pos-card highlight";
-  myCard.innerHTML = `<span class="pos-num">${myPos}°</span><span class="pos-label">su ${PLAYERS.length}</span><span class="pos-sub">${ptsSq > 0 ? '+' : ''}${ptsSq} pt squadra</span>`;
-  posRow.appendChild(myCard);
+    if (prevName) {
+      const div = document.createElement("div");
+      div.className = "pos-card";
+      div.innerHTML = `<span class="pos-num" style="font-size:14px;color:var(--text-muted)">${prevName.split(" ")[0]}</span><span class="pos-label">Sopra di te</span><span class="pos-sub">+${prevPts} pt</span>`;
+      posRow.appendChild(div);
+    }
 
-  if (nextName) {
-    const div = document.createElement("div");
-    div.className = "pos-card";
-    div.innerHTML = `<span class="pos-num" style="font-size:14px;color:var(--text-muted)">${nextName.split(" ")[0]}</span><span class="pos-label">Sotto di te</span><span class="pos-sub">${nextPts > 0 ? '+' : ''}${nextPts} pt</span>`;
-    posRow.appendChild(div);
+    const myCard = document.createElement("div");
+    myCard.className = "pos-card highlight";
+    myCard.innerHTML = `<span class="pos-num">${myPos}°</span><span class="pos-label">su ${PLAYERS.length}</span><span class="pos-sub">${ptsSq > 0 ? '+' : ''}${ptsSq} pt squadra</span>`;
+    posRow.appendChild(myCard);
+
+    if (nextName) {
+      const div = document.createElement("div");
+      div.className = "pos-card";
+      div.innerHTML = `<span class="pos-num" style="font-size:14px;color:var(--text-muted)">${nextName.split(" ")[0]}</span><span class="pos-label">Sotto di te</span><span class="pos-sub">${nextPts > 0 ? '+' : ''}${nextPts} pt</span>`;
+      posRow.appendChild(div);
+    }
   }
 
   // ── ALLEANZA ──
@@ -681,7 +697,7 @@ function render() {
   } else {
     const coeff = getCoeffAlleanza(miaAll.membri);
     const sqFormate = miaAll.membri.filter(m => teams[sanitize(m)]).length;
-    allContainer.innerHTML = `
+    allContainer.innerHTML = prefestaSbloccata ? `
       <div class="alleanza-mini" onclick="window.location.href='alleanze.html'">
         <div class="alleanza-mini-name">${miaAll.nome}</div>
         <div class="alleanza-mini-row">
@@ -692,6 +708,15 @@ function render() {
           <div class="alleanza-mini-fill" style="width:${Math.min(100, Math.max(5, 50 + coeff))}%"></div>
         </div>
         <div style="font-size:11px;color:var(--text-muted);margin-top:8px;">Tocca per vedere il dettaglio →</div>
+      </div>
+    ` : `
+      <div class="alleanza-mini" onclick="window.location.href='alleanze.html'">
+        <div class="alleanza-mini-name">${miaAll.nome}</div>
+        <div class="alleanza-mini-row">
+          <div class="alleanza-mini-coeff">🔒</div>
+          <div class="alleanza-mini-pos">${sqFormate}/${miaAll.membri.length} squadre formate</div>
+        </div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:8px;">Coefficiente e posizione si sbloccano all'inizio della festa →</div>
       </div>
     `;
   }
@@ -734,6 +759,10 @@ onValue(ref(db, "fazioni"), snap => {
 });
 onValue(ref(db, "alleanzaBonusFinale"), snap => {
   alleanzaBonusFinale = snap.exists() ? snap.val() : {};
+  render();
+});
+onValue(ref(db, "prefesta_sbloccata"), snap => {
+  prefestaSbloccata = snap.exists() && snap.val() === true;
   render();
 });
 </script>
