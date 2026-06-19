@@ -107,13 +107,14 @@ body {
 /* Fazioni bars (dentro lb view quando tab=fazioni) */
 .faz-bars-wrap { display: flex; flex-direction: column; gap: 24px; max-width: 800px; margin: auto; width: 100%; }
 
-/* Bonus/Malus più frequenti */
-.freq-wrap { display: flex; gap: 32px; max-width: 1100px; margin: 0 auto; width: 100%; }
-.freq-section { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+/* Bonus/Malus più frequenti — una fase alla volta, colonna singola */
+.freq-single { display: flex; flex-direction: column; gap: 8px; max-width: 800px; margin: 0 auto; width: 100%; }
 .freq-section-title {
-  font-family: 'Cinzel', serif; font-size: 18px; font-weight: 700;
-  margin-bottom: 6px; text-align: center;
+  font-family: 'Cinzel', serif; font-size: 26px; font-weight: 700;
+  margin-bottom: 16px; text-align: center;
+  animation: fadeInTitle .5s ease;
 }
+@keyframes fadeInTitle { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
 .faz-bar-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: 18px; padding: 24px 28px; }
 .faz-bar-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
 .faz-bar-name { display: flex; align-items: center; gap: 12px; font-size: 22px; font-weight: 800; }
@@ -126,26 +127,37 @@ body {
 
 /* ══════════ RUOTE ══════════ */
 .wheels-wrap { flex: 1; display: flex; align-items: center; justify-content: center; }
-.wheel-col { display: flex; flex-direction: column; align-items: center; gap: 26px; }
+.wheel-col { display: flex; flex-direction: column; align-items: center; gap: 30px; }
 .wheel-outer {
-  width: 340px; height: 340px; border-radius: 50%; position: relative;
-  border: 6px solid var(--border); box-shadow: 0 0 60px rgba(0,0,0,0.5);
+  width: 600px; height: 600px; border-radius: 50%; position: relative;
 }
-.wheel-outer-big { width: 420px; height: 420px; }
+.wheel-outer-big { width: 600px; height: 600px; }
 .wheel-spin {
-  width: 100%; height: 100%; border-radius: 50%; position: relative; overflow: hidden;
+  width: 100%; height: 100%; border-radius: 50%; position: relative;
   transition: transform 4.5s cubic-bezier(.12,.65,.16,1);
 }
+.wheel-disc {
+  position: absolute; inset: 0; border-radius: 50%; overflow: hidden;
+  border: 6px solid var(--border); box-shadow: 0 0 60px rgba(0,0,0,0.5);
+}
+.wheel-labels-layer {
+  position: absolute; inset: 0; pointer-events: none;
+}
 .wheel-pointer {
-  position: absolute; top: -22px; left: 50%; transform: translateX(-50%);
-  width: 0; height: 0; border-left: 16px solid transparent; border-right: 16px solid transparent;
-  border-top: 28px solid var(--gold); z-index: 5; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+  position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+  width: 0; height: 0; border-left: 18px solid transparent; border-right: 18px solid transparent;
+  border-top: 32px solid var(--gold); z-index: 5; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
 }
 .wheel-center {
   position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
-  width: 72px; height: 72px; border-radius: 50%; background: var(--bg);
+  width: 84px; height: 84px; border-radius: 50%; background: var(--bg);
   border: 4px solid var(--gold); z-index: 4; display: flex; align-items: center; justify-content: center;
-  font-size: 28px;
+  font-size: 32px;
+}
+.wheel-slice-label {
+  position: absolute; top: 50%; left: 50%; transform-origin: center;
+  font-size: 13px; font-weight: 700; color: var(--text);
+  white-space: nowrap; text-align: center;
 }
 .wheel-result-wrap { min-height: 70px; display: flex; align-items: center; justify-content: center; }
 .wheel-result {
@@ -271,7 +283,10 @@ body {
       <div class="wheel-col">
         <div class="wheel-outer wheel-outer-big">
           <div class="wheel-pointer"></div>
-          <div class="wheel-spin" id="wheel-persone"></div>
+          <div class="wheel-spin" id="wheel-persone">
+            <div class="wheel-disc" id="wheel-persone-disc"></div>
+            <div class="wheel-labels-layer" id="wheel-persone-labels"></div>
+          </div>
           <div class="wheel-center">🎯</div>
         </div>
         <div class="wheel-result-wrap">
@@ -492,6 +507,7 @@ const LB_TABS = [
   { key: "frequenti", title: "Bonus & Malus più Frequenti", sub: "" },
 ];
 let lbIndex = 0;
+let initialRenderDone = false; // diventa true dopo il primo render con dati Firebase reali
 
 function buildLbCampionatoHtml() {
   const data = PLAYERS
@@ -591,7 +607,7 @@ function renderLbFazioniContentOnly() {
 // (quiz/registrazione/squadra/alleanza) sono esclusi perché capitano quasi a tutti e
 // non sono interessanti come "classifica" — qui contano solo le cose decise da Pietro
 // o legate a Cat.2-5/Ad Personam.
-function buildLbFrequentiHtml() {
+function getFrequentiData() {
   const counts = {}; // desc -> { count, pts, tipo }
   Object.values(punti).forEach(eventiPersona => {
     Object.entries(eventiPersona || {}).forEach(([id, e]) => {
@@ -602,41 +618,64 @@ function buildLbFrequentiHtml() {
       counts[desc].count++;
     });
   });
-
   const all = Object.entries(counts).map(([desc, v]) => ({ desc, ...v }));
-  const topBonus = all.filter(x => x.tipo === "bonus").sort((a,b) => b.count - a.count).slice(0, 5);
-  const topMalus = all.filter(x => x.tipo === "malus").sort((a,b) => b.count - a.count).slice(0, 5);
+  return {
+    bonus: all.filter(x => x.tipo === "bonus").sort((a,b) => b.count - a.count).slice(0, 5),
+    malus: all.filter(x => x.tipo === "malus").sort((a,b) => b.count - a.count).slice(0, 5),
+  };
+}
 
-  if (!topBonus.length && !topMalus.length) {
-    return '<div class="lb-empty">Ancora nessun bonus o malus assegnato</div>';
-  }
-
-  const section = (title, items, color) => `
-    <div class="freq-section">
-      <div class="freq-section-title" style="color:${color}">${title}</div>
-      ${items.map((x,i) => `
-        <div class="lb-row" style="animation-delay:${Math.min(i*0.08,1)}s">
-          <div class="lb-pos">${i+1}°</div>
-          <div class="lb-info"><div class="lb-name">${x.desc}</div></div>
-          <div class="lb-pts" style="color:${color}">×${x.count}</div>
-        </div>
-      `).join("")}
-    </div>
-  `;
-
+function buildFreqSectionHtml(title, items, color) {
+  if (!items.length) return '<div class="lb-empty">Ancora nessun evento di questo tipo assegnato</div>';
   return `
-    <div class="freq-wrap">
-      ${topBonus.length ? section("🟢 Bonus più frequenti", topBonus, "var(--green)") : ""}
-      ${topMalus.length ? section("🔴 Malus più frequenti", topMalus, "var(--red)") : ""}
-    </div>
+    <div class="freq-section-title" style="color:${color}">${title}</div>
+    ${items.map((x,i) => `
+      <div class="lb-row" style="animation-delay:${Math.min(i*0.1,1)}s">
+        <div class="lb-pos">${i+1}°</div>
+        <div class="lb-info"><div class="lb-name">${x.desc}</div></div>
+        <div class="lb-pts" style="color:${color}">×${x.count}</div>
+      </div>
+    `).join("")}
   `;
 }
+
+// Sotto-fase interna: 0 = mostra Bonus, 1 = mostra Malus. Avanza con un timer dedicato,
+// indipendente dal timer di rotazione principale delle 5 slide.
+let freqSubPhase = 0;
+let freqSubTimer = null;
+
+function renderFreqSubPhase() {
+  const data = getFrequentiData();
+  const html = freqSubPhase === 0
+    ? buildFreqSectionHtml("🟢 Bonus più Frequenti", data.bonus, "var(--green)")
+    : buildFreqSectionHtml("🔴 Malus più Frequenti", data.malus, "var(--red)");
+  document.getElementById("lb-body").innerHTML = `<div class="freq-single">${html}</div>`;
+}
+
+function startFreqRotation() {
+  stopFreqRotation();
+  freqSubPhase = 0;
+  renderFreqSubPhase();
+  freqSubTimer = setInterval(() => {
+    freqSubPhase = freqSubPhase === 0 ? 1 : 0;
+    renderFreqSubPhase();
+  }, 5000); // 5s su Bonus, 5s su Malus — il tab "frequenti" dura quindi ~10s in totale
+}
+function stopFreqRotation() {
+  if (freqSubTimer) clearInterval(freqSubTimer);
+  freqSubTimer = null;
+}
+
 function renderLbFrequenti() {
-  document.getElementById("lb-body").innerHTML = buildLbFrequentiHtml();
-  scheduleAutoScroll();
+  startFreqRotation();
+  // Il tempo totale di questa slide nella rotazione principale è gestito a parte
+  // (vedi scheduleAutoScroll override sotto) — qui avanziamo dopo i due sotto-step.
+  if (lbAdvanceTimer) clearTimeout(lbAdvanceTimer);
+  lbAdvanceTimer = setTimeout(() => { stopFreqRotation(); advanceLb(); }, 10500);
 }
 function renderLbFrequentiContentOnly() {
-  document.getElementById("lb-body").innerHTML = buildLbFrequentiHtml();
+  // Aggiorna solo il conteggio della sotto-fase corrente, senza toccare i timer
+  renderFreqSubPhase();
 }
 
 // Aggiorna il contenuto della slide corrente SENZA resettare il timer di rotazione
@@ -713,6 +752,7 @@ function cancelAutoScroll() {
 }
 function advanceLb() {
   cancelAutoScroll();
+  stopFreqRotation();
   lbIndex = (lbIndex + 1) % LB_TABS.length;
   renderLb();
 }
@@ -723,6 +763,7 @@ function startLbRotation() {
 }
 function stopLbRotation() {
   cancelAutoScroll();
+  stopFreqRotation();
   if (lbAdvanceTimer) clearTimeout(lbAdvanceTimer);
   lbAdvanceTimer = null;
 }
@@ -733,7 +774,8 @@ function stopLbRotation() {
 const COLORS_WHEEL = ["#ff6b2b","#a855f7","#22c55e","#f59e0b","#ef4444","#3b82f6","#ec4899","#14b8a6"];
 
 function buildWheel(elId, items) {
-  const el = document.getElementById(elId);
+  const disc = document.getElementById(elId + "-disc");
+  const labelsLayer = document.getElementById(elId + "-labels");
   const n = items.length;
   const slice = 360 / n;
   let gradient = "conic-gradient(";
@@ -742,15 +784,43 @@ function buildWheel(elId, items) {
     gradient += `${c} ${i*slice}deg ${(i+1)*slice}deg${i < n-1 ? "," : ""}`;
   });
   gradient += ")";
-  el.style.background = gradient;
-  // Niente etichette di testo sugli spicchi: con 68 nomi sarebbero illeggibili e si
-  // sovrapporrebbero. Il nome estratto viene mostrato chiaramente sotto la ruota a fine giro.
+  disc.style.background = gradient;
+
+  // Con molti nomi (es. 68), il testo non sta dentro lo spicchio stretto: lo mettiamo
+  // come etichette radiali appena DENTRO il bordo della ruota (raggio ~265px su una
+  // ruota da 600px), orientate leggibili dal centro verso fuori. Niente è perfettamente
+  // leggibile mentre gira veloce — è normale, dà un'idea visiva di "tanti nomi";
+  // il nome vincitore vero si legge chiaro e per intero nel risultato finale sotto la ruota.
+  labelsLayer.innerHTML = "";
+  const radius = 265;
+  items.forEach((label, i) => {
+    const angle = slice * i + slice / 2;
+    const span = document.createElement("div");
+    span.className = "wheel-slice-label";
+    span.style.transform = `rotate(${angle}deg) translateY(-${radius}px) rotate(${angle > 90 && angle < 270 ? 180 : 0}deg)`;
+    span.textContent = abbreviaNome(label);
+    labelsLayer.appendChild(span);
+  });
 }
 
 let wheelRotation = { persone: 0 };
 
 function getNomiOspiti() {
   return PLAYERS.map(p => p.name);
+}
+
+// Per le etichette sulla ruota (spazio limitato): "Nome Cognome" lungo diventa "Nome C."
+// Il nome completo resta sempre quello mostrato nel risultato finale sotto la ruota.
+function abbreviaNome(nomeCompleto) {
+  const parti = nomeCompleto.trim().split(" ");
+  if (parti.length === 1) return parti[0];
+  const nome = parti[0];
+  const resto = parti.slice(1).join(" ");
+  // Se il nome+cognome è già corto, lascialo intero
+  if (nomeCompleto.length <= 14) return nomeCompleto;
+  // Altrimenti: Nome + iniziale del primo cognome (gestisce anche parentesi tipo "(madre)")
+  const cognomeIniziale = resto.replace(/[()]/g, "").charAt(0).toUpperCase();
+  return `${nome} ${cognomeIniziale}.`;
 }
 
 window.spinWheel = function(tipo) {
@@ -936,8 +1006,31 @@ window.prevAct = function() {
 // INIT
 // ══════════════════════════════════════
 function init() {
-  onValue(ref(db, "punti"), snap => { punti = snap.exists() ? snap.val() : {}; refreshCurrentLbContent(); });
-  onValue(ref(db, "teams"), snap => { teams = snap.exists() ? snap.val() : {}; refreshCurrentLbContent(); });
+  // Al primissimo arrivo dei dati (subito dopo l'apertura della pagina), i dati Firebase
+  // arrivano DOPO che startLbRotation() ha già fatto il primo render (a vuoto).
+  // Per questo, finché non è arrivato il primo dataset completo, usiamo renderLb() pieno
+  // (che riattiva scroll automatico e timer) invece del solo refresh contenuto.
+  let firstDataLoaded = { punti: false, teams: false };
+  function maybeFullRenderOrRefresh() {
+    if (!firstDataLoaded.punti || !firstDataLoaded.teams) return; // aspetta che arrivino entrambi
+    if (!initialRenderDone) {
+      initialRenderDone = true;
+      if (LB_TABS[lbIndex]) renderLb(); // primo render vero coi dati reali → attiva scroll/timer
+    } else {
+      refreshCurrentLbContent();
+    }
+  }
+
+  onValue(ref(db, "punti"), snap => {
+    punti = snap.exists() ? snap.val() : {};
+    firstDataLoaded.punti = true;
+    maybeFullRenderOrRefresh();
+  });
+  onValue(ref(db, "teams"), snap => {
+    teams = snap.exists() ? snap.val() : {};
+    firstDataLoaded.teams = true;
+    maybeFullRenderOrRefresh();
+  });
   onValue(ref(db, "fazioni"), snap => {
     fazioni = snap.exists() ? snap.val() : {};
     refreshCurrentLbContent();
@@ -950,8 +1043,6 @@ function init() {
   onValue(ref(db, "alleanzaBonusFinale"), snap => { alleanzaBonusFinale = snap.exists() ? snap.val() : {}; refreshCurrentLbContent(); });
 
   buildWheel("wheel-persone", getNomiOspiti());
-
-  startLbRotation();
 
   // Costruisci il reveal alla prima apertura della tab
   const origSetView = window.setView;
