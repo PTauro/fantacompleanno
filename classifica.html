@@ -318,7 +318,7 @@ const PLAYERS = [
   { name: "Eleonora Tauro", cost: 90 },
   { name: "Paolo Bello", cost: 110 },
   { name: "Mattia Caione", cost: 70 },
-  { name: "Mirco Caione", cost: 85 },
+  { name: "Mirko Caione", cost: 85 },
   { name: "Gloria Rinaldi", cost: 85 },
   { name: "Dario Caione", cost: 95 },
   { name: "Gabriele Mangione", cost: 100 },
@@ -384,7 +384,7 @@ const PLAYERS = [
 ];
 
 const ALLEANZE = {
-  "💰 ISEE Allargato": ["Alessia Ala","Anna Maria Caione (madre)","Eleonora Tauro","Paolo Bello","Mattia Caione","Mirco Caione","Gloria Rinaldi","Dario Caione","Gabriele Mangione","Federica Ala","Simone Baldassarre","Desi Ala","Michele Nervo","Zia Anna","Arianna Forte"],
+  "💰 ISEE Allargato": ["Alessia Ala","Anna Maria Caione (madre)","Eleonora Tauro","Paolo Bello","Mattia Caione","Mirko Caione","Gloria Rinaldi","Dario Caione","Gabriele Mangione","Federica Ala","Simone Baldassarre","Desi Ala","Michele Nervo","Zia Anna","Arianna Forte"],
   "💥 Bombette di Cisternino ASAP": ["Francesca Terlizzi","Nicolas Costa","Giulia Trevisi","Andrea Sozzani","Emilio Pulli","Eleonora Bello","Marta Mignone","Giuseppe Susca","Annachiara Maci","Davide Secci"],
   "😈 Il Buono Il Bello e il Danilo": ["Antonio Borelli","Marika Giagnotti","Danilo Schiavone","Ilaria Tenore","Donato Stragapede","Emily Giancane"],
   "💸 Cuoricini Broke": ["Martina Poso","Maycols Sirsi","Laura Capodieci","Davide Attanasio","Manuel Palma","Carlotta D'aversa","Nicolò Spada","Antonella Lo vecchio","Beatrice Gloria","Mariacarla Spagnolo","Mattia Martina","Lorenzo Taffone"],
@@ -490,11 +490,20 @@ function getPuntiSquadra(ownerName) {
 // Coefficiente alleanza = media bonus squadra membri - media malus squadra membri
 function getCoeffAlleanza(membri) {
   if (membri.length === 0) return 0;
-  const conSquadra = membri.filter(m => teams[sanitize(m)]);
-  if (conSquadra.length === 0) return 0;
-  const totBonus = conSquadra.reduce((s, m) => s + getPuntiSquadra(m).bonus, 0);
-  const totMalus = conSquadra.reduce((s, m) => s + getPuntiSquadra(m).malus, 0);
-  return (totBonus / conSquadra.length) - (totMalus / conSquadra.length);
+  // Chi ha fatto squadra conta con getPuntiSquadra (capitano incluso).
+  // Chi NON ha fatto squadra conta comunque con i suoi punti personali grezzi
+  // (nessun moltiplicatore capitano, ma malus pre-festa "non ho fatto squadra" già inclusi) —
+  // non viene escluso dalla media, altrimenti i membri assenti sarebbero "invisibili"
+  // invece che penalizzanti per l'alleanza.
+  const totBonus = membri.reduce((s, m) => {
+    const p = teams[sanitize(m)] ? getPuntiSquadra(m) : getPuntiPersonali(m);
+    return s + p.bonus;
+  }, 0);
+  const totMalus = membri.reduce((s, m) => {
+    const p = teams[sanitize(m)] ? getPuntiSquadra(m) : getPuntiPersonali(m);
+    return s + p.malus;
+  }, 0);
+  return (totBonus / membri.length) - (totMalus / membri.length);
 }
 
 // Effetto del ruolo fazione sul totale: a chi vanno i punti e con che moltiplicatore

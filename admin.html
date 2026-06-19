@@ -574,11 +574,16 @@ function getPuntiSquadraRaw(ownerName) {
   return { bonus, malus };
 }
 function getCoeffAlleanzaRaw(membri) {
-  const conSquadra = membri.filter(m => allTeams[sanitize(m)]);
-  if (conSquadra.length === 0) return 0;
-  const totBonus = conSquadra.reduce((s, m) => s + getPuntiSquadraRaw(m).bonus, 0);
-  const totMalus = conSquadra.reduce((s, m) => s + getPuntiSquadraRaw(m).malus, 0);
-  return (totBonus / conSquadra.length) - (totMalus / conSquadra.length);
+  if (!membri.length) return 0;
+  const totBonus = membri.reduce((s, m) => {
+    const p = allTeams[sanitize(m)] ? getPuntiSquadraRaw(m) : getPuntiPersonaliRaw(m);
+    return s + p.bonus;
+  }, 0);
+  const totMalus = membri.reduce((s, m) => {
+    const p = allTeams[sanitize(m)] ? getPuntiSquadraRaw(m) : getPuntiPersonaliRaw(m);
+    return s + p.malus;
+  }, 0);
+  return (totBonus / membri.length) - (totMalus / membri.length);
 }
 
 // ── EVENTI RAPIDI ──

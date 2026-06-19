@@ -520,11 +520,16 @@ function getMiaAlleanza() {
 }
 
 function getCoeffAlleanza(membri) {
-  const conSq = membri.filter(m => teams[sanitize(m)]);
-  if (!conSq.length) return 0;
-  const totB = conSq.reduce((s,m) => s + getPuntiSquadra(m).bonus, 0);
-  const totM = conSq.reduce((s,m) => s + getPuntiSquadra(m).malus, 0);
-  return (totB / conSq.length) - (totM / conSq.length);
+  if (!membri.length) return 0;
+  const totB = membri.reduce((s, m) => {
+    const p = teams[sanitize(m)] ? getPuntiSquadra(m) : getPuntiPersonali(m);
+    return s + p.bonus;
+  }, 0);
+  const totM = membri.reduce((s, m) => {
+    const p = teams[sanitize(m)] ? getPuntiSquadra(m) : getPuntiPersonali(m);
+    return s + p.malus;
+  }, 0);
+  return (totB / membri.length) - (totM / membri.length);
 }
 
 // ── RENDER ──

@@ -377,11 +377,20 @@ function getPuntiSquadra(ownerName) {
 
 function getCoeffAlleanza(membri) {
   if (membri.length === 0) return 0;
-  const conSquadra = membri.filter(m => teams[sanitize(m)]);
-  if (conSquadra.length === 0) return 0;
-  const totBonus = conSquadra.reduce((s, m) => s + getPuntiSquadra(m).bonus, 0);
-  const totMalus = conSquadra.reduce((s, m) => s + getPuntiSquadra(m).malus, 0);
-  return (totBonus / conSquadra.length) - (totMalus / conSquadra.length);
+  // Chi ha fatto squadra conta con getPuntiSquadra (capitano incluso).
+  // Chi NON ha fatto squadra conta comunque con i suoi punti personali grezzi
+  // (nessun moltiplicatore capitano, ma malus pre-festa "non ho fatto squadra" già inclusi) —
+  // non viene escluso dalla media, altrimenti i membri assenti sarebbero "invisibili"
+  // invece che penalizzanti per l'alleanza.
+  const totBonus = membri.reduce((s, m) => {
+    const p = teams[sanitize(m)] ? getPuntiSquadra(m) : getPuntiPersonali(m);
+    return s + p.bonus;
+  }, 0);
+  const totMalus = membri.reduce((s, m) => {
+    const p = teams[sanitize(m)] ? getPuntiSquadra(m) : getPuntiPersonali(m);
+    return s + p.malus;
+  }, 0);
+  return (totBonus / membri.length) - (totMalus / membri.length);
 }
 
 function getRuoloEffetto(fazioneBase, ruoloId) {
