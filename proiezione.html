@@ -106,6 +106,14 @@ body {
 
 /* Fazioni bars (dentro lb view quando tab=fazioni) */
 .faz-bars-wrap { display: flex; flex-direction: column; gap: 24px; max-width: 800px; margin: auto; width: 100%; }
+
+/* Bonus/Malus più frequenti */
+.freq-wrap { display: flex; gap: 32px; max-width: 1100px; margin: 0 auto; width: 100%; }
+.freq-section { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+.freq-section-title {
+  font-family: 'Cinzel', serif; font-size: 18px; font-weight: 700;
+  margin-bottom: 6px; text-align: center;
+}
 .faz-bar-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: 18px; padding: 24px 28px; }
 .faz-bar-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
 .faz-bar-name { display: flex; align-items: center; gap: 12px; font-size: 22px; font-weight: 800; }
@@ -117,16 +125,16 @@ body {
 .faz-fill.siria { background: linear-gradient(90deg, #a855f7, #c081fa); }
 
 /* ══════════ RUOTE ══════════ */
-.wheels-wrap { flex: 1; display: flex; align-items: center; justify-content: center; gap: 80px; }
-.wheel-col { display: flex; flex-direction: column; align-items: center; gap: 20px; }
-.wheel-label { font-family: 'Cinzel', serif; font-size: 20px; font-weight: 700; color: var(--text-muted); }
+.wheels-wrap { flex: 1; display: flex; align-items: center; justify-content: center; }
+.wheel-col { display: flex; flex-direction: column; align-items: center; gap: 26px; }
 .wheel-outer {
   width: 340px; height: 340px; border-radius: 50%; position: relative;
   border: 6px solid var(--border); box-shadow: 0 0 60px rgba(0,0,0,0.5);
 }
+.wheel-outer-big { width: 420px; height: 420px; }
 .wheel-spin {
   width: 100%; height: 100%; border-radius: 50%; position: relative; overflow: hidden;
-  transition: transform 4s cubic-bezier(.17,.67,.2,1);
+  transition: transform 4.5s cubic-bezier(.12,.65,.16,1);
 }
 .wheel-pointer {
   position: absolute; top: -22px; left: 50%; transform: translateX(-50%);
@@ -135,18 +143,24 @@ body {
 }
 .wheel-center {
   position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
-  width: 64px; height: 64px; border-radius: 50%; background: var(--bg);
+  width: 72px; height: 72px; border-radius: 50%; background: var(--bg);
   border: 4px solid var(--gold); z-index: 4; display: flex; align-items: center; justify-content: center;
-  font-size: 24px;
+  font-size: 28px;
 }
-.wheel-slice-label {
-  position: absolute; left: 50%; top: 50%; transform-origin: 0 0;
-  font-size: 11px; font-weight: 700; color: #fff; white-space: nowrap;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.6);
-}
+.wheel-result-wrap { min-height: 70px; display: flex; align-items: center; justify-content: center; }
 .wheel-result {
-  font-size: 24px; font-weight: 800; text-align: center; min-height: 36px;
-  font-family: 'Space Grotesk', sans-serif;
+  font-size: 30px; font-weight: 800; text-align: center;
+  font-family: 'Cinzel', serif; color: var(--text-muted);
+}
+.wheel-result.spinning { color: var(--text-muted); font-size: 20px; font-family: 'Space Mono', monospace; }
+.wheel-result.landed {
+  color: var(--gold); animation: resultLand .5s cubic-bezier(.34,1.56,.64,1);
+  text-shadow: 0 0 24px rgba(245,158,11,0.5);
+}
+@keyframes resultLand {
+  0% { transform: scale(0.4); opacity: 0; }
+  60% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); }
 }
 .wheel-btn {
   background: var(--gold); color: #1a1500; border: none; border-radius: 100px;
@@ -251,28 +265,19 @@ body {
   <div class="view" id="view-ruote">
     <div class="view-header">
       <div class="view-title">La Ruota del Destino</div>
-      <div class="view-sub">Gira la ruota — chi sarà il prescelto?</div>
+      <div class="view-sub">Chi sarà il prescelto?</div>
     </div>
     <div class="wheels-wrap">
       <div class="wheel-col">
-        <div class="wheel-label">👤 Persona</div>
-        <div class="wheel-outer">
+        <div class="wheel-outer wheel-outer-big">
           <div class="wheel-pointer"></div>
           <div class="wheel-spin" id="wheel-persone"></div>
           <div class="wheel-center">🎯</div>
         </div>
-        <div class="wheel-result" id="result-persone">—</div>
-        <button class="wheel-btn" id="btn-spin-persone" onclick="spinWheel('persone')">🎲 Gira</button>
-      </div>
-      <div class="wheel-col">
-        <div class="wheel-label">🎮 Prova</div>
-        <div class="wheel-outer">
-          <div class="wheel-pointer"></div>
-          <div class="wheel-spin" id="wheel-prove"></div>
-          <div class="wheel-center">🏆</div>
+        <div class="wheel-result-wrap">
+          <div class="wheel-result" id="result-persone">Premi "Gira" per estrarre</div>
         </div>
-        <div class="wheel-result" id="result-prove">—</div>
-        <button class="wheel-btn" id="btn-spin-prove" onclick="spinWheel('prove')">🎲 Gira</button>
+        <button class="wheel-btn" id="btn-spin-persone" onclick="spinWheel('persone')">🎲 Gira la Ruota</button>
       </div>
     </div>
   </div>
@@ -480,10 +485,11 @@ window.showCtrlBar = function() {
 // CLASSIFICA ROTANTE
 // ══════════════════════════════════════
 const LB_TABS = [
-  { key: "campionato", title: "Campionato", sub: "— top 8 squadre —" },
-  { key: "invitati", title: "Invitati", sub: "— top 8 punti personali —" },
-  { key: "alleanze", title: "Alleanze", sub: "— classifica coefficiente —" },
-  { key: "fazioni", title: "Fazioni", sub: "— Cody vs Siria —" },
+  { key: "campionato", title: "Campionato", sub: "" },
+  { key: "invitati", title: "Invitati", sub: "" },
+  { key: "alleanze", title: "Alleanze", sub: "" },
+  { key: "fazioni", title: "Fazioni", sub: "" },
+  { key: "frequenti", title: "Bonus & Malus più Frequenti", sub: "" },
 ];
 let lbIndex = 0;
 
@@ -579,6 +585,60 @@ function renderLbFazioniContentOnly() {
   document.getElementById("lb-body").innerHTML = buildLbFazioniHtml();
 }
 
+// ── BONUS/MALUS PIÙ FREQUENTI ──
+// Conta quante volte ogni descrizione di evento è stata assegnata (tra tutti gli ospiti),
+// separando bonus (punti positivi) da malus (punti negativi). Eventi automatici Cat.1
+// (quiz/registrazione/squadra/alleanza) sono esclusi perché capitano quasi a tutti e
+// non sono interessanti come "classifica" — qui contano solo le cose decise da Pietro
+// o legate a Cat.2-5/Ad Personam.
+function buildLbFrequentiHtml() {
+  const counts = {}; // desc -> { count, pts, tipo }
+  Object.values(punti).forEach(eventiPersona => {
+    Object.entries(eventiPersona || {}).forEach(([id, e]) => {
+      if (CAT12_IDS.has(id)) return; // esclude automatismi pre-festa, troppo "ovvi"
+      if (id.startsWith("custom_")) return; // punti personalizzati sono unici, non si ripetono
+      const desc = e.desc || id;
+      if (!counts[desc]) counts[desc] = { count: 0, pts: e.pts, tipo: e.pts > 0 ? "bonus" : "malus" };
+      counts[desc].count++;
+    });
+  });
+
+  const all = Object.entries(counts).map(([desc, v]) => ({ desc, ...v }));
+  const topBonus = all.filter(x => x.tipo === "bonus").sort((a,b) => b.count - a.count).slice(0, 5);
+  const topMalus = all.filter(x => x.tipo === "malus").sort((a,b) => b.count - a.count).slice(0, 5);
+
+  if (!topBonus.length && !topMalus.length) {
+    return '<div class="lb-empty">Ancora nessun bonus o malus assegnato</div>';
+  }
+
+  const section = (title, items, color) => `
+    <div class="freq-section">
+      <div class="freq-section-title" style="color:${color}">${title}</div>
+      ${items.map((x,i) => `
+        <div class="lb-row" style="animation-delay:${Math.min(i*0.08,1)}s">
+          <div class="lb-pos">${i+1}°</div>
+          <div class="lb-info"><div class="lb-name">${x.desc}</div></div>
+          <div class="lb-pts" style="color:${color}">×${x.count}</div>
+        </div>
+      `).join("")}
+    </div>
+  `;
+
+  return `
+    <div class="freq-wrap">
+      ${topBonus.length ? section("🟢 Bonus più frequenti", topBonus, "var(--green)") : ""}
+      ${topMalus.length ? section("🔴 Malus più frequenti", topMalus, "var(--red)") : ""}
+    </div>
+  `;
+}
+function renderLbFrequenti() {
+  document.getElementById("lb-body").innerHTML = buildLbFrequentiHtml();
+  scheduleAutoScroll();
+}
+function renderLbFrequentiContentOnly() {
+  document.getElementById("lb-body").innerHTML = buildLbFrequentiHtml();
+}
+
 // Aggiorna il contenuto della slide corrente SENZA resettare il timer di rotazione
 // (usato quando arrivano nuovi dati da Firebase mentre una slide è già in corso)
 function refreshCurrentLbContent() {
@@ -588,17 +648,20 @@ function refreshCurrentLbContent() {
   else if (tab.key === "invitati") renderLbInvitatiContentOnly();
   else if (tab.key === "alleanze") renderLbAlleanzeContentOnly();
   else if (tab.key === "fazioni") renderLbFazioniContentOnly();
+  else if (tab.key === "frequenti") renderLbFrequentiContentOnly();
 }
 
 function renderLb() {
   const tab = LB_TABS[lbIndex];
   document.getElementById("lb-title").textContent = tab.title;
   document.getElementById("lb-sub").textContent = tab.sub;
+  document.getElementById("lb-sub").style.display = tab.sub ? "block" : "none";
   document.getElementById("lb-body").scrollTop = 0;
   if (tab.key === "campionato") renderLbCampionato();
   else if (tab.key === "invitati") renderLbInvitati();
   else if (tab.key === "alleanze") renderLbAlleanze();
   else if (tab.key === "fazioni") renderLbFazioni();
+  else if (tab.key === "frequenti") renderLbFrequenti();
 }
 
 // ── AUTO-SCROLL per liste più lunghe dello spazio visibile ──
@@ -617,9 +680,12 @@ function scheduleAutoScroll() {
       lbAdvanceTimer = setTimeout(advanceLb, MIN_SLIDE_TIME);
       return;
     }
-    const SCROLL_SPEED = 32; // px/secondo — lento e leggibile
-    const PAUSE_START = 1800;
-    const PAUSE_END = 1800;
+    // Velocità di scroll più alta per liste molto lunghe (es. Invitati con 68 righe)
+    // così il tempo totale di lettura resta ragionevole anche con tanto contenuto.
+    const rowCount = body.children.length;
+    const SCROLL_SPEED = rowCount > 30 ? 90 : 55; // px/secondo
+    const PAUSE_START = 1200;
+    const PAUSE_END = 1200;
     const scrollDuration = (overflow / SCROLL_SPEED) * 1000;
     const totalSlideTime = Math.max(MIN_SLIDE_TIME, PAUSE_START + scrollDuration + PAUSE_END + 600);
     lbAdvanceTimer = setTimeout(advanceLb, totalSlideTime);
@@ -662,12 +728,8 @@ function stopLbRotation() {
 }
 
 // ══════════════════════════════════════
-// RUOTE
+// RUOTA PARTECIPANTI
 // ══════════════════════════════════════
-const PROVE = [
-  "Karaoke a sorpresa", "Sfida PS2/Switch", "Clash Royale 1v1", "Asta misteriosa",
-  "Ballo improvvisato", "Indovina la canzone", "Mimo silenzioso", "Cash or Trash"
-];
 const COLORS_WHEEL = ["#ff6b2b","#a855f7","#22c55e","#f59e0b","#ef4444","#3b82f6","#ec4899","#14b8a6"];
 
 function buildWheel(elId, items) {
@@ -681,18 +743,11 @@ function buildWheel(elId, items) {
   });
   gradient += ")";
   el.style.background = gradient;
-  el.querySelectorAll(".wheel-slice-label").forEach(x => x.remove());
-  items.forEach((label, i) => {
-    const angle = slice * i + slice/2;
-    const span = document.createElement("div");
-    span.className = "wheel-slice-label";
-    span.style.transform = `rotate(${angle}deg) translate(70px, -6px)`;
-    span.textContent = label.length > 14 ? label.slice(0,13)+"…" : label;
-    el.appendChild(span);
-  });
+  // Niente etichette di testo sugli spicchi: con 68 nomi sarebbero illeggibili e si
+  // sovrapporrebbero. Il nome estratto viene mostrato chiaramente sotto la ruota a fine giro.
 }
 
-let wheelRotation = { persone: 0, prove: 0 };
+let wheelRotation = { persone: 0 };
 
 function getNomiOspiti() {
   return PLAYERS.map(p => p.name);
@@ -700,26 +755,40 @@ function getNomiOspiti() {
 
 window.spinWheel = function(tipo) {
   const btn = document.getElementById("btn-spin-" + tipo);
-  const items = tipo === "persone" ? getNomiOspiti() : PROVE;
+  const items = getNomiOspiti();
   const wheelEl = document.getElementById("wheel-" + tipo);
+  const resultEl = document.getElementById("result-" + tipo);
   btn.disabled = true;
+  resultEl.className = "wheel-result spinning";
+  resultEl.textContent = "🎲 Si gira...";
 
   const n = items.length;
   const slice = 360 / n;
   const winnerIndex = Math.floor(Math.random() * n);
-  // L'indicatore punta verso l'alto (0deg) — calcoliamo la rotazione per allineare la slice vincente lì
-  const targetAngle = 360 - (winnerIndex * slice + slice/2);
-  const fullSpins = 5 * 360;
-  wheelRotation[tipo] += fullSpins + targetAngle - (wheelRotation[tipo] % 360);
+
+  // L'indicatore (wheel-pointer) è fisso in alto, a 0° rispetto al centro della ruota.
+  // Lo spicchio "winnerIndex" occupa l'arco [winnerIndex*slice, (winnerIndex+1)*slice) nel
+  // gradiente conico (che parte da 0° in alto e gira in senso orario, come CSS conic-gradient).
+  // Per portare il CENTRO di quello spicchio sotto il puntatore, dobbiamo ruotare la ruota
+  // di un angolo tale che: (centro_spicchio + rotazione) mod 360 == 0
+  const centroSpicchio = winnerIndex * slice + slice / 2;
+  const angoloNecessario = (360 - centroSpicchio) % 360;
+
+  // Normalizziamo la rotazione attuale a [0,360) e aggiungiamo N giri interi + l'angolo target,
+  // così l'animazione parte sempre da una base pulita e finisce esattamente sull'angolo corretto.
+  const currentNormalized = ((wheelRotation[tipo] % 360) + 360) % 360;
+  const fullSpins = 6 * 360;
+  // Quanto manca per arrivare dall'angolo attuale all'angolo target, andando sempre avanti
+  const delta = ((angoloNecessario - currentNormalized) % 360 + 360) % 360;
+  wheelRotation[tipo] += fullSpins + delta;
 
   wheelEl.style.transform = `rotate(${wheelRotation[tipo]}deg)`;
 
-  document.getElementById("result-" + tipo).textContent = "🎲 ...";
-
   setTimeout(() => {
-    document.getElementById("result-" + tipo).textContent = items[winnerIndex];
+    resultEl.className = "wheel-result landed";
+    resultEl.textContent = "🎯 " + items[winnerIndex];
     btn.disabled = false;
-  }, 4100);
+  }, 4500);
 };
 
 // ══════════════════════════════════════
@@ -881,7 +950,6 @@ function init() {
   onValue(ref(db, "alleanzaBonusFinale"), snap => { alleanzaBonusFinale = snap.exists() ? snap.val() : {}; refreshCurrentLbContent(); });
 
   buildWheel("wheel-persone", getNomiOspiti());
-  buildWheel("wheel-prove", PROVE);
 
   startLbRotation();
 
