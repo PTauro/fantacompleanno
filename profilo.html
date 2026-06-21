@@ -622,7 +622,7 @@ function render() {
     header.className = "squadra-header";
     const spesi = myTeam.roster.reduce((s,n) => s + (PLAYERS.find(p=>p.name===n)?.cost||0), 0);
     const ab = alleanzaBonusFinale[myKey];
-    const abRow = ab ? `<div class="squadra-budget" style="color:var(--gold);margin-top:4px;">🏆 +${ab.pts} Bonus Alleanza Finale — ${ab.alleanza}</div>` : '';
+    const abRow = (ab && prefestaSbloccata) ? `<div class="squadra-budget" style="color:var(--gold);margin-top:4px;">🏆 +${ab.pts} Bonus Alleanza Finale — ${ab.alleanza}</div>` : '';
     header.innerHTML = `<div class="squadra-nome">${myTeam.teamName || "Squadra senza nome"}</div><div class="squadra-budget">✂️ ${spesi}/500 Capelli spesi · ${myTeam.roster.length}/5 giocatori</div>${abRow}`;
     sqContainer.appendChild(header);
 
@@ -637,6 +637,10 @@ function render() {
 
       const div = document.createElement("div");
       div.className = "giocatore-row" + (isCap ? " capitano" : "");
+      const pointsHtml = prefestaSbloccata
+        ? `<div class="giocatore-pts ${ptsConMolt > 0 ? 'pos' : ptsConMolt < 0 ? 'neg' : 'zero'}">${ptsConMolt > 0 ? '+' : ''}${ptsConMolt}</div>
+           ${isCap ? '<div class="cap-x2">x2 applicato</div>' : ''}`
+        : `<div class="giocatore-pts zero">🔒</div>`;
       div.innerHTML = `
         <div class="giocatore-avatar">${isCap ? "⭐" : initials2}</div>
         <div class="giocatore-info">
@@ -644,8 +648,7 @@ function render() {
           <div class="giocatore-ruolo">${pData?.cost || 0} ✂️${isCap ? " · CAPITANO x2" : ""}</div>
         </div>
         <div>
-          <div class="giocatore-pts ${ptsConMolt > 0 ? 'pos' : ptsConMolt < 0 ? 'neg' : 'zero'}">${ptsConMolt > 0 ? '+' : ''}${ptsConMolt}</div>
-          ${isCap ? '<div class="cap-x2">x2 applicato</div>' : ''}
+          ${pointsHtml}
         </div>
       `;
       sqContainer.appendChild(div);
