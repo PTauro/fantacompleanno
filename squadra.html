@@ -315,6 +315,7 @@ body { padding-bottom: 170px !important; }
 
 <!-- TAB: MIA SQUADRA -->
 <div class="tab-content active" id="content-mia-squadra">
+  <div id="team-points-box" style="display:none;"></div>
   <div class="squad-header" style="margin-top:8px;">
     <div class="section-label">Nome Squadra</div>
     <input class="team-name-input" id="team-name-input" type="text" placeholder="Dai un nome alla tua squadra..." maxlength="40">
@@ -385,7 +386,7 @@ const PLAYERS = [
   { name: "Eleonora Tauro", cost: 90, tags: ["affetto", "coppia"] },
   { name: "Paolo Bello", cost: 110, tags: ["affetto", "coppia"] },
   { name: "Mattia Caione", cost: 70, tags: ["affetto", "remoto"] },
-  { name: "Mirco Caione", cost: 85, tags: ["affetto", "coppia"] },
+  { name: "Mirko Caione", cost: 85, tags: ["affetto", "coppia"] },
   { name: "Gloria Rinaldi", cost: 85, tags: ["affetto", "coppia"] },
   { name: "Dario Caione", cost: 95, tags: ["affetto", "coppia"] },
   { name: "Gabriele Mangione", cost: 100, tags: ["affetto", "coppia"] },
@@ -463,6 +464,8 @@ let myName = localStorage.getItem("fc_player_name");
 let myTeam = []; // array di { name, cost, tags }
 let myCaptain = null; // nome del capitano
 let myTeamName = "";
+let punti = {}; // dati punti da Firebase, per calcolare i punteggi una volta sbloccati
+let prefestaSbloccata = false;
 let allTeams = {}; // { playerName: { teamName, roster, captain } }
 
 // ── INIT ──
@@ -510,6 +513,16 @@ async function init() {
     renderOtherTeams();
   });
 
+  // Ascolta i punti e lo sblocco pre-festa, per mostrare i punteggi live una volta sbloccati
+  onValue(ref(db, "punti"), (snap) => {
+    punti = snap.exists() ? snap.val() : {};
+    if (prefestaSbloccata) renderSquad();
+  });
+  onValue(ref(db, "prefesta_sbloccata"), (snap) => {
+    prefestaSbloccata = snap.exists() && snap.val() === true;
+    renderSquad();
+  });
+
   // Aggiorna nome squadra live
   document.getElementById("team-name-input").addEventListener("input", (e) => {
     myTeamName = e.target.value;
@@ -523,7 +536,7 @@ function getRemaining() { return BUDGET - getSpent(); }
 // ── CAT.2: COPPIE (per "Love is in the Air") ──
 const COPPIE = [
   ["Eleonora Tauro", "Paolo Bello"],
-  ["Mirco Caione", "Gloria Rinaldi"],
+  ["Mirko Caione", "Gloria Rinaldi"],
   ["Dario Caione", "Gabriele Mangione"],
   ["Desi Ala", "Michele Nervo"],
   ["Francesca Terlizzi", "Nicolas Costa"],
@@ -680,6 +693,27 @@ function renderSquad() {
   document.querySelector("#content-mia-squadra .section-label:last-of-type").textContent =
     `Rosa (${myTeam.length}/${MAX_PLAYERS}) — tocca un giocatore per rimuoverlo · tocca ⭐ per il capitano`;
 
+  // Box totale punti squadra — visibile solo dopo lo sblocco pre-festa
+  const ptsBox = document.getElementById("team-points-box");
+  if (prefestaSbloccata) {
+    const tot = getPuntiSquadraCorrente();
+    ptsBox.style.display = "block";
+    ptsBox.innerHTML = `
+      <div style="background:linear-gradient(135deg, rgba(255,107,43,0.12), rgba(168,85,247,0.10));border:1.5px solid var(--border);border-radius:14px;padding:16px 18px;margin-bottom:14px;text-align:center;">
+        <div style="font-size:11px;color:var(--text-muted);letter-spacing:.05em;margin-bottom:4px;">PUNTI SQUADRA — LIVE</div>
+        <div style="font-family:'Space Mono',monospace;font-size:30px;font-weight:800;color:${tot.tot >= 0 ? 'var(--green)' : 'var(--red)'};">${tot.tot > 0 ? '+' : ''}${tot.tot}</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">+${tot.bonus} bonus &nbsp;·&nbsp; -${tot.malus} malus</div>
+      </div>
+    `;
+  } else {
+    ptsBox.style.display = "block";
+    ptsBox.innerHTML = `
+      <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:16px 18px;margin-bottom:14px;text-align:center;color:var(--text-muted);">
+        🔒 I punti si sbloccano all'inizio della festa
+      </div>
+    `;
+  }
+
   for (let i = 0; i < MAX_PLAYERS; i++) {
     const player = myTeam[i];
     const div = document.createElement("div");
@@ -687,11 +721,22 @@ function renderSquad() {
     div.className = "squad-slot " + (player ? (isCap ? "captain-slot" : "filled") : "");
 
     if (player) {
+      const ptsRow = prefestaSbloccata
+        ? (() => {
+            const pp = getPuntiPersonali(player.name);
+            const ptsConMolt = isCap
+              ? (pp.bonusFisso + pp.bonusMolt * 2) - (pp.malusFisso + pp.malusMolt * 2)
+              : pp.tot;
+            const color = ptsConMolt > 0 ? "var(--green)" : ptsConMolt < 0 ? "var(--red)" : "var(--text-muted)";
+            return `<div style="font-family:'Space Mono',monospace;font-weight:800;font-size:13px;color:${color};margin-top:2px;">${ptsConMolt > 0 ? '+' : ''}${ptsConMolt} pt</div>`;
+          })()
+        : "";
       div.innerHTML = `
         <div class="slot-num">${isCap ? "⭐" : (i + 1)}</div>
         <div class="slot-info">
           <div class="slot-name">${player.name}</div>
           <div class="slot-cost">${player.cost} ✂️ ${isCap ? '<span style="color:var(--gold);font-size:11px;">CAPITANO x2</span>' : ''}</div>
+          ${ptsRow}
         </div>
         <button class="btn-set-cap ${isCap ? 'is-cap' : ''}" onclick="toggleCaptain(this.dataset.name)" data-name="${player.name.replace(/"/g, '&quot;')}">
           ${isCap ? "⭐ Cap" : "⭐ Cap?"}
@@ -859,6 +904,46 @@ window.switchTab = function(tab) {
 
 // ── UTILS ──
 function sanitize(str) { return str.replace(/[.#$[\]]/g, "_"); }
+
+// ── CALCOLO PUNTI (visibile solo dopo sblocco pre-festa) ──
+// Stessa logica di classifica.html/profilo.html: il moltiplicatore capitano (x2)
+// si applica SOLO a Cat.3-5/Ad Personam/custom, mai a Cat.1 (automatismi) o Cat.2 (draft).
+const CAT12_IDS = new Set([
+  "b_quiz_location","m_quiz_location","b_registrazione","b_squadra_creata",
+  "b_alleanza_vista","b_agente_missione",
+  "m_non_registrato","m_squadra_non_creata","m_fazione_non_pescata","m_alleanza_non_vista"
+]);
+function isMoltiplicabile(id, entry) {
+  if (id.startsWith("b_cat2_")) return false;
+  if (CAT12_IDS.has(id)) return false;
+  if (id.startsWith("custom_") && entry && entry.noCap) return false;
+  return true;
+}
+function getPuntiPersonali(name) {
+  const key = sanitize(name);
+  if (!punti[key]) return { bonus: 0, malus: 0, tot: 0, bonusFisso: 0, malusFisso: 0, bonusMolt: 0, malusMolt: 0 };
+  let bonus = 0, malus = 0, bonusFisso = 0, malusFisso = 0, bonusMolt = 0, malusMolt = 0;
+  Object.entries(punti[key]).forEach(([id, e]) => {
+    const molt = isMoltiplicabile(id, e);
+    if (e.pts > 0) { bonus += e.pts; if (molt) bonusMolt += e.pts; else bonusFisso += e.pts; }
+    else { const v = Math.abs(e.pts); malus += v; if (molt) malusMolt += v; else malusFisso += v; }
+  });
+  return { bonus, malus, tot: bonus - malus, bonusFisso, malusFisso, bonusMolt, malusMolt };
+}
+function getPuntiSquadraCorrente() {
+  // Calcola il totale della squadra ATTUALMENTE composta in editor (myTeam/myCaptain),
+  // non quella salvata su Firebase — così riflette subito eventuali modifiche non ancora salvate.
+  let bonus = 0, malus = 0;
+  myTeam.forEach(p => {
+    const isCap = myCaptain === p.name;
+    const pp = getPuntiPersonali(p.name);
+    const mult = isCap ? 2 : 1;
+    bonus += pp.bonusFisso + pp.bonusMolt * mult;
+    malus += pp.malusFisso + pp.malusMolt * mult;
+  });
+  return { bonus, malus, tot: bonus - malus };
+}
+
 
 function showToast(msg, type = "ok") {
   const t = document.getElementById("toast");
