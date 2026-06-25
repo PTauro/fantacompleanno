@@ -219,6 +219,17 @@ body {
 }
 .slot-btn-secondary:hover { border-color: var(--text-muted); color: var(--text); }
 
+/* Slot gioco — item più alto */
+#gioco-window .slot-item { height: 140px; font-size: clamp(18px,2.5vw,28px); }
+#gioco-window .slot-item.winner {
+  font-family: 'Cinzel', serif; font-size: clamp(20px,3vw,32px);
+  color: var(--gold); text-shadow: 0 0 20px rgba(245,158,11,0.5);
+}
+#gioco-window.landed {
+  border-color: var(--gold);
+  box-shadow: 0 0 50px rgba(245,158,11,0.5), inset 0 0 24px rgba(245,158,11,0.06);
+}
+
 /* ══════════ REVEAL FAZIONI ══════════ */
 .reveal-wrap { flex: 1; display: flex; flex-direction: column; }
 .reveal-stage-label {
@@ -318,20 +329,35 @@ body {
       <div class="view-sub" id="slot-sub">Caricamento...</div>
     </div>
 
-    <!-- TEAM A vs TEAM B -->
-    <div class="slot-arena" id="slot-arena">
-      <!-- slots generati dinamicamente da JS -->
+    <!-- FASE 1: TEAM A vs TEAM B -->
+    <div id="fase-nomi">
+      <div class="slot-arena" id="slot-arena"></div>
+
+      <div class="slot-vs-row" id="slot-vs-row" style="display:none;">
+        <div class="slot-team-label" id="slot-label-a" style="color:var(--accent-cody)">SQUADRA A</div>
+        <div class="slot-vs-badge">VS</div>
+        <div class="slot-team-label" id="slot-label-b" style="color:var(--accent-siria)">SQUADRA B</div>
+      </div>
+
+      <div class="slot-controls">
+        <button class="slot-btn" id="slot-btn" onclick="avviaEstrazione()">🎲 ESTRAI!</button>
+        <button class="slot-btn" id="slot-gioco-btn" onclick="avviaEstrazioneGioco()" style="display:none;background:linear-gradient(135deg,var(--accent-siria),#6366f1);">🎮 ESTRAI IL GIOCO!</button>
+        <button class="slot-btn-secondary" id="slot-reset-btn" onclick="resetEstrazione()" style="display:none;">🔄 Nuova Estrazione</button>
+      </div>
     </div>
 
-    <div class="slot-vs-row" id="slot-vs-row" style="display:none;">
-      <div class="slot-team-label" id="slot-label-a" style="color:var(--accent-cody)">SQUADRA A</div>
-      <div class="slot-vs-badge">VS</div>
-      <div class="slot-team-label" id="slot-label-b" style="color:var(--accent-siria)">SQUADRA B</div>
-    </div>
-
-    <div class="slot-controls">
-      <button class="slot-btn" id="slot-btn" onclick="avviaEstrazione()">🎲 ESTRAI!</button>
-      <button class="slot-btn-secondary" id="slot-reset-btn" onclick="resetEstrazione()" style="display:none;">🔄 Nuova Estrazione</button>
+    <!-- FASE 2: SLOT GIOCO -->
+    <div id="fase-gioco" style="display:none;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:20px;">
+      <div style="font-family:'Cinzel',serif;font-size:clamp(16px,2vw,22px);color:var(--gold);letter-spacing:.08em;text-align:center;">🎮 IL GIOCO È...</div>
+      <div class="slot-window" id="gioco-window" style="width:min(480px,90vw);height:140px;border-color:rgba(245,158,11,0.5);">
+        <div class="slot-reel" id="gioco-reel">
+          <div class="slot-item" style="color:var(--text-muted);height:140px;">?</div>
+        </div>
+      </div>
+      <div id="gioco-desc" style="display:none;max-width:520px;text-align:center;font-size:15px;color:var(--text-muted);line-height:1.6;padding:0 20px;"></div>
+      <div class="slot-controls" style="padding:8px 0;">
+        <button class="slot-btn-secondary" onclick="resetEstrazione()">🔄 Nuova Estrazione</button>
+      </div>
     </div>
   </div>
 
@@ -818,7 +844,7 @@ let nomiPool = []; // nomi presenti, aggiornati da Firebase
 function aggiornaPool() {
   const tuttiNomi = PLAYERS.map(p => p.name);
   if (Object.keys(ruotaConfig.presenti).length === 0) {
-    nomiPool = tuttiNomi; // nessuna configurazione → tutti
+    nomiPool = tuttiNomi;
   } else {
     nomiPool = tuttiNomi.filter(n => ruotaConfig.presenti[n] !== false);
   }
@@ -839,12 +865,10 @@ function buildSlotArena(fmt) {
   labelA.className = "slot-group-label a";
   labelA.textContent = "⚔️ SFIDANTE A";
   groupA.appendChild(labelA);
-  for (let i = 0; i < fmt; i++) {
-    groupA.appendChild(createSlotWindow("a", i));
-  }
+  for (let i = 0; i < fmt; i++) groupA.appendChild(createSlotWindow("a", i));
   arena.appendChild(groupA);
 
-  // VS separator (solo se schermo largo)
+  // VS separator
   const sep = document.createElement("div");
   sep.style.cssText = "font-family:'Cinzel',serif;font-size:clamp(36px,5vw,72px);font-weight:800;color:var(--gold);opacity:.3;align-self:center;flex-shrink:0;";
   sep.textContent = "VS";
@@ -857,16 +881,17 @@ function buildSlotArena(fmt) {
   labelB.className = "slot-group-label b";
   labelB.textContent = "🛡️ SFIDANTE B";
   groupB.appendChild(labelB);
-  for (let i = 0; i < fmt; i++) {
-    groupB.appendChild(createSlotWindow("b", i));
-  }
+  for (let i = 0; i < fmt; i++) groupB.appendChild(createSlotWindow("b", i));
   arena.appendChild(groupB);
 
-  // Reset stato
+  // Reset stato UI
   document.getElementById("slot-vs-row").style.display = "none";
   document.getElementById("slot-reset-btn").style.display = "none";
+  document.getElementById("slot-gioco-btn").style.display = "none";
   document.getElementById("slot-btn").disabled = false;
   document.getElementById("slot-btn").style.display = "";
+  document.getElementById("fase-nomi").style.display = "";
+  document.getElementById("fase-gioco").style.display = "none";
 }
 
 function createSlotWindow(team, idx) {
@@ -876,7 +901,6 @@ function createSlotWindow(team, idx) {
   const reel = document.createElement("div");
   reel.className = "slot-reel";
   reel.id = `slot-reel-${team}-${idx}`;
-  // Popola con placeholder
   const placeholder = document.createElement("div");
   placeholder.className = "slot-item";
   placeholder.style.color = "var(--text-muted)";
@@ -886,7 +910,6 @@ function createSlotWindow(team, idx) {
   return win;
 }
 
-// Rimescola array (Fisher-Yates)
 function shuffle(arr) {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -894,6 +917,51 @@ function shuffle(arr) {
     [a[i], a[j]] = [a[j], a[i]];
   }
   return a;
+}
+
+// Anima un singolo slot e risolve quando atterrato
+// duration: ms dello scroll, delay: ms di attesa prima di partire
+function animaSlot(team, idx, winnerName, delay, duration) {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      const reel = document.getElementById(`slot-reel-${team}-${idx}`);
+      const win = document.getElementById(`slot-win-${team}-${idx}`);
+
+      // Nastro: 14 nomi random + vincitore in fondo (meno items = più veloce visivamente)
+      const nastro = shuffle([...nomiPool, ...nomiPool])
+        .slice(0, 14)
+        .concat([winnerName]);
+
+      reel.innerHTML = "";
+      nastro.forEach((name, i) => {
+        const item = document.createElement("div");
+        item.className = "slot-item" + (i === nastro.length - 1 ? " winner" : "");
+        item.textContent = name.split(" ")[0];
+        reel.appendChild(item);
+      });
+
+      const ITEM_H = 90;
+      const finalOffset = (nastro.length - 1) * ITEM_H;
+      const startTime = performance.now();
+      function easeOut(t) { return 1 - Math.pow(1 - t, 4); }
+
+      function step(now) {
+        const elapsed = now - startTime;
+        const t = Math.min(elapsed / duration, 1);
+        reel.style.transform = `translateY(-${easeOut(t) * finalOffset}px)`;
+        if (t < 1) {
+          requestAnimationFrame(step);
+        } else {
+          reel.style.transform = `translateY(-${finalOffset}px)`;
+          reel.lastChild.textContent = winnerName;
+          reel.lastChild.style.fontSize = "17px";
+          win.classList.add("landed");
+          resolve();
+        }
+      }
+      requestAnimationFrame(step);
+    }, delay);
+  });
 }
 
 window.avviaEstrazione = async function() {
@@ -910,91 +978,139 @@ window.avviaEstrazione = async function() {
   document.getElementById("slot-btn").disabled = true;
   document.getElementById("slot-vs-row").style.display = "none";
   document.getElementById("slot-reset-btn").style.display = "none";
+  document.getElementById("slot-gioco-btn").style.display = "none";
 
-  // Pesca random senza ripetizioni
   const pool = shuffle(nomiPool);
   const teamA = pool.slice(0, fmt);
   const teamB = pool.slice(fmt, fmt * 2);
 
-  // Anima ogni slot in sequenza
-  const allSlots = [
-    ...teamA.map((name, i) => ({ team: "a", idx: i, name })),
-    ...teamB.map((name, i) => ({ team: "b", idx: i, name })),
-  ];
+  // ── Prima tutti gli A in sequenza, poi tutti i B ──
+  // Gap tra slot dello stesso team: 300ms. Tra A e B: 500ms.
+  // Durata animazione singolo slot: 1000ms (era 1400ms → più veloce)
+  const SLOT_DUR = 1000;
+  const GAP_SAME = 350;   // pausa tra slot dello stesso team
+  const GAP_AB = 600;     // pausa extra tra fine A e inizio B
 
-  // Mischia l'ordine di atterraggio per più drammaticità
-  const ordine = shuffle(allSlots);
+  let currentDelay = 0;
+  const promises = [];
 
-  for (let s = 0; s < ordine.length; s++) {
-    await animaSlot(ordine[s].team, ordine[s].idx, ordine[s].name, s * 600);
+  // Team A — uno dopo l'altro
+  for (let i = 0; i < fmt; i++) {
+    promises.push(animaSlot("a", i, teamA[i], currentDelay, SLOT_DUR));
+    currentDelay += SLOT_DUR + GAP_SAME;
   }
 
-  // Attendi che finiscano tutte
-  await new Promise(r => setTimeout(r, ordine.length * 600 + 1800));
+  // Team B — dopo che finisce l'ultimo A
+  currentDelay += GAP_AB - GAP_SAME; // aggiusta per la pausa extra AB
+  for (let i = 0; i < fmt; i++) {
+    promises.push(animaSlot("b", i, teamB[i], currentDelay, SLOT_DUR));
+    currentDelay += SLOT_DUR + GAP_SAME;
+  }
+
+  await Promise.all(promises);
+  // Attendi che finisca l'ultima animazione (l'ultima ha delay + duration)
+  const lastDelay = currentDelay - GAP_SAME; // ultimo delay effettivo già avanzato
+  // Promise.all aspetta già tutto — piccolo buffer visivo
+  await new Promise(r => setTimeout(r, 400));
 
   // Mostra etichette VS
   document.getElementById("slot-label-a").textContent = teamA.join(" & ");
   document.getElementById("slot-label-b").textContent = teamB.join(" & ");
   document.getElementById("slot-vs-row").style.display = "flex";
+  document.getElementById("slot-gioco-btn").style.display = "";
   document.getElementById("slot-reset-btn").style.display = "";
   document.getElementById("slot-btn").style.display = "none";
 
   slotRunning = false;
 };
 
-function animaSlot(team, idx, winnerName, delay) {
-  return new Promise(resolve => {
-    setTimeout(() => {
-      const reel = document.getElementById(`slot-reel-${team}-${idx}`);
-      const win = document.getElementById(`slot-win-${team}-${idx}`);
+// ══════════════════════════════════════
+// SLOT GIOCO
+// ══════════════════════════════════════
+const GIOCHI = [
+  {
+    nome: "🎯 IL CROCCANTINO VOLANTE",
+    desc: "Tiro al bersaglio con palline su tessuto. Cody lancerebbe qualsiasi cosa pur di mangiare — stasera lanci tu. Chi centra di più vince. Chi manca… Cody ti mangia la merenda."
+  },
+  {
+    nome: "🍺 LA CIOTOLA DI SIRIA",
+    desc: "Birra Pong — cerchio, bottiglia e bicchierini ai lati. Siria non condivide mai il cibo. Stasera è costretta. Metti la pallina nella ciotola giusta o bevi il suo dispetto con uno shot."
+  },
+  {
+    nome: "🌀 LA CODA DI CODY",
+    desc: "Hula Hoop — chi lo tiene su più a lungo vince. Cody agita la coda senza mai fermarsi. Dimostra di avere la sua stessa energia o ammetti la sconfitta davanti a tutti."
+  },
+  {
+    nome: "🎤 URLA COME SIRIA ALLE 3 DI NOTTE",
+    desc: "Karaoke — canta e convinci la sala. Siria non canta. Urla. Stasera tocca a te. Convincici che hai voce o subisci il giudizio impietoso della gatta."
+  },
+];
 
-      // Costruisci nastro: 20 nomi random + il vincitore alla fine
-      const nastro = shuffle([...nomiPool, ...nomiPool, ...nomiPool])
-        .slice(0, 22)
-        .concat([winnerName]);
+let giocoRunning = false;
 
-      reel.innerHTML = "";
-      nastro.forEach((name, i) => {
-        const item = document.createElement("div");
-        item.className = "slot-item" + (i === nastro.length - 1 ? " winner" : "");
-        item.textContent = name.split(" ")[0]; // solo nome di battesimo durante lo scroll
-        reel.appendChild(item);
-      });
+window.avviaEstrazioneGioco = async function() {
+  if (giocoRunning) return;
+  giocoRunning = true;
 
-      const ITEM_H = 90;
-      const totalH = nastro.length * ITEM_H;
-      const finalOffset = (nastro.length - 1) * ITEM_H;
+  // Nascondi fase nomi, mostra fase gioco
+  document.getElementById("fase-nomi").style.display = "none";
+  document.getElementById("fase-gioco").style.display = "flex";
+  document.getElementById("gioco-desc").style.display = "none";
 
-      // Anima: scrolla veloce poi frena sul vincitore
-      const duration = 1400; // ms
-      const startTime = performance.now();
+  const winnerIdx = Math.floor(Math.random() * GIOCHI.length);
+  const winner = GIOCHI[winnerIdx];
 
-      function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+  // Costruisci nastro gioco
+  const giocoReel = document.getElementById("gioco-reel");
+  const giocoWin = document.getElementById("gioco-window");
+  giocoWin.classList.remove("landed");
 
-      function step(now) {
-        const elapsed = now - startTime;
-        const t = Math.min(elapsed / duration, 1);
-        const pos = easeOut(t) * finalOffset;
-        reel.style.transform = `translateY(-${pos}px)`;
-        if (t < 1) {
-          requestAnimationFrame(step);
-        } else {
-          // Atterrato!
-          reel.style.transform = `translateY(-${finalOffset}px)`;
-          // Mostra nome completo
-          const lastItem = reel.lastChild;
-          lastItem.textContent = winnerName;
-          lastItem.style.fontSize = "18px";
-          win.classList.add("landed");
-          resolve();
-        }
-      }
-      requestAnimationFrame(step);
-    }, delay);
+  const ITEM_H = 140;
+  const nastro = [];
+  // Ripeti i giochi in loop per creare effetto scroll
+  for (let i = 0; i < 20; i++) nastro.push(GIOCHI[i % GIOCHI.length].nome);
+  nastro.push(winner.nome); // vincitore alla fine
+
+  giocoReel.innerHTML = "";
+  nastro.forEach((nome, i) => {
+    const item = document.createElement("div");
+    item.className = "slot-item" + (i === nastro.length - 1 ? " winner" : "");
+    item.style.height = ITEM_H + "px";
+    item.textContent = nome;
+    giocoReel.appendChild(item);
   });
-}
+
+  const finalOffset = (nastro.length - 1) * ITEM_H;
+  const duration = 2200;
+  const startTime = performance.now();
+  function easeOut(t) { return 1 - Math.pow(1 - t, 4); }
+
+  await new Promise(resolve => {
+    function step(now) {
+      const t = Math.min((now - startTime) / duration, 1);
+      giocoReel.style.transform = `translateY(-${easeOut(t) * finalOffset}px)`;
+      if (t < 1) requestAnimationFrame(step);
+      else {
+        giocoReel.style.transform = `translateY(-${finalOffset}px)`;
+        giocoWin.classList.add("landed");
+        resolve();
+      }
+    }
+    requestAnimationFrame(step);
+  });
+
+  // Mostra descrizione dopo mezzo secondo
+  await new Promise(r => setTimeout(r, 500));
+  const descEl = document.getElementById("gioco-desc");
+  descEl.textContent = winner.desc;
+  descEl.style.display = "block";
+
+  giocoRunning = false;
+};
 
 window.resetEstrazione = function() {
+  giocoRunning = false;
+  slotRunning = false;
   const fmt = ruotaConfig.formato || 1;
   buildSlotArena(fmt);
 };
