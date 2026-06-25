@@ -608,11 +608,13 @@ function renderLbFazioniContentOnly() {
 // non sono interessanti come "classifica" — qui contano solo le cose decise da Pietro
 // o legate a Cat.2-5/Ad Personam.
 function getFrequentiData() {
-  const counts = {}; // desc -> { count, pts, tipo }
+  const counts = {};
   Object.values(punti).forEach(eventiPersona => {
     Object.entries(eventiPersona || {}).forEach(([id, e]) => {
-      if (CAT12_IDS.has(id)) return; // esclude automatismi pre-festa, troppo "ovvi"
-      if (id.startsWith("custom_")) return; // punti personalizzati sono unici, non si ripetono
+      if (id.startsWith("custom_")) return; // punti personalizzati sono unici
+      // Per i BONUS escludiamo Cat.1 (quiz/registrazione/squadra/alleanza — capitano quasi a tutti)
+      // Per i MALUS li includiamo tutti — anche Cat.1 come "non ha risolto quiz" sono interessanti
+      if (e.pts > 0 && CAT12_IDS.has(id)) return;
       const desc = e.desc || id;
       if (!counts[desc]) counts[desc] = { count: 0, pts: e.pts, tipo: e.pts > 0 ? "bonus" : "malus" };
       counts[desc].count++;
