@@ -333,11 +333,7 @@ body {
     <div id="fase-nomi">
       <div class="slot-arena" id="slot-arena"></div>
 
-      <div class="slot-vs-row" id="slot-vs-row" style="display:none;">
-        <div class="slot-team-label" id="slot-label-a" style="color:var(--accent-cody)">SQUADRA A</div>
-        <div class="slot-vs-badge">VS</div>
-        <div class="slot-team-label" id="slot-label-b" style="color:var(--accent-siria)">SQUADRA B</div>
-      </div>
+      <!-- slot-vs-row rimosso: nomi già visibili nelle slot sopra -->
 
       <div class="slot-controls">
         <button class="slot-btn" id="slot-btn" onclick="avviaEstrazione()">🎲 ESTRAI!</button>
@@ -885,7 +881,6 @@ function buildSlotArena(fmt) {
   arena.appendChild(groupB);
 
   // Reset stato UI
-  document.getElementById("slot-vs-row").style.display = "none";
   document.getElementById("slot-reset-btn").style.display = "none";
   document.getElementById("slot-gioco-btn").style.display = "none";
   document.getElementById("slot-btn").disabled = false;
@@ -976,7 +971,6 @@ window.avviaEstrazione = async function() {
 
   slotRunning = true;
   document.getElementById("slot-btn").disabled = true;
-  document.getElementById("slot-vs-row").style.display = "none";
   document.getElementById("slot-reset-btn").style.display = "none";
   document.getElementById("slot-gioco-btn").style.display = "none";
 
@@ -1013,10 +1007,7 @@ window.avviaEstrazione = async function() {
   // Promise.all aspetta già tutto — piccolo buffer visivo
   await new Promise(r => setTimeout(r, 400));
 
-  // Mostra etichette VS
-  document.getElementById("slot-label-a").textContent = teamA.join(" & ");
-  document.getElementById("slot-label-b").textContent = teamB.join(" & ");
-  document.getElementById("slot-vs-row").style.display = "flex";
+  // Mostra bottone gioco
   document.getElementById("slot-gioco-btn").style.display = "";
   document.getElementById("slot-reset-btn").style.display = "";
   document.getElementById("slot-btn").style.display = "none";
