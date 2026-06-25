@@ -335,6 +335,7 @@ const ALLEANZE = {
 // ── STATO ──
 let punti = {};
 let teams = {};
+let prefestaSbloccata = false;
 let alleanzaBonusFinale = {};
 
 function sanitize(s) { return s.replace(/[.#$[\]]/g, "_"); }
@@ -456,6 +457,7 @@ function renderMiaAlleanza() {
     <div class="alleanza-hero">
       <div class="alleanza-hero-name">${mia.nome}</div>
       <div class="alleanza-hero-sub">Sei in questa alleanza · ${myPos}° posto in classifica</div>
+      ${prefestaSbloccata ? `
       <div class="coeff-row">
         <span class="coeff-label">COEFFICIENTE</span>
         <span class="coeff-val ${coeff < 0 ? 'neg' : ''}">${coeff > 0 ? '+' : ''}${coeff.toFixed(1)}</span>
@@ -465,6 +467,12 @@ function renderMiaAlleanza() {
         <div class="stat-pill pos">${myPos}° su 6 alleanze</div>
         <div class="stat-pill">${squadreFormate}/${totMembri} squadre formate</div>
       </div>
+      ` : `
+      <div class="stats-pills">
+        <div class="stat-pill">🔒 Coefficiente nascosto fino alla festa</div>
+        <div class="stat-pill">${squadreFormate}/${totMembri} squadre formate</div>
+      </div>
+      `}
     </div>
 
     <div class="section-label">
@@ -488,8 +496,11 @@ function renderMiaAlleanza() {
           <div class="squadra-owner">${s.owner}${isMe ? " 👤" : ""}</div>
         </div>
         <div>
-          <div class="squadra-pts ${s.pts > 0 ? 'pos' : s.pts < 0 ? 'neg' : 'zero'}">${s.pts > 0 ? '+' : ''}${s.pts}</div>
-          <div class="squadra-delta"><span style="color:var(--green)">+${s.bonus}</span> / <span style="color:var(--red)">-${s.malus}</span></div>
+          ${prefestaSbloccata
+            ? `<div class="squadra-pts ${s.pts > 0 ? 'pos' : s.pts < 0 ? 'neg' : 'zero'}">${s.pts > 0 ? '+' : ''}${s.pts}</div>
+               <div class="squadra-delta"><span style="color:var(--green)">+${s.bonus}</span> / <span style="color:var(--red)">-${s.malus}</span></div>`
+            : `<div class="squadra-pts zero">🔒</div>`
+          }
         </div>
       `;
       container.appendChild(div);
@@ -539,10 +550,13 @@ function renderAltreAlleanze() {
           <div class="altra-name">${a.nome}${isMia ? " 👤" : ""}</div>
           <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">${totMembri} membri</div>
         </div>
-        <div class="altra-pos ${i === 0 ? 'first' : ''}">${i === 0 ? '🥇 1°' : (i + 1) + '°'}</div>
+        ${prefestaSbloccata ? `<div class="altra-pos ${i === 0 ? 'first' : ''}">${i === 0 ? '🥇 1°' : (i + 1) + '°'}</div>` : `<div class="altra-pos">🔒</div>`}
       </div>
-      <div class="altra-coeff ${a.coeff < 0 ? 'neg' : ''}">${a.coeff > 0 ? '+' : ''}${a.coeff.toFixed(1)}</div>
-      <div class="altra-track"><div class="altra-track-fill" style="width:${pct}%"></div></div>
+      ${prefestaSbloccata
+        ? `<div class="altra-coeff ${a.coeff < 0 ? 'neg' : ''}">${a.coeff > 0 ? '+' : ''}${a.coeff.toFixed(1)}</div>
+           <div class="altra-track"><div class="altra-track-fill" style="width:${pct}%"></div></div>`
+        : `<div class="altra-coeff" style="color:var(--text-muted);font-size:13px;">🔒 coefficiente nascosto</div>`
+      }
       <div class="altra-footer">
         <div class="altra-counter ${isComplete ? 'ok' : ''}">
           ✂️ ${squadreFormate}/${totMembri} squadre formate
@@ -558,7 +572,9 @@ function renderAltreAlleanze() {
 window.openDettaglio = function(nome, membri, pos, coeff) {
   document.getElementById("modal-alleanza-title").textContent = nome;
   document.getElementById("modal-alleanza-coeff").textContent =
-    `${pos}° posto · Coefficiente ${coeff > 0 ? '+' : ''}${coeff.toFixed(1)}`;
+    prefestaSbloccata
+      ? `${pos}° posto · Coefficiente ${coeff > 0 ? '+' : ''}${coeff.toFixed(1)}`
+      : `🔒 Coefficiente nascosto fino alla festa`;
 
   const squadreFormate = getSquadreFormate(membri);
   const body = document.getElementById("modal-alleanza-body");
@@ -598,8 +614,11 @@ window.openDettaglio = function(nome, membri, pos, coeff) {
           <div class="squadra-owner">${s.owner}${isMe ? " 👤" : ""}</div>
         </div>
         <div>
-          <div class="squadra-pts ${s.pts > 0 ? 'pos' : s.pts < 0 ? 'neg' : 'zero'}">${s.pts > 0 ? '+' : ''}${s.pts}</div>
-          <div class="squadra-delta"><span style="color:var(--green)">+${s.bonus}</span> / <span style="color:var(--red)">-${s.malus}</span></div>
+          ${prefestaSbloccata
+            ? `<div class="squadra-pts ${s.pts > 0 ? 'pos' : s.pts < 0 ? 'neg' : 'zero'}">${s.pts > 0 ? '+' : ''}${s.pts}</div>
+               <div class="squadra-delta"><span style="color:var(--green)">+${s.bonus}</span> / <span style="color:var(--red)">-${s.malus}</span></div>`
+            : `<div class="squadra-pts zero">🔒</div>`
+          }
         </div>
       `;
       body.appendChild(div);
@@ -652,6 +671,12 @@ function init() {
 
   onValue(ref(db, "alleanzaBonusFinale"), snap => {
     alleanzaBonusFinale = snap.exists() ? snap.val() : {};
+    renderMiaAlleanza();
+    renderAltreAlleanze();
+  });
+
+  onValue(ref(db, "prefesta_sbloccata"), snap => {
+    prefestaSbloccata = snap.exists() && snap.val() === true;
     renderMiaAlleanza();
     renderAltreAlleanze();
   });
