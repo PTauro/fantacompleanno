@@ -125,61 +125,99 @@ body {
 .faz-fill.cody { background: linear-gradient(90deg, #ff6b2b, #ff9456); }
 .faz-fill.siria { background: linear-gradient(90deg, #a855f7, #c081fa); }
 
-/* ══════════ RUOTE ══════════ */
-.wheels-wrap { flex: 1; display: flex; align-items: center; justify-content: center; }
-.wheel-col { display: flex; flex-direction: column; align-items: center; gap: 30px; }
-.wheel-outer {
-  width: 600px; height: 600px; border-radius: 50%; position: relative;
+/* ══════════ SLOT MACHINE ESTRAZIONE ══════════ */
+.slot-arena {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  gap: 16px; flex-wrap: wrap; padding: 0 20px;
 }
-.wheel-outer-big { width: 600px; height: 600px; }
-.wheel-spin {
-  width: 100%; height: 100%; border-radius: 50%; position: relative;
-  transition: transform 4.5s cubic-bezier(.12,.65,.16,1);
+.slot-group {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
 }
-.wheel-disc {
-  position: absolute; inset: 0; border-radius: 50%; overflow: hidden;
-  border: 6px solid var(--border); box-shadow: 0 0 60px rgba(0,0,0,0.5);
+.slot-group-label {
+  font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: .12em;
+  text-transform: uppercase; font-weight: 700;
 }
-.wheel-labels-layer {
-  position: absolute; inset: 0; pointer-events: none;
+.slot-group-label.a { color: var(--accent-cody); }
+.slot-group-label.b { color: var(--accent-siria); }
+
+.slot-window {
+  width: 240px; height: 90px; overflow: hidden; border-radius: 16px;
+  border: 2px solid var(--border); background: var(--surface);
+  position: relative; box-shadow: 0 0 0 0 transparent; transition: box-shadow .4s;
 }
-.wheel-pointer {
-  position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
-  width: 0; height: 0; border-left: 18px solid transparent; border-right: 18px solid transparent;
-  border-top: 32px solid var(--gold); z-index: 5; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+.slot-window.team-a { border-color: rgba(255,107,43,0.4); }
+.slot-window.team-b { border-color: rgba(168,85,247,0.4); }
+.slot-window.landed.team-a {
+  border-color: var(--accent-cody);
+  box-shadow: 0 0 40px rgba(255,107,43,0.5), inset 0 0 20px rgba(255,107,43,0.08);
 }
-.wheel-center {
-  position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
-  width: 84px; height: 84px; border-radius: 50%; background: var(--bg);
-  border: 4px solid var(--gold); z-index: 4; display: flex; align-items: center; justify-content: center;
-  font-size: 32px;
+.slot-window.landed.team-b {
+  border-color: var(--accent-siria);
+  box-shadow: 0 0 40px rgba(168,85,247,0.5), inset 0 0 20px rgba(168,85,247,0.08);
 }
-.wheel-slice-label {
-  position: absolute; top: 50%; left: 50%; transform-origin: center;
-  font-size: 13px; font-weight: 700; color: var(--text);
-  white-space: nowrap; text-align: center;
+/* linee guida laterali */
+.slot-window::before, .slot-window::after {
+  content: ""; position: absolute; left: 0; right: 0; height: 2px; z-index: 3; pointer-events: none;
 }
-.wheel-result-wrap { min-height: 70px; display: flex; align-items: center; justify-content: center; }
-.wheel-result {
-  font-size: 30px; font-weight: 800; text-align: center;
-  font-family: 'Cinzel', serif; color: var(--text-muted);
+.slot-window::before { top: 18px; background: rgba(255,255,255,0.06); }
+.slot-window::after { bottom: 18px; background: rgba(255,255,255,0.06); }
+
+.slot-reel {
+  display: flex; flex-direction: column; align-items: center;
+  transition: transform 0s; /* sostituto con JS */
 }
-.wheel-result.spinning { color: var(--text-muted); font-size: 20px; font-family: 'Space Mono', monospace; }
-.wheel-result.landed {
-  color: var(--gold); animation: resultLand .5s cubic-bezier(.34,1.56,.64,1);
-  text-shadow: 0 0 24px rgba(245,158,11,0.5);
+.slot-item {
+  width: 240px; height: 90px; display: flex; align-items: center; justify-content: center;
+  font-size: 22px; font-weight: 800; text-align: center; padding: 0 16px;
+  line-height: 1.2; flex-shrink: 0;
 }
-@keyframes resultLand {
-  0% { transform: scale(0.4); opacity: 0; }
-  60% { transform: scale(1.15); opacity: 1; }
-  100% { transform: scale(1); }
+.slot-item.winner {
+  color: var(--text);
+  animation: slotPop .45s cubic-bezier(.34,1.56,.64,1) forwards;
 }
-.wheel-btn {
-  background: var(--gold); color: #1a1500; border: none; border-radius: 100px;
-  padding: 12px 32px; font-size: 15px; font-weight: 800; cursor: pointer;
-  font-family: 'Space Grotesk', sans-serif;
+@keyframes slotPop {
+  0% { transform: scale(.85); opacity: .6; }
+  60% { transform: scale(1.08); }
+  100% { transform: scale(1); opacity: 1; }
 }
-.wheel-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+/* VS row */
+.slot-vs-row {
+  display: flex; align-items: center; justify-content: center; gap: 28px;
+  margin: 10px 0; flex-shrink: 0;
+}
+.slot-team-label {
+  font-family: 'Cinzel', serif; font-size: clamp(14px,2vw,22px); font-weight: 800;
+  text-align: center; max-width: 300px; line-height: 1.3;
+}
+.slot-vs-badge {
+  font-family: 'Cinzel', serif; font-size: clamp(28px,4vw,52px); font-weight: 800;
+  color: var(--gold); text-shadow: 0 0 30px rgba(245,158,11,0.6);
+  animation: vsPulse 1.8s ease-in-out infinite;
+}
+@keyframes vsPulse { 0%,100% { opacity:1; } 50% { opacity:.6; } }
+
+/* Controlli */
+.slot-controls {
+  display: flex; align-items: center; justify-content: center; gap: 14px;
+  padding: 16px 0; flex-shrink: 0;
+}
+.slot-btn {
+  background: linear-gradient(135deg, var(--accent-cody), var(--gold));
+  color: #1a0a00; border: none; border-radius: 100px;
+  padding: 16px 48px; font-size: 20px; font-weight: 800; cursor: pointer;
+  font-family: 'Space Grotesk', sans-serif; letter-spacing: .02em;
+  box-shadow: 0 4px 24px rgba(255,107,43,0.4);
+  transition: transform .15s, box-shadow .15s;
+}
+.slot-btn:hover { transform: scale(1.04); box-shadow: 0 6px 32px rgba(255,107,43,0.6); }
+.slot-btn:disabled { opacity:.4; cursor:not-allowed; transform:none; }
+.slot-btn-secondary {
+  background: var(--surface); border: 1.5px solid var(--border); color: var(--text-muted);
+  border-radius: 100px; padding: 12px 28px; font-size: 15px; font-weight: 700; cursor: pointer;
+  font-family: 'Space Grotesk', sans-serif; transition: all .2s;
+}
+.slot-btn-secondary:hover { border-color: var(--text-muted); color: var(--text); }
 
 /* ══════════ REVEAL FAZIONI ══════════ */
 .reveal-wrap { flex: 1; display: flex; flex-direction: column; }
@@ -273,27 +311,27 @@ body {
     <div class="lb-body" id="lb-body"></div>
   </div>
 
-  <!-- ══ VIEW: RUOTE ══ -->
+  <!-- ══ VIEW: ESTRAZIONE SFIDA ══ -->
   <div class="view" id="view-ruote">
     <div class="view-header">
-      <div class="view-title">La Ruota del Destino</div>
-      <div class="view-sub">Chi sarà il prescelto?</div>
+      <div class="view-title" id="slot-title">⚔️ Estrazione Sfida</div>
+      <div class="view-sub" id="slot-sub">Caricamento...</div>
     </div>
-    <div class="wheels-wrap">
-      <div class="wheel-col">
-        <div class="wheel-outer wheel-outer-big">
-          <div class="wheel-pointer"></div>
-          <div class="wheel-spin" id="wheel-persone">
-            <div class="wheel-disc" id="wheel-persone-disc"></div>
-            <div class="wheel-labels-layer" id="wheel-persone-labels"></div>
-          </div>
-          <div class="wheel-center">🎯</div>
-        </div>
-        <div class="wheel-result-wrap">
-          <div class="wheel-result" id="result-persone">Premi "Gira" per estrarre</div>
-        </div>
-        <button class="wheel-btn" id="btn-spin-persone" onclick="spinWheel('persone')">🎲 Gira la Ruota</button>
-      </div>
+
+    <!-- TEAM A vs TEAM B -->
+    <div class="slot-arena" id="slot-arena">
+      <!-- slots generati dinamicamente da JS -->
+    </div>
+
+    <div class="slot-vs-row" id="slot-vs-row" style="display:none;">
+      <div class="slot-team-label" id="slot-label-a" style="color:var(--accent-cody)">SQUADRA A</div>
+      <div class="slot-vs-badge">VS</div>
+      <div class="slot-team-label" id="slot-label-b" style="color:var(--accent-siria)">SQUADRA B</div>
+    </div>
+
+    <div class="slot-controls">
+      <button class="slot-btn" id="slot-btn" onclick="avviaEstrazione()">🎲 ESTRAI!</button>
+      <button class="slot-btn-secondary" id="slot-reset-btn" onclick="resetEstrazione()" style="display:none;">🔄 Nuova Estrazione</button>
     </div>
   </div>
 
@@ -771,96 +809,194 @@ function stopLbRotation() {
 }
 
 // ══════════════════════════════════════
-// RUOTA PARTECIPANTI
+// SLOT MACHINE ESTRAZIONE SFIDA
 // ══════════════════════════════════════
-const COLORS_WHEEL = ["#ff6b2b","#a855f7","#22c55e","#f59e0b","#ef4444","#3b82f6","#ec4899","#14b8a6"];
+let ruotaConfig = { formato: 1, presenti: {} };
+let slotRunning = false;
+let nomiPool = []; // nomi presenti, aggiornati da Firebase
 
-function buildWheel(elId, items) {
-  const disc = document.getElementById(elId + "-disc");
-  const labelsLayer = document.getElementById(elId + "-labels");
-  const n = items.length;
-  const slice = 360 / n;
-  let gradient = "conic-gradient(";
-  items.forEach((_, i) => {
-    const c = COLORS_WHEEL[i % COLORS_WHEEL.length];
-    gradient += `${c} ${i*slice}deg ${(i+1)*slice}deg${i < n-1 ? "," : ""}`;
+function aggiornaPool() {
+  const tuttiNomi = PLAYERS.map(p => p.name);
+  if (Object.keys(ruotaConfig.presenti).length === 0) {
+    nomiPool = tuttiNomi; // nessuna configurazione → tutti
+  } else {
+    nomiPool = tuttiNomi.filter(n => ruotaConfig.presenti[n] !== false);
+  }
+  const fmt = ruotaConfig.formato || 1;
+  document.getElementById("slot-sub").textContent =
+    `${nomiPool.length} presenti · formato ${fmt}v${fmt}`;
+  buildSlotArena(fmt);
+}
+
+function buildSlotArena(fmt) {
+  const arena = document.getElementById("slot-arena");
+  arena.innerHTML = "";
+
+  // Team A
+  const groupA = document.createElement("div");
+  groupA.className = "slot-group";
+  const labelA = document.createElement("div");
+  labelA.className = "slot-group-label a";
+  labelA.textContent = "⚔️ SFIDANTE A";
+  groupA.appendChild(labelA);
+  for (let i = 0; i < fmt; i++) {
+    groupA.appendChild(createSlotWindow("a", i));
+  }
+  arena.appendChild(groupA);
+
+  // VS separator (solo se schermo largo)
+  const sep = document.createElement("div");
+  sep.style.cssText = "font-family:'Cinzel',serif;font-size:clamp(36px,5vw,72px);font-weight:800;color:var(--gold);opacity:.3;align-self:center;flex-shrink:0;";
+  sep.textContent = "VS";
+  arena.appendChild(sep);
+
+  // Team B
+  const groupB = document.createElement("div");
+  groupB.className = "slot-group";
+  const labelB = document.createElement("div");
+  labelB.className = "slot-group-label b";
+  labelB.textContent = "🛡️ SFIDANTE B";
+  groupB.appendChild(labelB);
+  for (let i = 0; i < fmt; i++) {
+    groupB.appendChild(createSlotWindow("b", i));
+  }
+  arena.appendChild(groupB);
+
+  // Reset stato
+  document.getElementById("slot-vs-row").style.display = "none";
+  document.getElementById("slot-reset-btn").style.display = "none";
+  document.getElementById("slot-btn").disabled = false;
+  document.getElementById("slot-btn").style.display = "";
+}
+
+function createSlotWindow(team, idx) {
+  const win = document.createElement("div");
+  win.className = `slot-window team-${team}`;
+  win.id = `slot-win-${team}-${idx}`;
+  const reel = document.createElement("div");
+  reel.className = "slot-reel";
+  reel.id = `slot-reel-${team}-${idx}`;
+  // Popola con placeholder
+  const placeholder = document.createElement("div");
+  placeholder.className = "slot-item";
+  placeholder.style.color = "var(--text-muted)";
+  placeholder.textContent = "?";
+  reel.appendChild(placeholder);
+  win.appendChild(reel);
+  return win;
+}
+
+// Rimescola array (Fisher-Yates)
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+window.avviaEstrazione = async function() {
+  if (slotRunning) return;
+  const fmt = ruotaConfig.formato || 1;
+  const totalNeeded = fmt * 2;
+
+  if (nomiPool.length < totalNeeded) {
+    alert(`Servono almeno ${totalNeeded} presenti per un ${fmt}v${fmt}. Ora ci sono solo ${nomiPool.length}.`);
+    return;
+  }
+
+  slotRunning = true;
+  document.getElementById("slot-btn").disabled = true;
+  document.getElementById("slot-vs-row").style.display = "none";
+  document.getElementById("slot-reset-btn").style.display = "none";
+
+  // Pesca random senza ripetizioni
+  const pool = shuffle(nomiPool);
+  const teamA = pool.slice(0, fmt);
+  const teamB = pool.slice(fmt, fmt * 2);
+
+  // Anima ogni slot in sequenza
+  const allSlots = [
+    ...teamA.map((name, i) => ({ team: "a", idx: i, name })),
+    ...teamB.map((name, i) => ({ team: "b", idx: i, name })),
+  ];
+
+  // Mischia l'ordine di atterraggio per più drammaticità
+  const ordine = shuffle(allSlots);
+
+  for (let s = 0; s < ordine.length; s++) {
+    await animaSlot(ordine[s].team, ordine[s].idx, ordine[s].name, s * 600);
+  }
+
+  // Attendi che finiscano tutte
+  await new Promise(r => setTimeout(r, ordine.length * 600 + 1800));
+
+  // Mostra etichette VS
+  document.getElementById("slot-label-a").textContent = teamA.join(" & ");
+  document.getElementById("slot-label-b").textContent = teamB.join(" & ");
+  document.getElementById("slot-vs-row").style.display = "flex";
+  document.getElementById("slot-reset-btn").style.display = "";
+  document.getElementById("slot-btn").style.display = "none";
+
+  slotRunning = false;
+};
+
+function animaSlot(team, idx, winnerName, delay) {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      const reel = document.getElementById(`slot-reel-${team}-${idx}`);
+      const win = document.getElementById(`slot-win-${team}-${idx}`);
+
+      // Costruisci nastro: 20 nomi random + il vincitore alla fine
+      const nastro = shuffle([...nomiPool, ...nomiPool, ...nomiPool])
+        .slice(0, 22)
+        .concat([winnerName]);
+
+      reel.innerHTML = "";
+      nastro.forEach((name, i) => {
+        const item = document.createElement("div");
+        item.className = "slot-item" + (i === nastro.length - 1 ? " winner" : "");
+        item.textContent = name.split(" ")[0]; // solo nome di battesimo durante lo scroll
+        reel.appendChild(item);
+      });
+
+      const ITEM_H = 90;
+      const totalH = nastro.length * ITEM_H;
+      const finalOffset = (nastro.length - 1) * ITEM_H;
+
+      // Anima: scrolla veloce poi frena sul vincitore
+      const duration = 1400; // ms
+      const startTime = performance.now();
+
+      function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+
+      function step(now) {
+        const elapsed = now - startTime;
+        const t = Math.min(elapsed / duration, 1);
+        const pos = easeOut(t) * finalOffset;
+        reel.style.transform = `translateY(-${pos}px)`;
+        if (t < 1) {
+          requestAnimationFrame(step);
+        } else {
+          // Atterrato!
+          reel.style.transform = `translateY(-${finalOffset}px)`;
+          // Mostra nome completo
+          const lastItem = reel.lastChild;
+          lastItem.textContent = winnerName;
+          lastItem.style.fontSize = "18px";
+          win.classList.add("landed");
+          resolve();
+        }
+      }
+      requestAnimationFrame(step);
+    }, delay);
   });
-  gradient += ")";
-  disc.style.background = gradient;
-
-  // Con molti nomi (es. 68), il testo non sta dentro lo spicchio stretto: lo mettiamo
-  // come etichette radiali appena DENTRO il bordo della ruota (raggio ~265px su una
-  // ruota da 600px), orientate leggibili dal centro verso fuori. Niente è perfettamente
-  // leggibile mentre gira veloce — è normale, dà un'idea visiva di "tanti nomi";
-  // il nome vincitore vero si legge chiaro e per intero nel risultato finale sotto la ruota.
-  labelsLayer.innerHTML = "";
-  const radius = 265;
-  items.forEach((label, i) => {
-    const angle = slice * i + slice / 2;
-    const span = document.createElement("div");
-    span.className = "wheel-slice-label";
-    span.style.transform = `rotate(${angle}deg) translateY(-${radius}px) rotate(${angle > 90 && angle < 270 ? 180 : 0}deg)`;
-    span.textContent = abbreviaNome(label);
-    labelsLayer.appendChild(span);
-  });
 }
 
-let wheelRotation = { persone: 0 };
-
-function getNomiOspiti() {
-  return PLAYERS.map(p => p.name);
-}
-
-// Per le etichette sulla ruota (spazio limitato): "Nome Cognome" lungo diventa "Nome C."
-// Il nome completo resta sempre quello mostrato nel risultato finale sotto la ruota.
-function abbreviaNome(nomeCompleto) {
-  const parti = nomeCompleto.trim().split(" ");
-  if (parti.length === 1) return parti[0];
-  const nome = parti[0];
-  const resto = parti.slice(1).join(" ");
-  // Se il nome+cognome è già corto, lascialo intero
-  if (nomeCompleto.length <= 14) return nomeCompleto;
-  // Altrimenti: Nome + iniziale del primo cognome (gestisce anche parentesi tipo "(madre)")
-  const cognomeIniziale = resto.replace(/[()]/g, "").charAt(0).toUpperCase();
-  return `${nome} ${cognomeIniziale}.`;
-}
-
-window.spinWheel = function(tipo) {
-  const btn = document.getElementById("btn-spin-" + tipo);
-  const items = getNomiOspiti();
-  const wheelEl = document.getElementById("wheel-" + tipo);
-  const resultEl = document.getElementById("result-" + tipo);
-  btn.disabled = true;
-  resultEl.className = "wheel-result spinning";
-  resultEl.textContent = "🎲 Si gira...";
-
-  const n = items.length;
-  const slice = 360 / n;
-  const winnerIndex = Math.floor(Math.random() * n);
-
-  // L'indicatore (wheel-pointer) è fisso in alto, a 0° rispetto al centro della ruota.
-  // Lo spicchio "winnerIndex" occupa l'arco [winnerIndex*slice, (winnerIndex+1)*slice) nel
-  // gradiente conico (che parte da 0° in alto e gira in senso orario, come CSS conic-gradient).
-  // Per portare il CENTRO di quello spicchio sotto il puntatore, dobbiamo ruotare la ruota
-  // di un angolo tale che: (centro_spicchio + rotazione) mod 360 == 0
-  const centroSpicchio = winnerIndex * slice + slice / 2;
-  const angoloNecessario = (360 - centroSpicchio) % 360;
-
-  // Normalizziamo la rotazione attuale a [0,360) e aggiungiamo N giri interi + l'angolo target,
-  // così l'animazione parte sempre da una base pulita e finisce esattamente sull'angolo corretto.
-  const currentNormalized = ((wheelRotation[tipo] % 360) + 360) % 360;
-  const fullSpins = 6 * 360;
-  // Quanto manca per arrivare dall'angolo attuale all'angolo target, andando sempre avanti
-  const delta = ((angoloNecessario - currentNormalized) % 360 + 360) % 360;
-  wheelRotation[tipo] += fullSpins + delta;
-
-  wheelEl.style.transform = `rotate(${wheelRotation[tipo]}deg)`;
-
-  setTimeout(() => {
-    resultEl.className = "wheel-result landed";
-    resultEl.textContent = "🎯 " + items[winnerIndex];
-    btn.disabled = false;
-  }, 4500);
+window.resetEstrazione = function() {
+  const fmt = ruotaConfig.formato || 1;
+  buildSlotArena(fmt);
 };
 
 // ══════════════════════════════════════
@@ -1044,7 +1180,14 @@ function init() {
   });
   onValue(ref(db, "alleanzaBonusFinale"), snap => { alleanzaBonusFinale = snap.exists() ? snap.val() : {}; refreshCurrentLbContent(); });
 
-  buildWheel("wheel-persone", getNomiOspiti());
+  // Carica config ruota da Firebase (aggiornata in tempo reale quando admin salva)
+  onValue(ref(db, "ruotaConfig"), snap => {
+    if (snap.exists()) {
+      ruotaConfig = snap.val();
+      if (!ruotaConfig.presenti) ruotaConfig.presenti = {};
+    }
+    aggiornaPool();
+  });
 
   // Costruisci il reveal alla prima apertura della tab
   const origSetView = window.setView;
