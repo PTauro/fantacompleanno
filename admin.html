@@ -343,6 +343,19 @@ body {
     Sblocca podio.html per tutti gli ospiti — visibile da ogni telefono, resta accessibile per sempre come ricordo della serata. Da premere per ultimo, dopo Rivela Ruoli e Bonus Alleanze.
   </div>
 
+  <div class="section-label">Bonus Fazione Vincente</div>
+  <div style="display:flex;gap:8px;margin-bottom:6px;">
+    <button onclick="assegnaBonusFazione('cody')" style="flex:1;background:rgba(255,107,43,0.12);border:1.5px solid rgba(255,107,43,0.4);color:var(--accent-cody);padding:12px;border-radius:12px;font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">
+      🐕 +150 a Team Cody
+    </button>
+    <button onclick="assegnaBonusFazione('siria')" style="flex:1;background:rgba(168,85,247,0.12);border:1.5px solid rgba(168,85,247,0.4);color:var(--accent-siria);padding:12px;border-radius:12px;font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">
+      🐱 +150 a Team Siria
+    </button>
+  </div>
+  <div style="font-size:11px;color:var(--text-muted);margin-bottom:16px;line-height:1.5;">
+    Assegna +150 ai punti personali di tutti i membri della fazione vincente. Le spie sono gestite correttamente: una spia di Cody (che giocava per Siria) prende il bonus se vince Siria, e viceversa. Idempotente: si può premere più volte senza duplicare.
+  </div>
+
   <div class="section-label">Reset</div>
   <button onclick="resetPunti()" style="width:100%;background:rgba(239,68,68,0.1);border:1.5px solid rgba(239,68,68,0.4);color:var(--red);padding:14px 16px;border-radius:12px;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:12px;">
     🗑 Reset Totale Punti
@@ -1172,6 +1185,50 @@ window.assegnaBonusAlleanze = async function() {
   await Promise.all(writes);
 
   showToast(`✓ Bonus assegnato — 1°: ${podio[0]?.nome || '—'}`, "ok");
+};
+
+window.assegnaBonusFazione = async function(fazioneVincente) {
+  const nomeTeam = fazioneVincente === "cody" ? "Team Cody 🐕" : "Team Siria 🐱";
+
+  if (!confirm(`🏆 Assegnare +150 punti personali a tutti i membri di ${nomeTeam}?\n\nLe spie sono gestite correttamente:\n• Spia di Cody (ruoloId: spia_siria) → giocava per Siria → prende +150 se vince Siria\n• Spia di Siria (ruoloId: spia_cody) → giocava per Cody → prende +150 se vince Cody\n\nL'operazione è idempotente (premibile più volte senza duplicare).`)) return;
+
+  const snap = await get(ref(db, "fazioni"));
+  if (!snap.exists()) { showToast("Nessuna fazione trovata", "error"); return; }
+  const tutti = snap.val();
+
+  let count = 0;
+  const writes = [];
+
+  Object.entries(tutti).forEach(([key, f]) => {
+    if (!f.fazione) return;
+
+    // Determina per quale fazione ha effettivamente giocato questo ospite
+    // Le spie giocano per la fazione NEMICA rispetto alla loro fazione base:
+    // - spia_cody → il giocatore è in Siria ma i suoi punti vanno a Cody
+    // - spia_siria → il giocatore è in Cody ma i suoi punti vanno a Siria
+    const ruoloId = f.ruoloId || "";
+    let fazioneEffettiva = f.fazione; // default: stessa fazione base
+    if (ruoloId === "spia_cody") fazioneEffettiva = "cody";      // spia di Siria → gioca per Cody
+    else if (ruoloId === "spia_siria") fazioneEffettiva = "siria"; // spia di Cody → gioca per Siria
+
+    if (fazioneEffettiva !== fazioneVincente) return;
+
+    // Idempotente: usa eventId fisso per evitare duplicati
+    const eventId = `b_fazione_vincente_${fazioneVincente}`;
+    writes.push(
+      set(ref(db, `punti/${key}/${eventId}`), {
+        pts: 150,
+        desc: `Fazione vincente — ${nomeTeam}`,
+        ts: Date.now(),
+        noCap: true // non raddoppiabile anche se la persona è capitano di qualcuno
+      })
+    );
+    count++;
+  });
+
+  if (!writes.length) { showToast("Nessun membro trovato per questa fazione", "warn"); return; }
+  await Promise.all(writes);
+  showToast(`✓ +150 assegnato a ${count} membri di ${nomeTeam}`);
 };
 
 window.toggleMostraPodio = async function() {
