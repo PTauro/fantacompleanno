@@ -634,9 +634,9 @@ function renderCampionato() {
     div.className = "podio-slot " + posClass[i];
     div.innerHTML = `
       <div class="podio-bar"><span class="podio-pos">${posEmoji[i]}</span></div>
-      <div class="podio-name">${p.name.split(" ")[0]}</div>
+      <div class="podio-name">${p.teamName || '—'}</div>
       <div class="podio-pts">${p.pts > 0 ? '+' : ''}${p.pts}</div>
-      <div class="podio-team">${p.teamName || '—'}</div>
+      <div class="podio-team">${p.name.split(" ")[0]}</div>
     `;
     podio.appendChild(div);
   });
@@ -660,8 +660,8 @@ function renderCampionato() {
     div.innerHTML = `
       <div class="rank-pos ${posC}">${i + 1}</div>
       <div class="rank-info">
-        <div class="rank-name">${p.name}${isMe ? " 👤" : ""}${abBadge}</div>
-        <div class="rank-team">${p.teamName || 'Nessuna squadra'}</div>
+        <div class="rank-name">${p.teamName || 'Nessuna squadra'}${isMe ? " 👤" : ""}${abBadge}</div>
+        <div class="rank-team">${p.name}</div>
       </div>
       <div>
         <div class="rank-pts ${p.pts > 0 ? 'pos' : p.pts < 0 ? 'neg' : 'zero'}">${p.pts > 0 ? '+' : ''}${p.pts}</div>
